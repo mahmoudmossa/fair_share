@@ -34,3 +34,91 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+
+
+melos:
+  scripts:
+    # Code generation across all packages
+    generate:
+      run: dart run build_runner build --delete-conflicting-outputs
+      exec:
+        concurrency: 1
+      description: Run build_runner code generation in all packages
+
+    # Unit tests across all packages
+    test:unit:
+      run: flutter test test/unit --coverage
+      exec:
+        concurrency: 4
+        failFast: true
+      packageFilters:
+        dirExists: "test/unit"
+      description: Run all unit tests across all packages
+
+    # Widget & Golden tests in feature packages
+    test:golden:
+      run: flutter test test/widget
+      exec:
+        concurrency: 1
+      packageFilters:
+        scope: "features"
+      description: Run golden and widget tests in all feature packages
+
+    # Update golden baseline images
+    test:golden:update:
+      run: flutter test test/widget --update-goldens
+      exec:
+        concurrency: 1
+      packageFilters:
+        scope: "features"
+      description: Update golden baseline screenshots
+
+    # Lint and analyze all packages
+    analyze:
+      run: dart analyze --fatal-infos
+      exec:
+        concurrency: 4
+      description: Analyze all packages for errors and warnings
+
+    # Format all Dart files
+    format:
+      run: dart format . --line-length 80
+      exec:
+        concurrency: 4
+      description: Format all Dart code
+
+    # Check formatting without modifying
+    format:check:
+      run: dart format . --line-length 80 --set-exit-if-changed
+      exec:
+        concurrency: 4
+      description: Verify formatting without applying changes
+
+    # Clean all packages
+    clean:
+      run: flutter clean
+      exec:
+        concurrency: 4
+      description: Clean all Flutter packages
+
+    # Run the app in development flavor
+    run:dev:
+      run: flutter run --flavor development --target lib/main.dart
+      packageFilters:
+        scope: "app"
+      description: Run the app in development mode
+
+    # Build release APK for Android
+    build:android:
+      run: flutter build apk --flavor production --target lib/main.dart --release
+      packageFilters:
+        scope: "app"
+      description: Build production APK
+
+    # Build release IPA for iOS
+    build:ios:
+      run: flutter build ipa --flavor production --target lib/main.dart
+      packageFilters:
+        scope: "app"
+      description: Build production IPA
