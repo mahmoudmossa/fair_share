@@ -1,0 +1,46 @@
+{
+    "branches": [
+        "main",
+        "master"
+    ],
+    "plugins": [
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/release-notes-generator",
+        [
+            "@semantic-release/changelog",
+            {
+                "changelogFile": "CHANGELOG.md",
+                "changelogTitle": "# CHANGELOG"
+            }
+        ],
+        [
+            "semantic-release-dart"
+        ],
+        [
+            "@semantic-release/exec",
+            {
+                "prepareCmd": "cat << 'EOT' > releaseNotes.md \n${nextRelease.notes}\nEOT"
+            }
+        ],
+        [
+            "@semantic-release/exec",
+            {
+                "prepareCmd": "sed -i 's/^version: .*/version: ${nextRelease.version}/' apps/app/pubspec.yaml"
+            }
+        ],
+        [
+            "@semantic-release/git",
+            {
+                "assets": [
+                    "pubspec.yaml",
+                    "apps/app/pubspec.yaml",
+                    "CHANGELOG.md"
+                ],
+                "message": "chore(release): ${nextRelease.version} \n\n${nextRelease.notes}"
+            }
+        ],
+        "@semantic-release/gitlab"
+    ],
+    "preset": "angular",
+    "tagFormat": "${version}"
+}
