@@ -1,13 +1,13 @@
 name: Monorepo Dynamic Branch Pipeline
 
-# تشغيل الـ Pipeline عند أي عملية Push على أي فرع في المستودع
+# Trigger the Pipeline on any Push to any branch in the repository
 on:
   push:
     branches:
-      - '**' # تعني جميع الفروع بلا استثناء
+      - '**' # Means all branches without exception
 
 jobs:
-  # 1. مرحلة الفحص (تعمل على كل الفروع)
+  # 1. Validation stage (runs on all branches)
   validate:
     runs-on: ubuntu-latest
     steps:
@@ -19,7 +19,7 @@ jobs:
       - run: melos bootstrap
       - run: melos run analyze
 
-  # 2. مرحلة الاختبار (تعمل على كل الفروع بعد نجاح الفحص)
+  # 2. Testing stage (runs on all branches after validation succeeds)
   test:
     needs: validate
     runs-on: macos-latest
@@ -31,10 +31,10 @@ jobs:
       - run: dart pub global activate patrol_cli
       - run: patrol test --target integration_test/app_test.dart
 
-  # 3. مرحلة تحديد الإصدار (تعمل فقط على فرع main)
+  # 3. Release/Versioning stage (runs only on main branch)
   release:
     needs: test
-    if: github.ref == 'refs/heads/main' # شرط التشغيل على فرع main فقط
+    if: github.ref == 'refs/heads/main' # Run condition for main branch only
     runs-on: ubuntu-latest
     outputs:
       new_version: ${{ steps.semantic.outputs.new_release_version }}
@@ -47,7 +47,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
 
-  # 4. مرحلة البناء (تعتمد على النجاح وعلى شرط فرع main)
+  # 4. Build stage (depends on success and main branch condition)
   build:
     needs: release
     if: github.ref == 'refs/heads/main' && needs.release.outputs.new_version != ''
@@ -68,7 +68,7 @@ jobs:
           name: app-builds
           path: build/
 
-  # 5. التوزيع إلى الفايربيس (تعمل فقط على فرع main)
+  # 5. Firebase Distribution (runs only on main branch)
   distribute-firebase:
     needs: build
     if: github.ref == 'refs/heads/main'
@@ -79,7 +79,7 @@ jobs:
         with: { name: app-builds }
       - run: bundle exec fastlane android distribute_to_firebase
 
-  # 6. النشر اليدوي للمتاجر (تعمل فقط على فرع main وبموافقة)
+  # 6. Manual store publishing (runs only on main branch with manual approval)
   publish-stores:
     needs: build
     if: github.ref == 'refs/heads/main'
