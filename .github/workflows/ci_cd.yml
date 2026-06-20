@@ -1,0 +1,95 @@
+name: Monorepo Dynamic Branch Pipeline
+
+# تشغيل الـ Pipeline عند أي عملية Push على أي فرع في المستودع
+on:
+  push:
+    branches:
+      - '**' # تعني جميع الفروع بلا استثناء
+
+jobs:
+  # 1. مرحلة الفحص (تعمل على كل الفروع)
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: kuhnroyal/flutter-fvm-config-action@v2
+      - uses: subosito/flutter-action@v2
+        with: { flutter-version: ${{ env.FLUTTER_VERSION }} }
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - run: melos run analyze
+
+  # 2. مرحلة الاختبار (تعمل على كل الفروع بعد نجاح الفحص)
+  test:
+    needs: validate
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+      - run: melos bootstrap
+      - run: melos run test:unit
+      - run: dart pub global activate patrol_cli
+      - run: patrol test --target integration_test/app_test.dart
+
+  # 3. مرحلة تحديد الإصدار (تعمل فقط على فرع main)
+  release:
+    needs: test
+    if: github.ref == 'refs/heads/main' # شرط التشغيل على فرع main فقط
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.semantic.outputs.new_release_version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+      - name: Run Semantic Release
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+  # 4. مرحلة البناء (تعتمد على النجاح وعلى شرط فرع main)
+  build:
+    needs: release
+    if: github.ref == 'refs/heads/main' && needs.release.outputs.new_version != ''
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Android (on Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: flutter build appbundle --build-name=${{ needs.release.outputs.new_version }}
+      - name: Build iOS (on macOS)
+        if: matrix.os == 'macos-latest'
+        run: flutter build ipa --build-name=${{ needs.release.outputs.new_version }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: app-builds
+          path: build/
+
+  # 5. التوزيع إلى الفايربيس (تعمل فقط على فرع main)
+  distribute-firebase:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v3
+        with: { name: app-builds }
+      - run: bundle exec fastlane android distribute_to_firebase
+
+  # 6. النشر اليدوي للمتاجر (تعمل فقط على فرع main وبموافقة)
+  publish-stores:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment: production_manual_approval 
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v3
+        with: { name: app-builds }
+      - name: Fastlane Publish Android
+        run: bundle exec fastlane android deploy_play_store
+      - name: Fastlane Publish iOS
+        run: bundle exec fastlane ios deploy_app_store
