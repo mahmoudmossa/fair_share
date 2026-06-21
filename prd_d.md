@@ -9,7 +9,7 @@ Die App dient der transparenten und automatisierten Verwaltung von Wohngemeinsch
 
 Frontend: Flutter (mit Riverpod für State Management, um die komplexen dynamischen Formulare und Berechnungen performant zu handhaben).
 
-Backend & Auth: Firebase Authentication (Email/Password), Firebase Firestore (für strukturierte Daten wie Rechnungen, Profile, Kosten).
+Backend & Auth: Firebase Authentication (Email/Password), Firebase Firestore (Multi-Tenant-Struktur: globale `users`-Sammlung -> `wgs` (Wohngemeinschaften)-Sammlung -> `members`-Untersammlung für Rollenzuordnung, sowie Rechnungen, Profile und Kosten).
 
 Notifications: Firebase Cloud Messaging (FCM) für automatisierte und manuelle Push-Benachrichtigungen.
 
@@ -19,15 +19,15 @@ CI/CD: GitLab CI in Kombination mit Fastlane, um automatisierte Builds, Tests un
 
 3. User Roles
 
-Super Admin: System-Management, Löschen/Bearbeiten aller Nutzer.
+Super Admin: System-Management, Löschen/Bearbeiten aller Nutzer und WGs global.
 
-Admin: WG-Manager. Erstellt Kosten, prüft monatliche Drafts, publiziert Rechnungen, verwaltet User.
+Admin: WG-Manager. Generiert 6-stellige Einladungscodes, erstellt Kosten, prüft monatliche Drafts, publiziert Rechnungen, verwaltet Mitglieder/Rollen innerhalb der WG.
 
-User: WG-Bewohner. Konsumiert Rechnungen, reicht Ansprüche ein, pflegt Profilbild.
+User: WG-Bewohner. Tritt einer WG über einen Einladungscode bei, konsumiert Rechnungen, reicht Ansprüche ein, pflegt Profilbild.
 
 4. Key Epics & Features
 
-Epic 1: Authentication & User Management (Login, Profilbild, Namensänderung durch Admin, Rollenvergabe).
+Epic 1: Authentication & User Management (Registrierung über E-Mail/Passwort mit anschließendem Beitritt über 6-stelligen WG-Einladungscode, Profilbild, Namensänderung durch WG-Admin, Rollenvergabe über die `members`-Untersammlung in einer Multi-Tenant-Struktur).
 
 Epic 2: Cost Management Engine (CRUD-Operationen für Kosten, Dropdown für Zahlenden, Dynamische Formulare mit Default-Werten, One-Time vs. Recurring).
 

@@ -1,7 +1,10 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart';
 import 'package:fair_share/injection_container.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final crashReporterProvider = Provider<CrashReporter>((ref) {
+part 'crash_reporter_provider.g.dart';
+
+@riverpod
+CrashReporter crashReporter(Ref ref) {
   return getIt<CrashReporter>();
-});
+}

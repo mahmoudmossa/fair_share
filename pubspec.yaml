@@ -15,29 +15,33 @@ dependencies:
   auto_route: ^11.1.0
   dartz: ^0.10.1
   easy_localization: ^3.0.8
-  firebase_core: ^4.11.0
-  firebase_crashlytics: ^5.2.4
+  firebase_core: any
+  firebase_crashlytics: any
+  firebase_auth: any
+  cloud_firestore: any
   flutter:
     sdk: flutter
   flutter_flavor: ^3.1.4
   flutter_hooks: ^0.21.3+1
-  flutter_riverpod: ^2.6.1
+  flutter_riverpod: any
   get_it: ^7.7.0
-  hooks_riverpod: ^2.6.1
+  hooks_riverpod: any
   logger: ^2.7.0
   mason: ^0.1.2
-  riverpod_annotation: ^2.6.1
-  shared_core:
-    path: packages/shared_core
+  riverpod_annotation: any
+  shared_core: any
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   clean_architecture_with_state_management:
-  auto_route_generator: ^10.6.0
+  auto_route_generator: 10.4.0
   build_runner: ^2.4.11
+  riverpod_generator: any
+  mocktail: ^1.0.4
   melos: ^6.2.0
+
 
 flutter:
   uses-material-design: true

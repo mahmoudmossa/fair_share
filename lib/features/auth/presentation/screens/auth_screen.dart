@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../provider/auth_provider.dart';
-import '../provider/auth_state.dart';
+import 'package:shared_core/shared_core.dart';
+import '../provider/auth_notifier_provider.dart';
 
 class AuthScreen extends ConsumerWidget {
   static const String routeName = '/auth';
@@ -13,17 +13,11 @@ class AuthScreen extends ConsumerWidget {
 
     return Scaffold(
       body: Center(
-        child: Builder(
-          builder: (context) {
-            if (state is AuthInitial) {
-              return const Text('Initial State');
-            } else if (state is AuthLoading) {
-              return const Text('Loading State');
-            } else if (state is AuthLoaded) {
-              return const Text('Loaded State');
-            }
-            return const Text('Unknown State');
-          },
+        child: state.when(
+          initial: () => const Text('Initial State'),
+          loading: () => const Text('Loading State'),
+          success: (user) => const Text('Loaded State'),
+          error: (error, stackTrace) => const Text('Error State'),
         ),
       ),
     );

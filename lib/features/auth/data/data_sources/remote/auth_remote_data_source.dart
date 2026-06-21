@@ -1,20 +1,8 @@
-import 'package:dartz/dartz.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<Unit> callApi();
+  Stream<User?> get authStateChanges;
+  Future<UserCredential> signInWithEmail(String email, String password);
+  Future<UserCredential> signUpWithEmail(String email, String password);
+  Future<void> signOut();
 }
-
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  AuthRemoteDataSourceImpl();
-
-  @override
-  Future<Unit> callApi() async {
-    // send api request here
-    return Future.value(unit);
-  }
-
-}
-
-
-  

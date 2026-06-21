@@ -1,7 +1,10 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart';
 import 'package:fair_share/injection_container.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final appLoggerProvider = Provider<AppLogger>((ref) {
+part 'app_logger_provider.g.dart';
+
+@riverpod
+AppLogger appLogger(Ref ref) {
   return getIt<AppLogger>();
-});
+}

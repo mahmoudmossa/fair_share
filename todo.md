@@ -6,10 +6,14 @@
 - ❌ **CI/CD Pipeline:** Setup GitLab CI/CD and Fastlane for automated builds and deployment to iOS and Android.
 - ❌ **Localization:** Implement i18n support for English and German languages.
 
-## Epic 2: Authentication & User Roles
-- ❌ **User Authentication System:** Implement Firebase Email/Password login and registration flow for all users.
-- ❌ **Role Management Base:** Define data models and Firestore rules for Super Admin, Admin, and normal User roles. Include functionality for Super Admins to delete/edit Admins, and Admins to add/delete normal users.
-- ❌ **Profile Management:** Allow users to upload/edit a profile picture. Ensure the display name can ONLY be edited by an Admin or Super Admin.
+## Epic 2: Multi-Tenant Authentication & User Roles
+- ❌ **Global User Authentication:** Implement Firebase Email/Password registration and login to create a global account in the `users` collection.
+- ❌ **Multi-Tenant Firestore Structure:** Design and set up the Firestore collection hierarchy: global `users` collection, `wgs` (flats) collection, and a `members` subcollection under each WG. Define appropriate Firestore Rules.
+- ❌ **Invitation Code Generation (Admin):** Add a feature for Admins to generate a 6-digit invitation code for their WG, stored in Firestore with relevant metadata (expiration, status).
+- ❌ **Two-Step Registration & Code Validation:** Implement the flow where a newly registered user inputs the 6-digit invitation code to validate it and automatically join the corresponding WG as a "User" role in the `members` subcollection.
+- ❌ **Role Management Base:** Define models and rules for Super Admin, WG Admin, and normal User roles. Include functionality for Super Admins to manage WG Admins globally.
+- ❌ **Profile Management:** Allow users to upload/edit a profile picture. Ensure the display name can ONLY be edited by a WG Admin or Super Admin.
+
 
 ## Epic 3: Cost Management Engine (Admin Only)
 - ❌ **Dynamic Cost Types Form:** Create an admin view to add custom cost types (e.g., Electricity, Internet) using simple string text fields.

@@ -61,7 +61,7 @@ format_check:
 
 # Static Analysis and Linters (custom_lint & DCM presets)
 static_analysis:
-  <<: *flutter_docker_template
+  <<: *flutter_docker_generate_template
   stage: validate
   script:
     - melos run analyze
@@ -78,7 +78,7 @@ static_analysis:
 
 # Run all unit tests concurrently
 unit_tests:
-  <<: *flutter_docker_template
+  <<: *flutter_docker_generate_template
   stage: test
   script:
     - melos run test:unit
@@ -97,7 +97,7 @@ unit_tests:
 
 # Run widget & golden tests concurrently
 widget_tests:
-  <<: *flutter_docker_template
+  <<: *flutter_docker_generate_template
   stage: test
   script:
     - melos run test:golden
@@ -110,7 +110,7 @@ widget_tests:
 
 # Run Patrol E2E Integration tests
 patrol_tests:
-  <<: *flutter_docker_template
+  <<: *flutter_docker_generate_template
   stage: test
   script:
     - dart pub global activate patrol_cli

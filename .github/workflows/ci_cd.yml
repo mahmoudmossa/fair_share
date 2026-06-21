@@ -17,6 +17,7 @@ jobs:
         with: { flutter-version: ${{ env.FLUTTER_VERSION }} }
       - run: dart pub global activate melos
       - run: melos bootstrap
+      - run: melos run generate
       - run: melos run analyze
 
   # 2. Testing stage (runs on all branches after validation succeeds)
@@ -25,8 +26,12 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: kuhnroyal/flutter-fvm-config-action@v2
       - uses: subosito/flutter-action@v2
+        with: { flutter-version: ${{ env.FLUTTER_VERSION }} }
+      - run: dart pub global activate melos
       - run: melos bootstrap
+      - run: melos run generate
       - run: melos run test:unit
       - run: dart pub global activate patrol_cli
       - run: patrol test --target integration_test/app_test.dart
@@ -57,6 +62,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: kuhnroyal/flutter-fvm-config-action@v2
+      - uses: subosito/flutter-action@v2
+        with: { flutter-version: ${{ env.FLUTTER_VERSION }} }
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - run: melos run generate
       - name: Build Android (on Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: flutter build appbundle --build-name=${{ needs.release.outputs.new_version }}

@@ -9,7 +9,7 @@ The app is designed for the transparent and automated management of shared apart
 
 Frontend: Flutter (with Riverpod for state management, to efficiently handle the complex dynamic forms and calculations).
 
-Backend & Auth: Firebase Authentication (Email/Password), Firebase Firestore (for structured data like invoices, profiles, and costs).
+Backend & Auth: Firebase Authentication (Email/Password), Firebase Firestore (Multi-tenant structure: global `users` collection -> `wgs` (flats) collection -> `members` subcollection for role mapping, along with invoices, profiles, and costs).
 
 Notifications: Firebase Cloud Messaging (FCM) for automated and manual push notifications.
 
@@ -19,15 +19,15 @@ CI/CD: GitLab CI combined with Fastlane to ensure automated builds, tests, and d
 
 3. User Roles
 
-Super Admin: System management, deleting/editing all users.
+Super Admin: System management, deleting/editing all users and managing all WGs globally.
 
-Admin: WG Manager. Creates costs, reviews monthly drafts, publishes invoices, and manages users.
+Admin: WG Manager. Generates 6-digit invitation codes, creates costs, reviews monthly drafts, publishes invoices, and manages members/roles within their specific WG.
 
-User: WG Resident. Views/consumes invoices, submits claims, and maintains profile picture.
+User: WG Resident. Joins a WG via an invitation code, views/consumes invoices, submits claims, and maintains profile picture.
 
 4. Key Epics & Features
 
-Epic 1: Authentication & User Management (Login, profile picture, name change by admin, role assignment).
+Epic 1: Authentication & User Management (Firebase Auth Email/Password login, two-step registration with 6-digit WG invitation code, profile picture, name change by WG Admin, role assignment via `members` subcollection in multi-tenant Firestore structure).
 
 Epic 2: Cost Management Engine (CRUD operations for costs, payer dropdown, dynamic forms with default values, one-time vs. recurring costs).
 

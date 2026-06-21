@@ -1,0 +1,35 @@
+name: fair_share
+
+packages:
+  - packages/shared_ui
+  - packages/design_system
+  - packages/shared_core
+  - .
+
+scripts:
+  generate:
+    run: fvm dart run build_runner build --delete-conflicting-outputs
+    exec:
+      concurrency: 1
+    description: Run build_runner code generation in all packages
+
+  test:unit:
+    run: fvm flutter test test/unit --coverage
+    exec:
+      concurrency: 4
+      failFast: true
+    packageFilters:
+      dirExists: "test/unit"
+    description: Run all unit tests across all packages
+
+  analyze:
+    run: fvm dart analyze --fatal-infos
+    exec:
+      concurrency: 4
+    description: Analyze all packages for errors and warnings
+
+  format:
+    run: fvm dart format . --line-length 80
+    exec:
+      concurrency: 4
+    description: Format all Dart code

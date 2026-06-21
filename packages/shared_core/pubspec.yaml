@@ -12,13 +12,16 @@ dependencies:
   flutter:
     sdk: flutter
   logger: ^2.7.0
-  firebase_core: ^4.11.0
+  firebase_core: any
   firebase_crashlytics: ^5.2.4
+  freezed_annotation: any
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  freezed: any
+  build_runner: ^2.4.11
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
