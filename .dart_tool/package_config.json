@@ -147,9 +147,9 @@
     },
     {
       "name": "cli_util",
-      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/cli_util-0.4.2",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/cli_util-0.5.1",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.7"
     },
     {
       "name": "clock",
@@ -224,6 +224,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "dispose_scope",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/dispose_scope-2.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "easy_localization",
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/easy_localization-3.0.8",
       "packageUri": "lib/",
@@ -232,6 +238,12 @@
     {
       "name": "easy_logger",
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/easy_logger-0.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "equatable",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/equatable-2.0.8",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -314,6 +326,12 @@
       "languageVersion": "3.10"
     },
     {
+      "name": "flutter_driver",
+      "rootUri": "file:///C:/Users/mahmed/fvm/versions/3.44.2/packages/flutter_driver",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
       "name": "flutter_flavor",
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_flavor-3.1.4",
       "packageUri": "lib/",
@@ -374,6 +392,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "fuchsia_remote_debug_protocol",
+      "rootUri": "file:///C:/Users/mahmed/fvm/versions/3.44.2/packages/fuchsia_remote_debug_protocol",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
       "name": "get_it",
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/get_it-7.7.0",
       "packageUri": "lib/",
@@ -420,6 +444,12 @@
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/http_parser-4.1.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "integration_test",
+      "rootUri": "file:///C:/Users/mahmed/fvm/versions/3.44.2/packages/integration_test",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
     },
     {
       "name": "intl",
@@ -507,9 +537,9 @@
     },
     {
       "name": "melos",
-      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/melos-6.3.3",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/melos-7.8.2",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.9"
     },
     {
       "name": "meta",
@@ -576,6 +606,30 @@
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_windows-2.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "patrol",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/patrol-4.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
+      "name": "patrol_finders",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/patrol_finders-3.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
+      "name": "patrol_log",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/patrol_log-0.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
+      "name": "petitparser",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/petitparser-7.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
     },
     {
       "name": "platform",
@@ -782,6 +836,12 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "sync_http",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/sync_http-0.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "term_glyph",
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/term_glyph-1.2.2",
       "packageUri": "lib/",
@@ -848,6 +908,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "webdriver",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/webdriver-3.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
       "name": "webkit_inspection_protocol",
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/webkit_inspection_protocol-1.2.1",
       "packageUri": "lib/",
@@ -864,6 +930,12 @@
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/xdg_directories-1.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "xml",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/xml-7.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.11"
     },
     {
       "name": "xxh3",

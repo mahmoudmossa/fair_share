@@ -1,0 +1,15 @@
+{
+  "login": {
+    "title": "FairShare",
+    "subtitle": "Automatisierte WG-Kostenverteilung",
+    "email_label": "E-Mail-Adresse",
+    "password_label": "Passwort",
+    "forgot_password": "Passwort vergessen?",
+    "sign_in": "Anmelden",
+    "or": "oder",
+    "join_with_code": "Mit WG-Einladungscode beitreten",
+    "auth_success": "Erfolgreich angemeldet!",
+    "auth_failed": "Authentifizierung fehlgeschlagen: {}",
+    "validation_empty": "Bitte E-Mail und Passwort eingeben"
+  }
+}

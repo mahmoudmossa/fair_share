@@ -18,6 +18,7 @@ You are an expert Flutter developer and software architect. When writing, refact
 ## 2. Component Reusability & UI
 * **The `shared_ui` Package:** If a custom UI component (button, card, text field, dialog) is used in more than one place, it MUST be extracted and placed into the dedicated `shared_ui` package/folder. Do not duplicate UI code across different features.
 * **Widget Decomposition:** Keep `build` methods small. If a build method exceeds 60 lines, extract parts of it into separate, smaller stateless widgets. Do NOT extract UI into helper methods that return `Widget` (e.g., avoid `Widget _buildHeader() { ... }`).
+* **No Hardcoded Colors:** NEVER use hardcoded color values (e.g., `Color(0xFF...)` or `Colors.green`) directly in UI widgets. Always retrieve colors dynamically from `Theme.of(context).colorScheme` (such as `colorScheme.primary`, `colorScheme.error`) to ensure proper support for styling, branding, and dark/light modes.
 
 ## 3. File Structure & Organization
 * **Single Responsibility Files:** EVERY Provider must have its own dedicated file. Do not group multiple unrelated providers into a single `.dart` file.
@@ -37,3 +38,9 @@ You are an expert Flutter developer and software architect. When writing, refact
 * **Immutability:** All state classes and models MUST be immutable. Use the `freezed` package or standard `copyWith` methods to mutate state.
 * **Error Handling:** Never swallow exceptions. Server calls must be wrapped in `try/catch` blocks, mapping errors explicitly to the `ActionState.error` state to be handled by the UI.
 * **Null Safety:** Utilize strict null safety. Avoid using the `!` (bang) operator unless absolutely mathematically certain the value is not null. Use early returns and null-coalescing (`??`) instead.
+
+## 6. Integration Testing (Patrol & Flow Architecture)
+* **Key -> View -> Flow Pattern:** When testing UI screens and user journeys, ALWAYS structure tests using the `BaseTestScenario` chain of responsibility.
+* **Chaining Scenarios:** Screens must be tested in sequence by passing the next scenario to run in the `next` constructor argument (e.g., `SplashTestScenario($, next: AuthTestScenario($, next: HomeTestScenario($, next: null)))`).
+* **Mandatory Flow Addition:** Whenever a NEW screen or major feature is introduced, you MUST create a corresponding `BaseTestScenario` implementation for it and append it to the main application testing flow (e.g., `integration_test/app_flow_test.dart`). This prevents missing UI flows from coverage.
+* **Testing Keys:** Ensure all interactive elements have unique and descriptive `Key` annotations (e.g. `Key('signInButton')`) to facilitate robust finder matches in tests.

@@ -1,0 +1,15 @@
+{
+  "login": {
+    "title": "FairShare",
+    "subtitle": "Automated Flatmate Expense Sharing",
+    "email_label": "Email Address",
+    "password_label": "Password",
+    "forgot_password": "Forgot Password?",
+    "sign_in": "Sign In",
+    "or": "or",
+    "join_with_code": "Join with WG Invite Code",
+    "auth_success": "Successfully authenticated!",
+    "auth_failed": "Authentication Failed: {}",
+    "validation_empty": "Please enter email and password"
+  }
+}
