@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:fair_share/core/router/providers/app_router_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,7 @@ import 'package:fair_share/core/router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize easy_localization
   await EasyLocalization.ensureInitialized();
 
@@ -55,19 +56,17 @@ void main() async {
   );
 }
 
-class MainApp extends StatelessWidget {
-  MainApp({super.key});
-
-  final _appRouter = AppRouter();
-
+class MainApp extends ConsumerWidget {
+  const MainApp({super.key});
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appAutoRouter = ref.watch(appRouterProvider);
     const materialTheme = MaterialTheme(TextTheme());
     return MaterialApp.router(
       theme: materialTheme.light(),
       darkTheme: materialTheme.dark(),
       themeMode: ThemeMode.system,
-      routerConfig: _appRouter.config(),
+      routerConfig: appAutoRouter.config(),
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,

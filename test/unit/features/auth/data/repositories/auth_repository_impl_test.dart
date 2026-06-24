@@ -3,20 +3,24 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:fair_share/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
+import 'package:fair_share/features/auth/data/data_sources/remote/user_remote_data_source.dart';
 import 'package:fair_share/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:fair_share/features/auth/domain/entities/user_entity.dart';
 
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
+class MockUserRemoteDataSource extends Mock implements UserRemoteDataSource {}
 class MockUserCredential extends Mock implements firebase.UserCredential {}
 class MockUser extends Mock implements firebase.User {}
 
 void main() {
   late MockAuthRemoteDataSource mockRemoteDataSource;
+  late MockUserRemoteDataSource mockUserRemoteDataSource;
   late AuthRepositoryImpl repository;
 
   setUp(() {
     mockRemoteDataSource = MockAuthRemoteDataSource();
-    repository = AuthRepositoryImpl(mockRemoteDataSource);
+    mockUserRemoteDataSource = MockUserRemoteDataSource();
+    repository = AuthRepositoryImpl(mockRemoteDataSource, mockUserRemoteDataSource);
   });
 
   group('authStateChanges', () {
@@ -77,8 +81,9 @@ void main() {
   group('signUpWithEmailAndPassword', () {
     const email = 'test@example.com';
     const password = 'password';
+    const userEntity = UserEntity(id: '123', email: email, displayName: 'Test User');
 
-    test('should return Right(UserEntity) when sign up is successful', () async {
+    test('should return Right(UserEntity) when sign up and firestore creation is successful', () async {
       final mockFirebaseUser = MockUser();
       when(() => mockFirebaseUser.uid).thenReturn('123');
       when(() => mockFirebaseUser.email).thenReturn(email);
@@ -89,14 +94,14 @@ void main() {
 
       when(() => mockRemoteDataSource.signUpWithEmail(email, password))
           .thenAnswer((_) async => mockCredential);
+      when(() => mockUserRemoteDataSource.createUser(userEntity))
+          .thenAnswer((_) async {});
 
       final result = await repository.signUpWithEmailAndPassword(email, password);
 
-      expect(
-        result,
-        const Right(UserEntity(id: '123', email: email, displayName: 'Test User')),
-      );
+      expect(result, const Right(userEntity));
       verify(() => mockRemoteDataSource.signUpWithEmail(email, password)).called(1);
+      verify(() => mockUserRemoteDataSource.createUser(userEntity)).called(1);
     });
 
     test('should return Left(Exception) when sign up throws exception', () async {
@@ -107,6 +112,29 @@ void main() {
 
       expect(result, Left(exception));
       verify(() => mockRemoteDataSource.signUpWithEmail(email, password)).called(1);
+      verifyNever(() => mockUserRemoteDataSource.createUser(any()));
+    });
+
+    test('should return Left(Exception) when firestore user creation throws exception', () async {
+      final mockFirebaseUser = MockUser();
+      when(() => mockFirebaseUser.uid).thenReturn('123');
+      when(() => mockFirebaseUser.email).thenReturn(email);
+      when(() => mockFirebaseUser.displayName).thenReturn('Test User');
+
+      final mockCredential = MockUserCredential();
+      when(() => mockCredential.user).thenReturn(mockFirebaseUser);
+
+      final exception = Exception('Firestore failed');
+
+      when(() => mockRemoteDataSource.signUpWithEmail(email, password))
+          .thenAnswer((_) async => mockCredential);
+      when(() => mockUserRemoteDataSource.createUser(userEntity)).thenThrow(exception);
+
+      final result = await repository.signUpWithEmailAndPassword(email, password);
+
+      expect(result, Left(exception));
+      verify(() => mockRemoteDataSource.signUpWithEmail(email, password)).called(1);
+      verify(() => mockUserRemoteDataSource.createUser(userEntity)).called(1);
     });
   });
 
