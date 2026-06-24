@@ -10,16 +10,34 @@ class LoginTestScenario extends BaseTestScenario {
     await $(AppKeys.auth.emailField).waitUntilVisible();
     await $(AppKeys.auth.passwordField).waitUntilVisible();
     await $(AppKeys.auth.signInButton).waitUntilVisible();
+    await $(AppKeys.auth.toggleAuthModeButton).waitUntilVisible();
     return true;
   }
 
   @override
   Future<bool> run() async {
-    // Fill in the form and tap the Sign In button
+    // 1. Toggle to Create Account Mode
+    await $(AppKeys.auth.toggleAuthModeButton).tap();
+    await $.tester.pumpAndSettle();
+
+    // Verify Confirm Password field is visible
+    await $(AppKeys.auth.confirmPasswordField).waitUntilVisible();
+    await $(AppKeys.auth.signUpButton).waitUntilVisible();
+
+    // 2. Enter non-matching passwords to test validation ("not same check again")
     await $(AppKeys.auth.emailField).enterText('test@example.com');
     await $(AppKeys.auth.passwordField).enterText('password123');
-    await $(AppKeys.auth.signInButton).tap();
+    await $(AppKeys.auth.confirmPasswordField).enterText('different123');
+    
+    // Tap sign up and pump to see validation error SnackBar
+    await $(AppKeys.auth.signUpButton).tap();
     await $.tester.pumpAndSettle();
+
+    // 3. Enter matching passwords to complete sign up
+    await $(AppKeys.auth.confirmPasswordField).enterText('password123');
+    await $(AppKeys.auth.signUpButton).tap();
+    await $.tester.pumpAndSettle();
+
     return true;
   }
 }

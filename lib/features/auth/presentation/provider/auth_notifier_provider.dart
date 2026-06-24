@@ -3,6 +3,7 @@ import 'package:shared_core/shared_core.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/use_cases/sign_in_use_case.dart';
 import '../../domain/use_cases/sign_out_use_case.dart';
+import '../../domain/use_cases/sign_up_use_case.dart';
 
 part 'auth_notifier_provider.g.dart';
 
@@ -16,6 +17,16 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> signIn(String email, String password) async {
     state = const ActionLoading();
     final useCase = ref.read(signInUseCaseProvider);
+    final result = await useCase(email, password);
+    state = result.fold(
+      (error) => ActionError(error),
+      (user) => ActionSuccess(user),
+    );
+  }
+
+  Future<void> signUp(String email, String password) async {
+    state = const ActionLoading();
+    final useCase = ref.read(signUpUseCaseProvider);
     final result = await useCase(email, password);
     state = result.fold(
       (error) => ActionError(error),

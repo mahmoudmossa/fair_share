@@ -10,6 +10,12 @@
     "join_with_code": "Join with WG Invite Code",
     "auth_success": "Successfully authenticated!",
     "auth_failed": "Authentication Failed: {}",
-    "validation_empty": "Please enter email and password"
+    "validation_empty": "Please enter email and password",
+    "confirm_password_label": "Confirm Password",
+    "confirm_password_empty": "Please confirm your password",
+    "create_account": "Create Account",
+    "already_have_account": "Already have an account? Sign In",
+    "passwords_do_not_match": "Passwords do not match",
+    "sign_up": "Sign Up"
   }
 }

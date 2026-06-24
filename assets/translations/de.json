@@ -10,6 +10,12 @@
     "join_with_code": "Mit WG-Einladungscode beitreten",
     "auth_success": "Erfolgreich angemeldet!",
     "auth_failed": "Authentifizierung fehlgeschlagen: {}",
-    "validation_empty": "Bitte E-Mail und Passwort eingeben"
+    "validation_empty": "Bitte E-Mail und Passwort eingeben",
+    "confirm_password_label": "Passwort bestätigen",
+    "confirm_password_empty": "Bitte bestätigen Sie Ihr Passwort",
+    "create_account": "Konto erstellen",
+    "already_have_account": "Bereits ein Konto? Anmelden",
+    "passwords_do_not_match": "Passwörter stimmen nicht überein",
+    "sign_up": "Registrieren"
   }
 }

@@ -1,23 +1,31 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:patrol/patrol.dart';
 import 'package:fair_share/main.dart' as app;
 import 'package:fair_share/features/auth/data/repositories/auth_repository_impl.dart';
 import 'support/fake_auth_repository.dart';
 import 'scenarios/login_test_scenario.dart';
 
-void main() {
+void main() async {
   patrolWidgetTest(
     'Initial App Module Test Flow',
     ($) async {
+      await EasyLocalization.ensureInitialized();
       final fakeAuthRepository = FakeAuthRepository();
 
-      // Pump the main app with ProviderScope overriding real Firebase Auth repository
+      // Pump the main app wrapped with EasyLocalization and ProviderScope
       await $.pumpWidgetAndSettle(
-        ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWith((ref) => fakeAuthRepository),
-          ],
-          child: app.MainApp(),
+        EasyLocalization(
+          supportedLocales: const [Locale('en'), Locale('de')],
+          path: 'assets/translations',
+          fallbackLocale: const Locale('en'),
+          child: ProviderScope(
+            overrides: [
+              authRepositoryProvider.overrideWith((ref) => fakeAuthRepository),
+            ],
+            child: app.MainApp(),
+          ),
         ),
       );
 
