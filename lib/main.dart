@@ -9,7 +9,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'firebase_options.dart';
 import 'package:fair_share/core/theme/app_theme.dart';
 import 'injection_container.dart';
-import 'package:fair_share/core/router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

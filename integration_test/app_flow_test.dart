@@ -6,6 +6,8 @@ import 'package:fair_share/main.dart' as app;
 import 'package:fair_share/features/auth/data/repositories/auth_repository_impl.dart';
 import 'support/fake_auth_repository.dart';
 import 'scenarios/login_test_scenario.dart';
+import 'scenarios/flat_setup_test_scenario.dart';
+import 'scenarios/dashboard_test_scenario.dart';
 
 void main() async {
   patrolWidgetTest(
@@ -29,8 +31,10 @@ void main() async {
         ),
       );
 
-      // Setup the scenario flow (chain of responsibility) with only Login scenario
-      final loginScenario = LoginTestScenario($, next: null);
+      // Setup the scenario flow (chain of responsibility)
+      final dashboardScenario = DashboardTestScenario($, next: null);
+      final flatSetupScenario = FlatSetupTestScenario($, next: dashboardScenario);
+      final loginScenario = LoginTestScenario($, next: flatSetupScenario);
 
       // Execute the test flow starting from the Login Screen
       await loginScenario.startFlow();

@@ -11,8 +11,13 @@ class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 class MockUserRemoteDataSource extends Mock implements UserRemoteDataSource {}
 class MockUserCredential extends Mock implements firebase.UserCredential {}
 class MockUser extends Mock implements firebase.User {}
+class FakeUserEntity extends Fake implements UserEntity {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeUserEntity());
+  });
+
   late MockAuthRemoteDataSource mockRemoteDataSource;
   late MockUserRemoteDataSource mockUserRemoteDataSource;
   late AuthRepositoryImpl repository;

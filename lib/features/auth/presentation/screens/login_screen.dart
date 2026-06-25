@@ -6,6 +6,7 @@ import 'package:shared_core/shared_core.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fair_share/core/constants/app_keys.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
+import 'package:fair_share/core/router/app_router.dart';
 import '../provider/auth_notifier_provider.dart';
 import '../../domain/entities/user_entity.dart';
 
@@ -27,6 +28,7 @@ class LoginScreen extends HookConsumerWidget {
               backgroundColor: colorScheme.primary,
             ),
           );
+          AutoRouter.of(context).replace(const DashboardRoute());
         }
       } else if (next is ActionError<UserEntity?>) {
         ScaffoldMessenger.of(context).showSnackBar(

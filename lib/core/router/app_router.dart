@@ -1,5 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fair_share/features/auth/presentation/screens/login_screen.dart';
+import 'package:fair_share/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:fair_share/features/dashboard/presentation/screens/join_or_create_flat_screen.dart';
+import 'package:fair_share/core/router/guards/auth_guard.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'app_router.gr.dart';
@@ -13,6 +16,8 @@ class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [
-    AutoRoute(path: '/login', page: LoginRoute.page, initial: true),
+    AutoRoute(path: '/login', page: LoginRoute.page),
+    AutoRoute(path: '/dashboard', page: DashboardRoute.page, initial: true, guards: [AuthGuard(ref: ref)]),
+    AutoRoute(path: '/flat-setup', page: JoinOrCreateFlatRoute.page, guards: [AuthGuard(ref: ref)]),
   ];
 }
