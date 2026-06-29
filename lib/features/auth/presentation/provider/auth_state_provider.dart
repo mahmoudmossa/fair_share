@@ -4,7 +4,7 @@ import '../../domain/use_cases/auth_state_changes_use_case.dart';
 
 part 'auth_state_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 Stream<UserEntity?> authState(Ref ref) {
   final useCase = ref.watch(authStateChangesUseCaseProvider);
   return useCase();

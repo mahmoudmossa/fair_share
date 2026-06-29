@@ -56,6 +56,9 @@ flutter:
     - assets/translations/
 
 
+patrol: 
+  app_name: "Fair Share"
+  test_directory: integration_test
 
 melos:
   scripts:

@@ -157,6 +157,17 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .doc(userId)
         .update({FirestoreConstants.flatId: flatRef.id});
 
+    // Add creator as admin member
+    final creatorMember = MemberModel(
+      id: userId,
+      displayName: userName.isEmpty ? 'You' : userName,
+      role: 'admin',
+    );
+    await flatRef
+        .collection(FirestoreConstants.members)
+        .doc(userId)
+        .set(creatorMember.toMap());
+
     // Seed billing cycle
     final cycleRef =
         flatRef.collection(FirestoreConstants.billingCycles).doc('2024-03');

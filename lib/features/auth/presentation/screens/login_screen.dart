@@ -47,10 +47,7 @@ class LoginScreen extends HookConsumerWidget {
       body: const SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: 24.0,
-              vertical: 16.0,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
             child: _LoginContent(),
           ),
         ),
@@ -79,18 +76,14 @@ class _LoginContent extends HookConsumerWidget {
           ref.read(authProvider.notifier).signIn(email, password);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(LocaleKeys.login_validation_empty.tr()),
-            ),
+            SnackBar(content: Text(LocaleKeys.login_validation_empty.tr())),
           );
         }
       } else {
         final confirmPassword = confirmPasswordController.text;
         if (email.isEmpty || password.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(LocaleKeys.login_validation_empty.tr()),
-            ),
+            SnackBar(content: Text(LocaleKeys.login_validation_empty.tr())),
           );
           return;
         }
@@ -234,10 +227,7 @@ class _AuthForm extends HookWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: colorScheme.primary,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
             ),
           ),
         ),
@@ -266,10 +256,7 @@ class _AuthForm extends HookWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: colorScheme.primary,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
             ),
           ),
         ),
@@ -289,8 +276,8 @@ class _AuthForm extends HookWidget {
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
                 ),
-                onPressed: () =>
-                    obscureConfirmPassword.value = !obscureConfirmPassword.value,
+                onPressed: () => obscureConfirmPassword.value =
+                    !obscureConfirmPassword.value,
               ),
               labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
               floatingLabelStyle: TextStyle(color: colorScheme.primary),
@@ -300,10 +287,7 @@ class _AuthForm extends HookWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(
-                  color: colorScheme.primary,
-                  width: 2,
-                ),
+                borderSide: BorderSide(color: colorScheme.primary, width: 2),
               ),
             ),
           ),
@@ -352,7 +336,9 @@ class _ActionButtons extends StatelessWidget {
           const SizedBox(height: 12),
         ],
         ElevatedButton(
-          key: isLoginMode ? AppKeys.auth.signInButton : AppKeys.auth.signUpButton,
+          key: isLoginMode
+              ? AppKeys.auth.signInButton
+              : AppKeys.auth.signUpButton,
           onPressed: isLoading ? null : onPrimaryPressed,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -386,9 +372,7 @@ class _ActionButtons extends StatelessWidget {
         const SizedBox(height: 24),
         Row(
           children: [
-            Expanded(
-              child: Divider(color: colorScheme.outlineVariant),
-            ),
+            Expanded(child: Divider(color: colorScheme.outlineVariant)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -399,9 +383,7 @@ class _ActionButtons extends StatelessWidget {
                 ),
               ),
             ),
-            Expanded(
-              child: Divider(color: colorScheme.outlineVariant),
-            ),
+            Expanded(child: Divider(color: colorScheme.outlineVariant)),
           ],
         ),
         const SizedBox(height: 24),

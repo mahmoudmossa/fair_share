@@ -1,22 +1,23 @@
 import 'package:flutter/foundation.dart';
-import 'package:patrol_finders/patrol_finders.dart';
+import 'package:patrol/patrol.dart'; // PatrolIntegrationTester lives here
 
 abstract class BaseTestScenario {
-  /// [$] is a [PatrolTester] instance.
-  /// [next] is a [BaseTestScenario] instance.
+  /// [$] is a [PatrolIntegrationTester] instance provided by patrolTest.
+  /// [next] is the next scenario in the chain.
   const BaseTestScenario(this.$, {required this.next});
 
-  /// [next] is a [BaseTestScenario] instance.
   final BaseTestScenario? next;
-  final PatrolTester $;
 
-  /// [run] is a function that runs the test scenario.
+  /// PatrolIntegrationTester: the real-device tester from patrolTest.
+  final PatrolIntegrationTester $;
+
+  /// [run] executes the steps for this scenario's screen.
   Future<bool> run();
 
-  /// [waitAndCheckValid] is a function that waits for the test scenario to be valid.
+  /// [waitAndCheckValid] waits until this scenario's screen is visible.
   Future<bool> waitAndCheckValid();
 
-  /// [startFlow] is a function that starts the flow.
+  /// [startFlow] is the chain runner. It calls run(), then delegates to next.
   Future<void> startFlow() async {
     try {
       final isVisible = await waitAndCheckValid();
