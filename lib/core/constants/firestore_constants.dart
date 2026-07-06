@@ -21,4 +21,5 @@ class FirestoreConstants {
   static const String createdBy = 'createdBy';
   static const String createdByName = 'createdByName';
   static const String timestamp = 'timestamp';
+  static const String occupants = 'occupants';
 }

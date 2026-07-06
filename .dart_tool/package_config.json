@@ -267,7 +267,7 @@
     },
     {
       "name": "firebase_auth",
-      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_auth-6.5.3",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_auth-6.5.4",
       "packageUri": "lib/",
       "languageVersion": "3.6"
     },
@@ -495,7 +495,7 @@
     },
     {
       "name": "lean_builder",
-      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/lean_builder-0.1.5",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/lean_builder-0.1.6",
       "packageUri": "lib/",
       "languageVersion": "3.8"
     },
@@ -597,9 +597,9 @@
     },
     {
       "name": "path_provider_linux",
-      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_linux-2.2.1",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_linux-2.2.2",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.10"
     },
     {
       "name": "path_provider_platform_interface",
@@ -897,9 +897,9 @@
     },
     {
       "name": "watcher",
-      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/watcher-1.2.1",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/watcher-1.1.4",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.1"
     },
     {
       "name": "web",

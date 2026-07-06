@@ -12,7 +12,12 @@
           "package_name": "com.example.fair_share"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "246268639930-n5tlvbd9e3b95p9jemj2gl4abkinssou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDcqEchOZqdJbSLYrvGV83Wva8kbKlMhLA"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "246268639930-n5tlvbd9e3b95p9jemj2gl4abkinssou.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "246268639930-624bajq46vjcq87tkcu14d1rdel120j2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fairShare"
+              }
+            }
+          ]
         }
       }
     }

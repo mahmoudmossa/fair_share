@@ -32,6 +32,7 @@ dependencies:
   shared_core: any
   equatable: ^2.0.6
   json_annotation: ^4.9.0
+  freezed_annotation: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +49,7 @@ dev_dependencies:
   patrol_finders: ^3.5.0
   integration_test:
     sdk: flutter
+  freezed: ^3.2.5
 
 
 flutter:

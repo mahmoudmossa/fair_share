@@ -357,10 +357,10 @@ packages:
     dependency: "direct main"
     description:
       name: firebase_auth
-      sha256: "6b0f6a6d2b092c002dd15006b440f032f129449f87c338e918a35bc5a6565ec2"
+      sha256: "7996a49c4b4054573eac9124c1c412095ae1406ca367bd2373de1ad2eaba04b8"
       url: "https://pub.dev"
     source: hosted
-    version: "6.5.3"
+    version: "6.5.4"
   firebase_auth_platform_interface:
     dependency: transitive
     description:
@@ -483,7 +483,7 @@ packages:
     source: sdk
     version: "0.0.0"
   freezed:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: freezed
       sha256: f23ea33b3863f119b58ed1b586e881a46bd28715ddcc4dbc33104524e3434131
@@ -491,7 +491,7 @@ packages:
     source: hosted
     version: "3.2.5"
   freezed_annotation:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: freezed_annotation
       sha256: "7294967ff0a6d98638e7acb774aac3af2550777accd8149c90af5b014e6d44d8"
@@ -640,10 +640,10 @@ packages:
     dependency: transitive
     description:
       name: lean_builder
-      sha256: "4f3d70c34c52cc5034e8cc6f53d35aa3a32fb373b78fb4c29cf45cd1dcf06942"
+      sha256: "6af3cfbf34400eb14b89fe20111e5981e7083362f00ea10b9ed2a6e833250d76"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.5"
+    version: "0.1.6"
   lints:
     dependency: transitive
     description:
@@ -776,10 +776,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider_linux
-      sha256: f7a1fe3a634fe7734c8d3f2766ad746ae2a2884abe22e241a8b301bf5cac3279
+      sha256: "58c2005f147315b11e9b4a7bc889cd5203e250cba8e3f012dae259b4972b5c16"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.1"
+    version: "2.2.2"
   path_provider_platform_interface:
     dependency: transitive
     description:
@@ -1173,10 +1173,10 @@ packages:
     dependency: transitive
     description:
       name: watcher
-      sha256: "1398c9f081a753f9226febe8900fce8f7d0a67163334e1c94a2438339d79d635"
+      sha256: "592ab6e2892f67760543fb712ff0177f4ec76c031f02f5b4ff8d3fc5eb9fb61a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.1"
+    version: "1.1.4"
   web:
     dependency: transitive
     description:

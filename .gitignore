@@ -1,6 +1,11 @@
 # FVM Version Cache
 .fvm/
 
+.env.dev
+.env.cons
+.env.prod
+
+
 # Generated files
 *.g.dart
 *.freezed.dart
@@ -9,4 +14,4 @@
 .dart_tool/
 build/
 .flutter-plugins/
-.flutter-plugins-dependencies
+.flutter-plugins-dependencies

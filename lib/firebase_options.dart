@@ -56,22 +56,22 @@ class DefaultFirebaseOptions {
     projectId: 'fairshare-ffea8',
     storageBucket: 'fairshare-ffea8.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAUMH1XIociFYjBTbMu2ITANKNdeGtGwms',
     appId: '1:246268639930:ios:7d3f47b00cdd1132abe083',
     messagingSenderId: '246268639930',
     projectId: 'fairshare-ffea8',
     storageBucket: 'fairshare-ffea8.firebasestorage.app',
+    iosClientId: '246268639930-624bajq46vjcq87tkcu14d1rdel120j2.apps.googleusercontent.com',
     iosBundleId: 'com.example.fairShare',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAUMH1XIociFYjBTbMu2ITANKNdeGtGwms',
     appId: '1:246268639930:ios:7d3f47b00cdd1132abe083',
     messagingSenderId: '246268639930',
     projectId: 'fairshare-ffea8',
     storageBucket: 'fairshare-ffea8.firebasestorage.app',
+    iosClientId: '246268639930-624bajq46vjcq87tkcu14d1rdel120j2.apps.googleusercontent.com',
     iosBundleId: 'com.example.fairShare',
   );
 

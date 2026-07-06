@@ -155,7 +155,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     await _firestore
         .collection(FirestoreConstants.users)
         .doc(userId)
-        .update({FirestoreConstants.flatId: flatRef.id});
+        .set({FirestoreConstants.flatId: flatRef.id}, SetOptions(merge: true));
 
     // Add creator as admin member
     final creatorMember = MemberModel(
@@ -283,7 +283,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     await _firestore
         .collection(FirestoreConstants.users)
         .doc(userId)
-        .update({FirestoreConstants.flatId: flatId});
+        .set({FirestoreConstants.flatId: flatId}, SetOptions(merge: true));
 
     // Add as member using MemberModel
     final member = MemberModel(
