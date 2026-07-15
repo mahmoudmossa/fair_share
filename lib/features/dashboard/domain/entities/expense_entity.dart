@@ -1,4 +1,7 @@
-class ExpenseEntity {
+import 'package:equatable/equatable.dart';
+import 'recurrence_type.dart';
+
+class ExpenseEntity extends Equatable {
   final String id;
   final String title;
   final double amount;
@@ -8,6 +11,8 @@ class ExpenseEntity {
   final DateTime date;
   final bool isDisputed;
   final String? disputeReason;
+  final RecurrenceType recurrence;
+  final List<int>? specificMonths;
 
   const ExpenseEntity({
     required this.id,
@@ -19,32 +24,22 @@ class ExpenseEntity {
     required this.date,
     required this.isDisputed,
     this.disputeReason,
+    this.recurrence = RecurrenceType.oneTime,
+    this.specificMonths,
   });
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ExpenseEntity &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          title == other.title &&
-          amount == other.amount &&
-          payerId == other.payerId &&
-          payerName == other.payerName &&
-          category == other.category &&
-          date == other.date &&
-          isDisputed == other.isDisputed &&
-          disputeReason == other.disputeReason;
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      title.hashCode ^
-      amount.hashCode ^
-      payerId.hashCode ^
-      payerName.hashCode ^
-      category.hashCode ^
-      date.hashCode ^
-      isDisputed.hashCode ^
-      disputeReason.hashCode;
+  List<Object?> get props => [
+    id,
+    title,
+    amount,
+    payerId,
+    payerName,
+    category,
+    date,
+    isDisputed,
+    disputeReason,
+    recurrence,
+    specificMonths,
+  ];
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/expense_entity.dart';
+import '../../domain/entities/recurrence_type.dart';
 
 class ExpenseModel extends ExpenseEntity {
   const ExpenseModel({
@@ -12,6 +13,8 @@ class ExpenseModel extends ExpenseEntity {
     required super.date,
     required super.isDisputed,
     super.disputeReason,
+    super.recurrence,
+    super.specificMonths,
   });
 
   factory ExpenseModel.fromMap(Map<String, dynamic> map, String id) {
@@ -35,6 +38,8 @@ class ExpenseModel extends ExpenseEntity {
       date: parsedDate,
       isDisputed: map['isDisputed'] as bool? ?? false,
       disputeReason: map['disputeReason'] as String?,
+      recurrence: RecurrenceType.fromString(map['recurrence'] as String?),
+      specificMonths: (map['specificMonths'] as List<dynamic>?)?.map((e) => e as int).toList(),
     );
   }
 
@@ -48,6 +53,8 @@ class ExpenseModel extends ExpenseEntity {
       'date': Timestamp.fromDate(date),
       'isDisputed': isDisputed,
       'disputeReason': disputeReason,
+      'recurrence': recurrence.toJson(),
+      'specificMonths': specificMonths,
     };
   }
 }
