@@ -30,18 +30,18 @@ class FlatRemoteDataSourceImpl implements FlatRemoteDataSource {
   }
 
   @override
-  Future<List<FlatEntity>> getAllFlats() {
+  Future<List<FlatDto>> getAllFlats() {
     throw UnimplementedError();
   }
 
   @override
-  Future<FlatEntity> getFlat(String flatId) {
+  Future<FlatDto> getFlat(String flatId) {
     // TODO: implement getFlat
     throw UnimplementedError();
   }
 
   @override
-  Future<void> updateFlat(FlatEntity flatEntity) {
+  Future<void> updateFlat(FlatDto flatEntity) {
     // TODO: implement updateFlat
     throw UnimplementedError();
   }

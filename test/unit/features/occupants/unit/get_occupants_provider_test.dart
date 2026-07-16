@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:dartz/dartz.dart';
+import 'package:fair_share/core/errors/server_failure_type.dart';
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:fair_share/features/occupants/domain/repositories/occupants_repository.dart';
 import 'package:fair_share/features/occupants/domain/usecases/get_occupants_usecase.dart';
@@ -59,7 +60,7 @@ void main() {
     });
 
     test('failure get occupants', () async {
-      final tFailure = failure.ServerFailure('Database Connection Error');
+      final tFailure = failure.ServerFailure(ServerFailureType.unknown);
       // Arrange
       when((() => repo.getOccupants(tFlatId))).thenAnswer((_) async {
         return Left(tFailure);

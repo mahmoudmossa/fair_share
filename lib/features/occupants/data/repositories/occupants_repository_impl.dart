@@ -2,6 +2,7 @@
 import 'package:dartz/dartz.dart';
 
 import 'package:fair_share/core/errors/failures.dart';
+import 'package:fair_share/core/errors/server_failure_type.dart';
 import 'package:fair_share/features/occupants/data/models/occupants_response.dart';
 import 'package:fair_share/features/occupants/data/sources/ouccpants_data_source.dart';
 
@@ -27,7 +28,7 @@ class OccupantsRepositoryImpl implements OccupantsRepository {
       final result = occupants.map((occupant) => occupant.toEntity()).toList();
       return right(result);
     } catch (e) {
-      return left(ServerFailure(e.toString()));
+      return left(ServerFailure(ServerFailureType.unknown));
     }
   }
 

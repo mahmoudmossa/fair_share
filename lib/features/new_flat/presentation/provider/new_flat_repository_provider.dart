@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fair_share/core/providers/firebase_error_mapper_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/core/providers/app_error_handler_provider.dart';
 import 'package:fair_share/features/new_flat/domain/repositories/flat_repository.dart';
@@ -12,6 +12,6 @@ FlatRepository newFlatRepository(Ref ref) {
   return FlatRepositoryImpl(
     remoteDataSource: ref.watch(flatRemoteDataSourceProvider),
     errorHandler: ref.watch(appErrorHandlerProvider),
-    firebaseErrorMapper: null,
+    firebaseErrorMapper: ref.watch(firebaseErrorMapperProvider),
   );
 }

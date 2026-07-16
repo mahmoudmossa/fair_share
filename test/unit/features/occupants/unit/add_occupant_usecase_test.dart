@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:fair_share/core/errors/failures.dart';
+import 'package:fair_share/core/errors/server_failure_type.dart';
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:fair_share/features/occupants/domain/repositories/occupants_repository.dart';
 import 'package:fair_share/features/occupants/domain/usecases/add_occupants_usecase.dart';
@@ -33,7 +34,7 @@ void main() {
     });
 
     test('failure Failure added occupant', () async {
-      final tFailure = ServerFailure('failed to add occupant');
+      final tFailure = ServerFailure(ServerFailureType.unknown);
       when(
         () => mockRepo.addOccupant(flatId, occu),
       ).thenAnswer((_) async => Left(tFailure));

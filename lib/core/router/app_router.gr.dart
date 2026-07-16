@@ -57,3 +57,19 @@ class LoginRoute extends PageRouteInfo<void> {
     },
   );
 }
+
+/// generated route for
+/// [NewFlatScreen]
+class NewFlatRoute extends PageRouteInfo<void> {
+  const NewFlatRoute({List<PageRouteInfo>? children})
+    : super(NewFlatRoute.name, initialChildren: children);
+
+  static const String name = 'NewFlatRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const NewFlatScreen();
+    },
+  );
+}
