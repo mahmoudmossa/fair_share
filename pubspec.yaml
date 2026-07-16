@@ -23,7 +23,7 @@ dependencies:
     sdk: flutter
   flutter_flavor: ^3.1.4
   flutter_hooks: ^0.21.3+1
-  flutter_riverpod: any
+  flutter_riverpod: ^3.3.1
   get_it: ^7.7.0
   hooks_riverpod: any
   logger: ^2.7.0

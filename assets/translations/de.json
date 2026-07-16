@@ -60,5 +60,11 @@
     "create_failed": "Gründung fehlgeschlagen",
     "join_failed": "Beitritt fehlgeschlagen",
     "logout": "Abmelden"
+  },
+  "errors": {
+    "permission_denied": "Keine Berechtigung",
+    "unauthenticated": "Nicht authentifiziert",
+    "unavailable": "Nicht verfügbar",
+    "unknown": "Unbekannter Fehler"
   }
 }

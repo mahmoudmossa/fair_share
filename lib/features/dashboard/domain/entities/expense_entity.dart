@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'recurrence_type.dart';
+import '../../../new_flat/domain/entities/recurrence_type.dart';
 
 class ExpenseEntity extends Equatable {
   final String id;

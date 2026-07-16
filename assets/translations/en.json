@@ -60,5 +60,11 @@
     "create_failed": "Failed to create flat",
     "join_failed": "Failed to join flat",
     "logout": "Log Out"
+  },
+  "errors": {
+    "permission_denied": "Permission denied",
+    "unauthenticated": "Unauthenticated",
+    "unavailable": "Unavailable",
+    "unknown": "Unknown"
   }
 }
