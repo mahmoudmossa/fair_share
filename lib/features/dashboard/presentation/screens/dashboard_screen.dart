@@ -27,23 +27,36 @@ class DashboardScreen extends HookConsumerWidget {
     final userAsync = ref.watch(firestoreUserProvider);
 
     return userAsync.when(
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (err, stack) => Scaffold(
-        body: Center(
-          child: Text('Error loading user profile: $err'),
-        ),
+        body: Center(child: Text('Error loading user profile: $err')),
       ),
       data: (user) {
+        Future.microtask(
+          () => ref.read(appRouterProvider).replace(const NewFlatRoute()),
+        );
+
         if (user == null) {
           // Fallback if auth state is lost
-          Future.microtask(() => ref.read(appRouterProvider).replace(LoginRoute()));
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          Future.microtask(
+            () => ref.read(appRouterProvider).replace(LoginRoute()),
+          );
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
 
         if (user.flatId == null || user.flatId!.isEmpty) {
           // If the user has no flat, redirect to the Setup/Join/Create flow
-          Future.microtask(() => ref.read(appRouterProvider).replace(const JoinOrCreateFlatRoute()));
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          Future.microtask(
+            () => ref
+                .read(appRouterProvider)
+                .replace(const JoinOrCreateFlatRoute()),
+          );
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
 
         final stateAsync = ref.watch(dashboardStateProvider);
@@ -84,12 +97,17 @@ class DashboardScreen extends HookConsumerWidget {
                   actions: [
                     IconButton(
                       onPressed: () {},
-                      icon: Icon(Icons.notifications_none_outlined, color: colorScheme.primary),
+                      icon: Icon(
+                        Icons.notifications_none_outlined,
+                        color: colorScheme.primary,
+                      ),
                     ),
                     IconButton(
                       onPressed: () {
                         ref.read(authProvider.notifier).signOut().then((_) {
-                          ref.read(appRouterProvider).replaceAll([LoginRoute()]);
+                          ref.read(appRouterProvider).replaceAll([
+                            LoginRoute(),
+                          ]);
                         });
                       },
                       icon: Icon(Icons.logout, color: colorScheme.outline),
@@ -101,7 +119,12 @@ class DashboardScreen extends HookConsumerWidget {
           body: SafeArea(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: _buildBodyForTab(context, currentTab.value, stateAsync, user.id),
+              child: _buildBodyForTab(
+                context,
+                currentTab.value,
+                stateAsync,
+                user.id,
+              ),
             ),
           ),
           floatingActionButton: currentTab.value == 0
@@ -116,7 +139,8 @@ class DashboardScreen extends HookConsumerWidget {
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (context) => AddExpenseDialog(flatId: state.flat.id),
+                          builder: (context) =>
+                              AddExpenseDialog(flatId: state.flat.id),
                         );
                       },
                       child: const Icon(Icons.add, size: 28),
@@ -156,7 +180,12 @@ class DashboardScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildBodyForTab(BuildContext context, int tabIndex, AsyncValue<DashboardState?> stateAsync, String currentUserId) {
+  Widget _buildBodyForTab(
+    BuildContext context,
+    int tabIndex,
+    AsyncValue<DashboardState?> stateAsync,
+    String currentUserId,
+  ) {
     if (tabIndex != 0) {
       return Center(
         key: ValueKey('tab_$tabIndex'),
@@ -169,8 +198,8 @@ class DashboardScreen extends HookConsumerWidget {
                 tabIndex == 1
                     ? Icons.receipt_long
                     : tabIndex == 2
-                        ? Icons.group
-                        : Icons.settings,
+                    ? Icons.group
+                    : Icons.settings,
                 size: 64,
                 color: Colors.grey,
               ),
@@ -179,8 +208,8 @@ class DashboardScreen extends HookConsumerWidget {
                 tabIndex == 1
                     ? 'History Screen coming soon!'
                     : tabIndex == 2
-                        ? 'Admin Screen coming soon!'
-                        : 'Profile Settings coming soon!',
+                    ? 'Admin Screen coming soon!'
+                    : 'Profile Settings coming soon!',
                 style: const TextStyle(fontSize: 18, color: Colors.grey),
               ),
             ],
@@ -191,7 +220,8 @@ class DashboardScreen extends HookConsumerWidget {
 
     return stateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('Error loading dashboard: $err')),
+      error: (err, stack) =>
+          Center(child: Text('Error loading dashboard: $err')),
       data: (nullableState) {
         if (nullableState == null) {
           return const Center(child: CircularProgressIndicator());
@@ -220,13 +250,18 @@ class DashboardScreen extends HookConsumerWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: colorScheme.colorScheme.surfaceContainerHigh,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        LocaleKeys.dashboard_created_by.tr(args: [state.flat.createdByName]),
+                        LocaleKeys.dashboard_created_by.tr(
+                          args: [state.flat.createdByName],
+                        ),
                         style: textTheme.labelMedium?.copyWith(
                           color: colorScheme.colorScheme.onSurfaceVariant,
                         ),
@@ -234,7 +269,10 @@ class DashboardScreen extends HookConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: colorScheme.colorScheme.secondaryContainer,
                         borderRadius: BorderRadius.circular(8),
@@ -255,10 +293,7 @@ class DashboardScreen extends HookConsumerWidget {
               ],
 
               // Debt Matrix
-              DebtMatrixWidget(
-                flatId: state.flat.id,
-                debts: state.debts,
-              ),
+              DebtMatrixWidget(flatId: state.flat.id, debts: state.debts),
 
               // Itemized Expenses
               ItemizedExpensesWidget(
@@ -267,9 +302,7 @@ class DashboardScreen extends HookConsumerWidget {
               ),
 
               // Recent Activity Feed
-              ActivityFeedWidget(
-                activities: state.activities,
-              ),
+              ActivityFeedWidget(activities: state.activities),
             ],
           ),
         );
