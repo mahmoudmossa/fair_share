@@ -4,15 +4,23 @@ import 'package:fair_share/core/constants/app_keys.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
 
 class AddMemberField extends StatelessWidget {
-  const AddMemberField({super.key, required this.controller, required this.onAdd});
+  const AddMemberField({
+    super.key,
+    required this.controller,
+    required this.onAdd,
+    this.hintText,
+  });
 
   final TextEditingController controller;
   final VoidCallback onAdd;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    final effectiveHint = hintText ?? LocaleKeys.new_flat_setup_flatmate_name_hint.tr();
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -25,7 +33,8 @@ class AddMemberField extends StatelessWidget {
             textInputAction: TextInputAction.done,
             onSubmitted: (_) => onAdd(),
             decoration: InputDecoration(
-              hintText: LocaleKeys.new_flat_setup_flatmate_name_hint.tr(),
+              hintText: effectiveHint,
+              labelText: effectiveHint,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 16,

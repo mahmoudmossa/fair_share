@@ -8,6 +8,7 @@ import 'add_members/add_another_hint.dart';
 import 'add_members/add_member_field.dart';
 import 'add_members/admin_card.dart';
 import 'add_members/member_card.dart';
+import 'add_members/no_members_attention.dart';
 
 class AddMembersStepWidget extends HookConsumerWidget {
   const AddMembersStepWidget({super.key});
@@ -19,12 +20,22 @@ class AddMembersStepWidget extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    void addMember() {
+    final isUserAdded = flatSetup.createdByName.trim().isNotEmpty;
+
+    void onAddSubmitted() {
       final name = nameController.text.trim();
       if (name.isEmpty) return;
 
+      if (!isUserAdded) {
+        // First entry sets the user/creator username
+        ref.read(flatSetupProvider.notifier).updateCreatorName(name);
+        nameController.clear();
+        return;
+      }
+
       // Check if duplicate name
-      if (flatSetup.members.any((m) => m.name.toLowerCase() == name.toLowerCase())) {
+      if (flatSetup.createdByName.toLowerCase() == name.toLowerCase() ||
+          flatSetup.members.any((m) => m.name.toLowerCase() == name.toLowerCase())) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Member name already exists')),
         );
@@ -61,7 +72,10 @@ class AddMembersStepWidget extends HookConsumerWidget {
           const SizedBox(height: 24),
           AddMemberField(
             controller: nameController,
-            onAdd: addMember,
+            onAdd: onAddSubmitted,
+            hintText: isUserAdded
+                ? LocaleKeys.new_flat_setup_flatmate_name_hint.tr()
+                : 'Your Name',
           ),
           const SizedBox(height: 24),
           Text(
@@ -71,20 +85,24 @@ class AddMembersStepWidget extends HookConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          const AdminCard(),
-          const SizedBox(height: 8),
-          ...flatSetup.members.map(
-            (member) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: MemberCard(
-                name: member.name,
-                onRemove: () => removeMember(member.name),
+          if (!isUserAdded) ...[
+            const NoMembersAttention(),
+          ] else ...[
+            AdminCard(name: flatSetup.createdByName),
+            const SizedBox(height: 8),
+            ...flatSetup.members.map(
+              (member) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: MemberCard(
+                  name: member.name,
+                  onRemove: () => removeMember(member.name),
+                ),
               ),
             ),
-          ),
-          if (flatSetup.members.isEmpty) ...[
-            const SizedBox(height: 8),
-            const AddAnotherHint(),
+            if (flatSetup.members.isEmpty) ...[
+              const SizedBox(height: 8),
+              const AddAnotherHint(),
+            ],
           ],
           const SizedBox(height: 24),
           Center(

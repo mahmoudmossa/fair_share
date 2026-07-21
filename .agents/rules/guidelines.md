@@ -19,6 +19,8 @@ You are an expert Flutter developer and software architect. When writing, refact
 * **The `shared_ui` Package:** If a custom UI component (button, card, text field, dialog) is used in more than one place, it MUST be extracted and placed into the dedicated `shared_ui` package/folder. Do not duplicate UI code across different features.
 * **Widget Decomposition:** Keep `build` methods small. If a build method exceeds 60 lines, extract parts of it into separate, smaller stateless widgets. Do NOT extract UI into helper methods that return `Widget` (e.g., avoid `Widget _buildHeader() { ... }`).
 * **No Hardcoded Colors:** NEVER use hardcoded color values (e.g., `Color(0xFF...)` or `Colors.green`) directly in UI widgets. Always retrieve colors dynamically from `Theme.of(context).colorScheme` (such as `colorScheme.primary`, `colorScheme.error`) to ensure proper support for styling, branding, and dark/light modes.
+* **No Hardcoded Strings:** NEVER use hardcoded user-facing strings directly in UI widgets. Always use localization (e.g. `AppLocalizations.of(context)` or equivalent context extension) after adding the appropriate translation keys.
+
 
 ## 3. File Structure & Organization
 * **Single Responsibility Files:** EVERY Provider must have its own dedicated file. Do not group multiple unrelated providers into a single `.dart` file.

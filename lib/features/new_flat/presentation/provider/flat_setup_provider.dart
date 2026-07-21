@@ -17,12 +17,16 @@ class FlatSetup extends _$FlatSetup {
     return FlatEntity.empty().copyWith(
       id: const Uuid().v4(), // Autogenerate unique Flat ID at startup
       createdBy: user?.id ?? '',
-      createdByName: user?.displayName ?? user?.email ?? '',
+      createdByName: '', // Starts empty so the user enters their name first in Step 2
     );
   }
 
   void updateFlatName(String name) {
     state = state.copyWith(name: name);
+  }
+
+  void updateCreatorName(String name) {
+    state = state.copyWith(createdByName: name);
   }
 
   void addMember(String name) {
