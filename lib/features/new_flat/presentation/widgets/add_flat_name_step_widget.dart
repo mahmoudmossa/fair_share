@@ -1,15 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:fair_share/core/constants/app_keys.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
+import '../provider/flat_setup_provider.dart';
 
-class AddFlatNameStepWidget extends HookWidget {
+class AddFlatNameStepWidget extends HookConsumerWidget {
   const AddFlatNameStepWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = useTextEditingController();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final flatName = ref.read(flatSetupProvider).name;
+    final controller = useTextEditingController(text: flatName);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -42,6 +45,7 @@ class AddFlatNameStepWidget extends HookWidget {
             controller: controller,
             style: textTheme.titleMedium,
             textInputAction: TextInputAction.done,
+            onChanged: (val) => ref.read(flatSetupProvider.notifier).updateFlatName(val),
             decoration: InputDecoration(
               labelText: LocaleKeys.new_flat_setup_flat_name_label.tr(),
               border: OutlineInputBorder(

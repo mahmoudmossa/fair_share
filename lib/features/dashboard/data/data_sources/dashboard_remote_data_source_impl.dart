@@ -11,6 +11,7 @@ import '../models/expense_model.dart';
 import '../models/debt_model.dart';
 import '../models/activity_model.dart';
 import '../models/member_model.dart';
+import 'package:fair_share/features/new_flat/domain/entities/user_role.dart';
 import 'dashboard_remote_data_source.dart';
 
 part 'dashboard_remote_data_source_impl.g.dart';
@@ -32,13 +33,15 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
     void emitLatest() {
       if (latestFlat != null && !controller.isClosed) {
-        controller.add(DashboardState(
-          flat: latestFlat!,
-          activeCycle: latestCycle,
-          expenses: latestExpenses,
-          debts: latestDebts,
-          activities: latestActivities,
-        ));
+        controller.add(
+          DashboardState(
+            flat: latestFlat!,
+            activeCycle: latestCycle,
+            expenses: latestExpenses.map((e) => e.toEntity()).toList(),
+            debts: latestDebts,
+            activities: latestActivities,
+          ),
+        );
       }
     }
 
@@ -47,19 +50,19 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .doc(flatId)
         .snapshots()
         .listen(
-      (snap) {
-        if (snap.exists && snap.data() != null) {
-          latestFlat = FlatModel.fromMap(snap.data()!, snap.id);
-          emitLatest();
-        } else {
-          latestFlat = null;
-          if (!controller.isClosed) controller.add(null);
-        }
-      },
-      onError: (err) {
-        if (!controller.isClosed) controller.addError(err);
-      },
-    );
+          (snap) {
+            if (snap.exists && snap.data() != null) {
+              latestFlat = FlatModel.fromMap(snap.data()!, snap.id);
+              emitLatest();
+            } else {
+              latestFlat = null;
+              if (!controller.isClosed) controller.add(null);
+            }
+          },
+          onError: (err) {
+            if (!controller.isClosed) controller.addError(err);
+          },
+        );
 
     final cycleSub = _firestore
         .collection(FirestoreConstants.wgs)
@@ -67,47 +70,40 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .collection(FirestoreConstants.billingCycles)
         .doc('2024-03')
         .snapshots()
-        .listen(
-      (snap) {
-        if (snap.exists && snap.data() != null) {
-          latestCycle = BillingCycleModel.fromMap(snap.data()!, snap.id);
-        } else {
-          latestCycle = null;
-        }
-        emitLatest();
-      },
-      onError: (err) {},
-    );
+        .listen((snap) {
+          if (snap.exists && snap.data() != null) {
+            latestCycle = BillingCycleModel.fromMap(snap.data()!, snap.id);
+          } else {
+            latestCycle = null;
+          }
+          emitLatest();
+        }, onError: (err) {});
 
     final expensesSub = _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
         .collection(FirestoreConstants.expenses)
         .snapshots()
-        .listen(
-      (snap) {
-        latestExpenses =
-            snap.docs.map((d) => ExpenseModel.fromMap(d.data(), d.id)).toList();
-        // Sort expenses by date descending
-        latestExpenses.sort((a, b) => b.date.compareTo(a.date));
-        emitLatest();
-      },
-      onError: (err) {},
-    );
+        .listen((snap) {
+          latestExpenses = snap.docs
+              .map((d) => ExpenseModel.fromMap(d.data(), d.id))
+              .toList();
+          // Sort expenses by date descending
+          latestExpenses.sort((a, b) => b.date.compareTo(a.date));
+          emitLatest();
+        }, onError: (err) {});
 
     final debtsSub = _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
         .collection(FirestoreConstants.debts)
         .snapshots()
-        .listen(
-      (snap) {
-        latestDebts =
-            snap.docs.map((d) => DebtModel.fromMap(d.data(), d.id)).toList();
-        emitLatest();
-      },
-      onError: (err) {},
-    );
+        .listen((snap) {
+          latestDebts = snap.docs
+              .map((d) => DebtModel.fromMap(d.data(), d.id))
+              .toList();
+          emitLatest();
+        }, onError: (err) {});
 
     final activitiesSub = _firestore
         .collection(FirestoreConstants.wgs)
@@ -115,15 +111,12 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .collection(FirestoreConstants.activities)
         .orderBy(FirestoreConstants.timestamp, descending: true)
         .snapshots()
-        .listen(
-      (snap) {
-        latestActivities = snap.docs
-            .map((d) => ActivityModel.fromMap(d.data(), d.id))
-            .toList();
-        emitLatest();
-      },
-      onError: (err) {},
-    );
+        .listen((snap) {
+          latestActivities = snap.docs
+              .map((d) => ActivityModel.fromMap(d.data(), d.id))
+              .toList();
+          emitLatest();
+        }, onError: (err) {});
 
     controller.onCancel = () {
       flatSub.cancel();
@@ -152,16 +145,15 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     await flatRef.set(flat.toMap());
 
     // Update User Flat ID
-    await _firestore
-        .collection(FirestoreConstants.users)
-        .doc(userId)
-        .set({FirestoreConstants.flatId: flatRef.id}, SetOptions(merge: true));
+    await _firestore.collection(FirestoreConstants.users).doc(userId).set({
+      FirestoreConstants.flatId: flatRef.id,
+    }, SetOptions(merge: true));
 
     // Add creator as admin member
     final creatorMember = MemberModel(
       id: userId,
       displayName: userName.isEmpty ? 'You' : userName,
-      role: 'admin',
+      role: UserRole.admin,
     );
     await flatRef
         .collection(FirestoreConstants.members)
@@ -169,8 +161,9 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .set(creatorMember.toMap());
 
     // Seed billing cycle
-    final cycleRef =
-        flatRef.collection(FirestoreConstants.billingCycles).doc('2024-03');
+    final cycleRef = flatRef
+        .collection(FirestoreConstants.billingCycles)
+        .doc('2024-03');
     final cycle = BillingCycleModel(
       id: '2024-03',
       monthName: 'March 2024',
@@ -182,91 +175,108 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
     // Seed Expenses
     final exp1 = flatRef.collection(FirestoreConstants.expenses).doc();
-    await exp1.set(ExpenseModel(
-      id: exp1.id,
-      title: 'Electricity',
-      amount: 300.0,
-      payerId: 'sarah_123',
-      payerName: 'Sarah',
-      category: 'electricity',
-      date: DateTime.now().subtract(const Duration(days: 5)),
-      isDisputed: true,
-      disputeReason: 'Dispute open',
-    ).toMap());
+    await exp1.set(
+      ExpenseModel(
+        id: exp1.id,
+        title: 'Electricity',
+        amount: 300.0,
+        payerId: 'sarah_123',
+        payerName: 'Sarah',
+        category: 'electricity',
+        date: DateTime.now().subtract(const Duration(days: 5)),
+        isDisputed: true,
+        disputeReason: 'Dispute open',
+      ).toMap(),
+    );
 
     final exp2 = flatRef.collection(FirestoreConstants.expenses).doc();
-    await exp2.set(ExpenseModel(
-      id: exp2.id,
-      title: 'Internet',
-      amount: 40.0,
-      payerId: userId,
-      payerName: userName.isEmpty ? 'You' : userName,
-      category: 'internet',
-      date: DateTime.now().subtract(const Duration(days: 3)),
-      isDisputed: true,
-      disputeReason: 'Dispute open',
-    ).toMap());
+    await exp2.set(
+      ExpenseModel(
+        id: exp2.id,
+        title: 'Internet',
+        amount: 40.0,
+        payerId: userId,
+        payerName: userName.isEmpty ? 'You' : userName,
+        category: 'internet',
+        date: DateTime.now().subtract(const Duration(days: 3)),
+        isDisputed: true,
+        disputeReason: 'Dispute open',
+      ).toMap(),
+    );
 
     final exp3 = flatRef.collection(FirestoreConstants.expenses).doc();
-    await exp3.set(ExpenseModel(
-      id: exp3.id,
-      title: 'Groceries',
-      amount: 110.0,
-      payerId: userId,
-      payerName: userName.isEmpty ? 'You' : userName,
-      category: 'groceries',
-      date: DateTime.now().subtract(const Duration(days: 1)),
-      isDisputed: false,
-    ).toMap());
+    await exp3.set(
+      ExpenseModel(
+        id: exp3.id,
+        title: 'Groceries',
+        amount: 110.0,
+        payerId: userId,
+        payerName: userName.isEmpty ? 'You' : userName,
+        category: 'groceries',
+        date: DateTime.now().subtract(const Duration(days: 1)),
+        isDisputed: false,
+      ).toMap(),
+    );
 
     // Seed Debts
     final debt1 = flatRef.collection(FirestoreConstants.debts).doc('debt1');
-    await debt1.set(DebtModel(
-      id: 'debt1',
-      fromId: 'rahoul_123',
-      fromName: 'Rahoul',
-      toId: userId,
-      toName: userName.isEmpty ? 'Mahmoud' : userName,
-      amount: 100.0,
-      isSettled: false,
-    ).toMap());
+    await debt1.set(
+      DebtModel(
+        id: 'debt1',
+        fromId: 'rahoul_123',
+        fromName: 'Rahoul',
+        toId: userId,
+        toName: userName.isEmpty ? 'Mahmoud' : userName,
+        amount: 100.0,
+        isSettled: false,
+      ).toMap(),
+    );
 
     final debt2 = flatRef.collection(FirestoreConstants.debts).doc('debt2');
-    await debt2.set(DebtModel(
-      id: 'debt2',
-      fromId: 'sarah_123',
-      fromName: 'Sarah',
-      toId: userId,
-      toName: userName.isEmpty ? 'Mahmoud' : userName,
-      amount: 37.50,
-      isSettled: false,
-    ).toMap());
+    await debt2.set(
+      DebtModel(
+        id: 'debt2',
+        fromId: 'sarah_123',
+        fromName: 'Sarah',
+        toId: userId,
+        toName: userName.isEmpty ? 'Mahmoud' : userName,
+        amount: 37.50,
+        isSettled: false,
+      ).toMap(),
+    );
 
     // Seed Activities
     final act1 = flatRef.collection(FirestoreConstants.activities).doc();
-    await act1.set(ActivityModel(
-      id: act1.id,
-      userId: userId,
-      userName: userName.isEmpty ? 'Mahmoud' : userName,
-      action: 'uploaded the Electricity bill from Stadtwerke.',
-      timestamp: DateTime.now().subtract(const Duration(hours: 12)),
-    ).toMap());
+    await act1.set(
+      ActivityModel(
+        id: act1.id,
+        userId: userId,
+        userName: userName.isEmpty ? 'Mahmoud' : userName,
+        action: 'uploaded the Electricity bill from Stadtwerke.',
+        timestamp: DateTime.now().subtract(const Duration(hours: 12)),
+      ).toMap(),
+    );
 
     final act2 = flatRef.collection(FirestoreConstants.activities).doc();
-    await act2.set(ActivityModel(
-      id: act2.id,
-      userId: 'sarah_123',
-      userName: 'Sarah',
-      action: 'disputed the Internet split ratio.',
-      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-    ).toMap());
+    await act2.set(
+      ActivityModel(
+        id: act2.id,
+        userId: 'sarah_123',
+        userName: 'Sarah',
+        action: 'disputed the Internet split ratio.',
+        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+      ).toMap(),
+    );
 
     return flatRef.id;
   }
 
   @override
   Future<bool> joinFlat(
-      String invitationCode, String userId, String userName) async {
+    String invitationCode,
+    String userId,
+    String userName,
+  ) async {
     final query = await _firestore
         .collection(FirestoreConstants.wgs)
         .where(FirestoreConstants.invitationCode, isEqualTo: invitationCode)
@@ -280,17 +290,12 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     final flatId = query.docs.first.id;
 
     // Update User Flat ID
-    await _firestore
-        .collection(FirestoreConstants.users)
-        .doc(userId)
-        .set({FirestoreConstants.flatId: flatId}, SetOptions(merge: true));
+    await _firestore.collection(FirestoreConstants.users).doc(userId).set({
+      FirestoreConstants.flatId: flatId,
+    }, SetOptions(merge: true));
 
     // Add as member using MemberModel
-    final member = MemberModel(
-      id: userId,
-      displayName: userName,
-      role: 'user',
-    );
+    final member = MemberModel(id: userId, displayName: userName, role: UserRole.user);
     await _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
@@ -304,13 +309,15 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .doc(flatId)
         .collection(FirestoreConstants.activities)
         .doc();
-    await actRef.set(ActivityModel(
-      id: actRef.id,
-      userId: userId,
-      userName: userName,
-      action: 'joined the flat.',
-      timestamp: DateTime.now(),
-    ).toMap());
+    await actRef.set(
+      ActivityModel(
+        id: actRef.id,
+        userId: userId,
+        userName: userName,
+        action: 'joined the flat.',
+        timestamp: DateTime.now(),
+      ).toMap(),
+    );
 
     return true;
   }
@@ -330,16 +337,18 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .doc(flatId)
         .collection(FirestoreConstants.expenses)
         .doc();
-    await expRef.set(ExpenseModel(
-      id: expRef.id,
-      title: title,
-      amount: amount,
-      payerId: payerId,
-      payerName: payerName,
-      category: category,
-      date: DateTime.now(),
-      isDisputed: false,
-    ).toMap());
+    await expRef.set(
+      ExpenseModel(
+        id: expRef.id,
+        title: title,
+        amount: amount,
+        payerId: payerId,
+        payerName: payerName,
+        category: category,
+        date: DateTime.now(),
+        isDisputed: false,
+      ).toMap(),
+    );
 
     // Log Activity
     final actRef = _firestore
@@ -347,13 +356,15 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .doc(flatId)
         .collection(FirestoreConstants.activities)
         .doc();
-    await actRef.set(ActivityModel(
-      id: actRef.id,
-      userId: payerId,
-      userName: payerName,
-      action: 'added expense "$title" of ${amount.toStringAsFixed(2)}€.',
-      timestamp: DateTime.now(),
-    ).toMap());
+    await actRef.set(
+      ActivityModel(
+        id: actRef.id,
+        userId: payerId,
+        userName: payerName,
+        action: 'added expense "$title" of ${amount.toStringAsFixed(2)}€.',
+        timestamp: DateTime.now(),
+      ).toMap(),
+    );
 
     // Update Billing Cycle Total Cost
     final cycleRef = _firestore
@@ -367,10 +378,11 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       if (snapshot.exists && snapshot.data() != null) {
         final currentTotal =
             (snapshot.data()![FirestoreConstants.totalCosts] as num?)
-                    ?.toDouble() ??
-                0.0;
-        transaction.update(cycleRef,
-            {FirestoreConstants.totalCosts: currentTotal + amount});
+                ?.toDouble() ??
+            0.0;
+        transaction.update(cycleRef, {
+          FirestoreConstants.totalCosts: currentTotal + amount,
+        });
       }
     });
   }
@@ -396,13 +408,15 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .doc(flatId)
         .collection(FirestoreConstants.activities)
         .doc();
-    await actRef.set(ActivityModel(
-      id: actRef.id,
-      userId: userId,
-      userName: userName,
-      action: 'settled a debt.',
-      timestamp: DateTime.now(),
-    ).toMap());
+    await actRef.set(
+      ActivityModel(
+        id: actRef.id,
+        userId: userId,
+        userName: userName,
+        action: 'settled a debt.',
+        timestamp: DateTime.now(),
+      ).toMap(),
+    );
 
     // Recalculate Settled Percentage of Billing Cycle
     final debtsSnap = await _firestore
@@ -411,11 +425,10 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .collection(FirestoreConstants.debts)
         .get();
 
-    final allDebts =
-        debtsSnap.docs.map((d) => DebtModel.fromMap(d.data(), d.id)).toList();
-    final settledCount = allDebts
-        .where((d) => d.isSettled)
-        .length;
+    final allDebts = debtsSnap.docs
+        .map((d) => DebtModel.fromMap(d.data(), d.id))
+        .toList();
+    final settledCount = allDebts.where((d) => d.isSettled).length;
     final totalCount = allDebts.length;
 
     // Default starts at 85% settled. If 1/2 is settled, let's show 92.5%, if 2/2 is settled show 100%
@@ -429,8 +442,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .doc(flatId)
         .collection(FirestoreConstants.billingCycles)
         .doc('2024-03');
-    await cycleRef
-        .update({FirestoreConstants.settledPercentage: percentage});
+    await cycleRef.update({FirestoreConstants.settledPercentage: percentage});
   }
 
   @override

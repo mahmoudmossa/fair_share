@@ -28,6 +28,7 @@ You are an expert Flutter developer and software architect. When writing, refact
 * **Repository Provider Placement:** The Riverpod provider that instantiates a Repository (e.g. `flatRepositoryProvider`) must be placed in a dedicated file in the Presentation layer under the `presentation/provider/` directory (e.g. `[feature_name]_repository_provider.dart`), as it is consumed by presentation controllers. Never define repository providers inside the data layer.
 
 ## 4. Coding Principles (Clean Code)
+* **Decoupled Data Models (DTOs):** In strict Clean Architecture, Data Models/DTOs (like FlatDto) must not extend Domain Entities (like FlatEntity). They must be completely independent classes, using mapper methods (like toEntity() and fromEntity()) to convert between data structures. This prevents third-party serialization concerns (like json_serializable) from coupling to core domain logic.
 * **DRY (Don't Repeat Yourself):** Never duplicate logic. Extract shared logic into utility classes, repositories, or shared providers.
 * **KISS (Keep It Simple, Stupid):** Avoid over-engineering. Write code that is easy to read and understand. Prefer readable code over clever, condensed code.
 * **SOLID Principles:**

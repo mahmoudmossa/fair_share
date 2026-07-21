@@ -1,32 +1,42 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
+import '../provider/flat_setup_provider.dart';
 import 'add_members/add_another_hint.dart';
 import 'add_members/add_member_field.dart';
 import 'add_members/admin_card.dart';
 import 'add_members/member_card.dart';
 
-class AddMembersStepWidget extends HookWidget {
+class AddMembersStepWidget extends HookConsumerWidget {
   const AddMembersStepWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final nameController = useTextEditingController();
-    final members = useState<List<String>>([]);
+    final flatSetup = ref.watch(flatSetupProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     void addMember() {
       final name = nameController.text.trim();
       if (name.isEmpty) return;
-      members.value = [...members.value, name];
+
+      // Check if duplicate name
+      if (flatSetup.members.any((m) => m.name.toLowerCase() == name.toLowerCase())) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Member name already exists')),
+        );
+        return;
+      }
+
+      ref.read(flatSetupProvider.notifier).addMember(name);
       nameController.clear();
     }
 
-    void removeMember(int index) {
-      final updated = List<String>.from(members.value)..removeAt(index);
-      members.value = updated;
+    void removeMember(String name) {
+      ref.read(flatSetupProvider.notifier).removeMember(name);
     }
 
     return SingleChildScrollView(
@@ -63,16 +73,16 @@ class AddMembersStepWidget extends HookWidget {
           const SizedBox(height: 12),
           const AdminCard(),
           const SizedBox(height: 8),
-          ...members.value.asMap().entries.map(
-            (entry) => Padding(
+          ...flatSetup.members.map(
+            (member) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: MemberCard(
-                name: entry.value,
-                onRemove: () => removeMember(entry.key),
+                name: member.name,
+                onRemove: () => removeMember(member.name),
               ),
             ),
           ),
-          if (members.value.isEmpty) ...[
+          if (flatSetup.members.isEmpty) ...[
             const SizedBox(height: 8),
             const AddAnotherHint(),
           ],
