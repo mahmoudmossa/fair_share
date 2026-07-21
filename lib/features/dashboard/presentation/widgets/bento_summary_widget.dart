@@ -155,12 +155,13 @@ class BentoSummaryWidget extends StatelessWidget {
                             Text(
                               LocaleKeys.dashboard_settled_msg.tr(args: [
                                 cycle.settledPercentage.toStringAsFixed(0),
-                                'March'
+                                cycle.monthName,
                               ]),
                               style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onPrimary.withOpacity(0.85),
                               ),
                             ),
+
                           ],
                         ),
                       ),

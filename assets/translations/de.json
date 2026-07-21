@@ -42,7 +42,19 @@
     "expense_category": "Kategorie",
     "save": "Speichern",
     "cancel": "Abbrechen",
-    "validation_empty_fields": "Bitte füllen Sie alle Felder aus"
+    "validation_empty_fields": "Bitte füllen Sie alle Felder aus",
+    "history_tab": "Verlauf",
+    "admin_tab": "Admin",
+    "profile_tab": "Profil",
+    "history_coming_soon": "Verlauf-Bildschirm kommt bald!",
+    "admin_coming_soon": "Admin-Bildschirm kommt bald!",
+    "profile_coming_soon": "Profil-Einstellungen kommen bald!",
+    "error_loading_user": "Fehler beim Laden des Benutzerprofils: {}",
+    "error_loading_dashboard": "Fehler beim Laden des Dashboards: {}",
+    "category_electricity": "Strom",
+    "category_internet": "Internet",
+    "category_groceries": "Lebensmittel",
+    "category_other": "Sonstiges"
   },
   "flat_setup": {
     "title": "Tritt deiner WG bei",
@@ -87,12 +99,26 @@
     "recurring_monthly": "Monatlich",
     "one_time": "Einmalig",
     "add_another_cost": "+ Weitere Kosten hinzufügen",
-    "almost_there": "Fast geschafft!"
+    "almost_there": "Fast geschafft!",
+    "no_members_attention": "Noch keine Mitbewohner hinzugefügt. Starte mit deinem Namen.",
+    "member_exists_error": "Name des Mitbewohners existiert bereits",
+    "your_name_hint": "Dein Name",
+    "enter_flat_name_error": "Bitte gib einen Namen für deine WG ein",
+    "add_member_error": "Bitte füge mindestens einen Mitbewohner zu deinem Haushalt hinzu",
+    "session_not_found_error": "Benutzersitzung nicht gefunden. Bitte erneut anmelden.",
+    "invalid_costs_error": "Bitte gib gültige Titel und Beträge für alle Kosten ein",
+    "cost_number": "Kosten #{}"
   },
   "errors": {
     "permission_denied": "Keine Berechtigung",
     "unauthenticated": "Nicht authentifiziert",
     "unavailable": "Nicht verfügbar",
     "unknown": "Unbekannter Fehler"
+  },
+  "occupants": {
+    "title": "Bewohner-Ansicht",
+    "subtitle": "Dies ist die Bewohner-Ansicht",
+    "widget": "Bewohner-Widget"
   }
 }
+

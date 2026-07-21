@@ -37,7 +37,11 @@ class AddMembersStepWidget extends HookConsumerWidget {
       if (flatSetup.createdByName.toLowerCase() == name.toLowerCase() ||
           flatSetup.members.any((m) => m.name.toLowerCase() == name.toLowerCase())) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Member name already exists')),
+          SnackBar(
+            content: Text(
+              LocaleKeys.new_flat_setup_member_exists_error.tr(),
+            ),
+          ),
         );
         return;
       }
@@ -75,8 +79,9 @@ class AddMembersStepWidget extends HookConsumerWidget {
             onAdd: onAddSubmitted,
             hintText: isUserAdded
                 ? LocaleKeys.new_flat_setup_flatmate_name_hint.tr()
-                : 'Your Name',
+                : LocaleKeys.new_flat_setup_your_name_hint.tr(),
           ),
+
           const SizedBox(height: 24),
           Text(
             LocaleKeys.new_flat_setup_current_household.tr(),

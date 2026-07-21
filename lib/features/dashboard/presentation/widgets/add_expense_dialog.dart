@@ -36,11 +36,24 @@ class AddExpenseDialog extends HookConsumerWidget {
     });
 
     final categories = [
-      {'value': 'electricity', 'label': 'Electricity'},
-      {'value': 'internet', 'label': 'Internet'},
-      {'value': 'groceries', 'label': 'Groceries'},
-      {'value': 'other', 'label': 'Other'},
+      {
+        'value': 'electricity',
+        'label': LocaleKeys.dashboard_category_electricity.tr(),
+      },
+      {
+        'value': 'internet',
+        'label': LocaleKeys.dashboard_category_internet.tr(),
+      },
+      {
+        'value': 'groceries',
+        'label': LocaleKeys.dashboard_category_groceries.tr(),
+      },
+      {
+        'value': 'other',
+        'label': LocaleKeys.dashboard_category_other.tr(),
+      },
     ];
+
 
     void submit() {
       final title = titleController.text.trim();

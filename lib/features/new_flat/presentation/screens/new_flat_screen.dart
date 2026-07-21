@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'package:fair_share/core/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -61,15 +63,21 @@ class NewFlatScreen extends HookConsumerWidget {
         // Step 1: Flat Name Validation
         if (currentStep.value == 0 && flatSetup.name.trim().isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please enter a name for your flat')),
+            SnackBar(
+              content: Text(
+                LocaleKeys.new_flat_setup_enter_flat_name_error.tr(),
+              ),
+            ),
           );
           return;
         }
         // Step 2: Members Validation
         if (currentStep.value == 1 && flatSetup.members.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Please add at least one member to your household'),
+            SnackBar(
+              content: Text(
+                LocaleKeys.new_flat_setup_add_member_error.tr(),
+              ),
             ),
           );
           return;
@@ -79,8 +87,10 @@ class NewFlatScreen extends HookConsumerWidget {
         // Step 3: Submission & Final Setup
         if (currentUser == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('User session not found. Please log in again.'),
+            SnackBar(
+              content: Text(
+                LocaleKeys.new_flat_setup_session_not_found_error.tr(),
+              ),
             ),
           );
           return;
@@ -92,14 +102,15 @@ class NewFlatScreen extends HookConsumerWidget {
         );
         if (invalidExpense) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text(
-                'Please enter valid titles and amounts for all costs',
+                LocaleKeys.new_flat_setup_invalid_costs_error.tr(),
               ),
             ),
           );
           return;
         }
+
 
         final setupNotifier = ref.read(flatSetupProvider.notifier);
 

@@ -58,7 +58,9 @@ class CostCard extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Cost #${index + 1}',
+                LocaleKeys.new_flat_setup_cost_number.tr(
+                  args: [(index + 1).toString()],
+                ),
                 style: textTheme.titleSmall?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.bold,
@@ -158,11 +160,12 @@ class CostCard extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Payer',
+                      LocaleKeys.new_flat_setup_paid_by_label.tr(),
                       style: textTheme.labelMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
+
                     const SizedBox(height: 4),
                     DropdownButtonFormField<String>(
                       value: selectedMember.id,

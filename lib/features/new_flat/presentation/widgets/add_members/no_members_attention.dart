@@ -1,4 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:fair_share/core/localization/locale_keys.g.dart';
+
 
 class NoMembersAttention extends StatelessWidget {
   const NoMembersAttention({super.key});
@@ -20,12 +23,13 @@ class NoMembersAttention extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'No members added yet. Start with your name.',
+            LocaleKeys.new_flat_setup_no_members_attention.tr(),
             textAlign: TextAlign.center,
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
             ),
           ),
+
         ],
       ),
     );

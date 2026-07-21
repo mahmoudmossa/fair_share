@@ -30,8 +30,13 @@ class DashboardScreen extends HookConsumerWidget {
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (err, stack) => Scaffold(
-        body: Center(child: Text('Error loading user profile: $err')),
+        body: Center(
+          child: Text(
+            LocaleKeys.dashboard_error_loading_user.tr(args: [err.toString()]),
+          ),
+        ),
       ),
+
       data: (user) {
         Future.microtask(
           () => ref.read(appRouterProvider).replace(const NewFlatRoute()),
@@ -161,17 +166,17 @@ class DashboardScreen extends HookConsumerWidget {
               NavigationDestination(
                 icon: const Icon(Icons.receipt_long_outlined),
                 selectedIcon: const Icon(Icons.receipt_long),
-                label: 'History',
+                label: LocaleKeys.dashboard_history_tab.tr(),
               ),
               NavigationDestination(
                 icon: const Icon(Icons.group_outlined),
                 selectedIcon: const Icon(Icons.group),
-                label: 'Admin',
+                label: LocaleKeys.dashboard_admin_tab.tr(),
               ),
               NavigationDestination(
                 icon: const Icon(Icons.settings_outlined),
                 selectedIcon: const Icon(Icons.settings),
-                label: 'Profile',
+                label: LocaleKeys.dashboard_profile_tab.tr(),
               ),
             ],
           ),
@@ -206,10 +211,10 @@ class DashboardScreen extends HookConsumerWidget {
               const SizedBox(height: 16),
               Text(
                 tabIndex == 1
-                    ? 'History Screen coming soon!'
+                    ? LocaleKeys.dashboard_history_coming_soon.tr()
                     : tabIndex == 2
-                    ? 'Admin Screen coming soon!'
-                    : 'Profile Settings coming soon!',
+                    ? LocaleKeys.dashboard_admin_coming_soon.tr()
+                    : LocaleKeys.dashboard_profile_coming_soon.tr(),
                 style: const TextStyle(fontSize: 18, color: Colors.grey),
               ),
             ],
@@ -220,8 +225,14 @@ class DashboardScreen extends HookConsumerWidget {
 
     return stateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) =>
-          Center(child: Text('Error loading dashboard: $err')),
+      error: (err, stack) => Center(
+        child: Text(
+          LocaleKeys.dashboard_error_loading_dashboard.tr(
+            args: [err.toString()],
+          ),
+        ),
+      ),
+
       data: (nullableState) {
         if (nullableState == null) {
           return const Center(child: CircularProgressIndicator());
