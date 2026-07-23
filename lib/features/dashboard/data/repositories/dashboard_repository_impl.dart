@@ -1,11 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/dashboard_state.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 import '../data_sources/dashboard_remote_data_source.dart';
 import '../data_sources/dashboard_remote_data_source_impl.dart';
-
-part 'dashboard_repository_impl.g.dart';
 
 class DashboardRepositoryImpl implements DashboardRepository {
   final DashboardRemoteDataSource _remoteDataSource;
@@ -66,9 +63,4 @@ class DashboardRepositoryImpl implements DashboardRepository {
       return Left(e);
     }
   }
-}
-
-@riverpod
-DashboardRepository dashboardRepository(Ref ref) {
-  return DashboardRepositoryImpl(ref.watch(dashboardRemoteDataSourceProvider));
 }

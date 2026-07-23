@@ -12,7 +12,7 @@ import '../provider/new_flat_provider.dart';
 import '../widgets/setup_top_bar_widget.dart';
 import '../widgets/setup_progress_bar_widget.dart';
 import '../widgets/setup_bottom_bar_widget.dart';
-import '../widgets/add_flat_name_step_widget.dart';
+import '../widgets/create_flat_step_widget.dart';
 import '../widgets/add_members_step_widget.dart';
 import '../widgets/add_costs_step_widget.dart';
 
@@ -23,7 +23,7 @@ class NewFlatScreen extends HookConsumerWidget {
   static const _totalSteps = 3;
 
   static const _steps = [
-    AddFlatNameStepWidget(),
+    CreateFlatStepWidget(),
     AddMembersStepWidget(),
     AddCostsStepWidget(),
   ];

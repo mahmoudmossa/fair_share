@@ -34,7 +34,6 @@ class NewFlatTestScenario extends BaseTestScenario {
     // step 3
     await $(AppKeys.newFlat.costTitle).enterText('internet');
     await $(AppKeys.newFlat.costAmount).enterText('100');
-    await $(AppKeys.newFlat.payedByDropdown).;
     await $(AppKeys.newFlat.costTitle).enterText('internet');
     
     return true;

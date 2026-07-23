@@ -38,10 +38,6 @@ class DashboardScreen extends HookConsumerWidget {
       ),
 
       data: (user) {
-        Future.microtask(
-          () => ref.read(appRouterProvider).replace(const NewFlatRoute()),
-        );
-
         if (user == null) {
           // Fallback if auth state is lost
           Future.microtask(

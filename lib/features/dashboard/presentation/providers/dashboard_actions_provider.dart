@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_core/shared_core.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_state_provider.dart';
-import '../../data/repositories/dashboard_repository_impl.dart';
+import 'dashboard_repository_provider.dart';
 
 part 'dashboard_actions_provider.g.dart';
 

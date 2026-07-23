@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:fair_share/features/auth/domain/entities/user_entity.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_state_provider.dart';
 import 'package:fair_share/features/dashboard/data/repositories/dashboard_repository_impl.dart';
+import 'package:fair_share/features/dashboard/presentation/providers/dashboard_repository_provider.dart';
 import 'package:fair_share/features/dashboard/presentation/providers/dashboard_actions_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
