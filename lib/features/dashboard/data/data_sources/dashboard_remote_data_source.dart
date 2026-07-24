@@ -2,8 +2,6 @@ import 'package:fair_share/features/dashboard/domain/entities/dashboard_state.da
 
 abstract class DashboardRemoteDataSource {
   Stream<DashboardState?> watchDashboardState(String flatId);
-  Future<String> createFlat(String name, String userId, String userName);
-  Future<bool> joinFlat(String invitationCode, String userId, String userName);
   Future<void> addExpense(
     String flatId,
     String title,

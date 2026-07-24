@@ -12,53 +12,6 @@ class DashboardActions extends _$DashboardActions {
     return const ActionInitial();
   }
 
-  Future<void> createFlat(String name) async {
-    state = const ActionLoading();
-    final auth = ref.read(authStateProvider).value;
-    if (auth == null) {
-      state = ActionError(Exception('User not authenticated'));
-      return;
-    }
-
-    final repository = ref.read(dashboardRepositoryProvider);
-    final result = await repository.createFlat(
-      name,
-      auth.id,
-      auth.displayName ?? auth.email.split('@').first,
-    );
-    state = result.fold(
-      (error) => ActionError(error),
-      (flatId) => const ActionSuccess(null),
-    );
-  }
-
-  Future<void> joinFlat(String invitationCode) async {
-    state = const ActionLoading();
-    final auth = ref.read(authStateProvider).value;
-    if (auth == null) {
-      state = ActionError(Exception('User not authenticated'));
-      return;
-    }
-
-    final repository = ref.read(dashboardRepositoryProvider);
-    final result = await repository.joinFlat(
-      invitationCode.trim(),
-      auth.id,
-      auth.displayName ?? auth.email.split('@').first,
-    );
-
-    state = result.fold(
-      (error) => ActionError(error),
-      (success) {
-        if (success) {
-          return const ActionSuccess(null);
-        } else {
-          return ActionError(Exception('Invalid invitation code'));
-        }
-      },
-    );
-  }
-
   Future<void> addExpense({
     required String flatId,
     required String title,

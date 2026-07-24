@@ -6,14 +6,16 @@ class FlatCostEntity extends Equatable {
   final double amount;
   final RecurrenceType recurrenceType;
   final String payerId;
+  final String payerName;
 
   const FlatCostEntity({
     required this.title,
     required this.amount,
     required this.recurrenceType,
     required this.payerId,
+    required this.payerName,
   });
 
   @override
-  List<Object?> get props => [title, amount, recurrenceType, payerId];
+  List<Object?> get props => [title, amount, recurrenceType, payerId, payerName];
 }

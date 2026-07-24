@@ -46,7 +46,8 @@ class CreateFlatStepWidget extends HookConsumerWidget {
             controller: controller,
             style: const TextStyle(fontFamily: 'Inter'),
             textInputAction: TextInputAction.done,
-            onChanged: (val) => ref.read(flatSetupProvider.notifier).updateFlatName(val),
+            onChanged: (val) =>
+                ref.read(flatSetupProvider.notifier).updateFlatName(val),
             decoration: InputDecoration(
               labelText: LocaleKeys.flat_setup_flat_name_label.tr(),
               prefixIcon: const Icon(Icons.home_work_outlined),
@@ -54,7 +55,10 @@ class CreateFlatStepWidget extends HookConsumerWidget {
               floatingLabelStyle: TextStyle(color: colorScheme.primary),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: colorScheme.outlineVariant, width: 2),
+                borderSide: BorderSide(
+                  color: colorScheme.outlineVariant,
+                  width: 2,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),

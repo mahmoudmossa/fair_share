@@ -19,18 +19,21 @@ void main() {
           amount: 150.0,
           recurrenceType: RecurrenceType.monthly,
           payerId: 'v_id',
+          payerName: 'V',
         ),
         const FlatCostEntity(
           title: 'Gas',
           amount: 200.0,
           recurrenceType: RecurrenceType.monthly,
           payerId: 'a_id',
+          payerName: 'A',
         ),
         const FlatCostEntity(
           title: 'Internet',
           amount: 20.0,
           recurrenceType: RecurrenceType.monthly,
           payerId: 'r_id',
+          payerName: 'R',
         ),
       ];
 
@@ -49,7 +52,7 @@ void main() {
         (d) => d.fromId == 'r_id' && d.toId == 'v_id',
       );
 
-      expect(rToA.amount, closeTo(76.66, 0.01));
+      expect(rToA.amount, closeTo(76.67, 0.01));
       expect(rToV.amount, closeTo(26.67, 0.01));
     });
   });

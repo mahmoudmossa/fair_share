@@ -7,7 +7,6 @@ class ExpenseEntity extends Equatable {
   final double amount;
   final String payerId;
   final String payerName;
-  final String category; // 'electricity' | 'internet' | 'groceries' | 'other'
   final DateTime date;
   final bool isDisputed;
   final String? disputeReason;
@@ -20,7 +19,6 @@ class ExpenseEntity extends Equatable {
     required this.amount,
     required this.payerId,
     required this.payerName,
-    required this.category,
     required this.date,
     required this.isDisputed,
     this.disputeReason,
@@ -35,7 +33,6 @@ class ExpenseEntity extends Equatable {
     amount,
     payerId,
     payerName,
-    category,
     date,
     isDisputed,
     disputeReason,

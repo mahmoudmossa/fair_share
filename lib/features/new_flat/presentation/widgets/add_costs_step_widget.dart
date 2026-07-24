@@ -22,11 +22,14 @@ class AddCostsStepWidget extends HookConsumerWidget {
     useEffect(() {
       if (flatSetup.costs.isEmpty) {
         Future.microtask(() {
-          ref.read(flatSetupProvider.notifier).addCost(
+          ref
+              .read(flatSetupProvider.notifier)
+              .addCost(
                 title: '',
                 amount: 0.0,
                 recurrenceType: RecurrenceType.oneTime,
                 payerId: flatSetup.createdBy,
+                payerName: flatSetup.createdByName,
               );
         });
       }
@@ -34,10 +37,13 @@ class AddCostsStepWidget extends HookConsumerWidget {
     }, []);
 
     void addNewCostField() {
-      ref.read(flatSetupProvider.notifier).addCost(
+      ref
+          .read(flatSetupProvider.notifier)
+          .addCost(
             title: '',
             amount: 0.0,
             recurrenceType: RecurrenceType.oneTime,
+            payerName: flatSetup.createdByName,
             payerId: flatSetup.createdBy,
           );
     }

@@ -21,43 +21,27 @@ void main() {
     container = ProviderContainer(
       overrides: [
         dashboardRepositoryProvider.overrideWithValue(mockRepository),
-        authStateProvider.overrideWith(
-          (ref) {
-            final controller = StreamController<UserEntity?>.broadcast();
-            ref.onDispose(controller.close);
-            scheduleMicrotask(() {
-              if (!controller.isClosed) {
-                controller.add(
-                  const UserEntity(
-                    id: 'mahmoud',
-                    email: 'mahmoud@example.com',
-                    displayName: 'Medo',
-                  ),
-                );
-              }
-            });
-            return controller.stream;
-          },
-        ),
+        authStateProvider.overrideWith((ref) {
+          final controller = StreamController<UserEntity?>.broadcast();
+          ref.onDispose(controller.close);
+          scheduleMicrotask(() {
+            if (!controller.isClosed) {
+              controller.add(
+                const UserEntity(
+                  id: 'mahmoud',
+                  email: 'mahmoud@example.com',
+                  displayName: 'Medo',
+                ),
+              );
+            }
+          });
+          return controller.stream;
+        }),
       ],
     );
     container.listen(authStateProvider, (previous, next) {});
   });
   tearDown(() {
     container.dispose();
-  });
-
-  test('dashboardTest', () async {
-    await container.read(authStateProvider.future);
-
-    when(
-      () => mockRepository.createFlat(any(), any(), any()),
-    ).thenAnswer((_) async => right('flat_id_123'));
-
-    final notifier = container.read(dashboardActionsProvider.notifier);
-    await notifier.createFlat('My New Flat');
-    final state = container.read(dashboardActionsProvider);
-    expect(state, isA<ActionSuccess>());
-    verify(() => mockRepository.createFlat('My New Flat', 'mahmoud', 'Medo')).called(1);
   });
 }

@@ -40,25 +40,9 @@ class ItemizedExpensesWidget extends StatelessWidget {
             separatorBuilder: (context, index) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final exp = expenses[index];
-              final isPayerYou = exp.payerId == currentUserId;
-              
-              // Map categories to icons
-              IconData categoryIcon = Icons.receipt_long;
-              switch (exp.category) {
-                case 'electricity':
-                  categoryIcon = Icons.bolt;
-                  break;
-                case 'internet':
-                  categoryIcon = Icons.wifi;
-                  break;
-                case 'groceries':
-                  categoryIcon = Icons.shopping_basket;
-                  break;
-              }
-
-              final String payerText = isPayerYou
-                  ? LocaleKeys.dashboard_paid_by_you.tr(args: [exp.amount.toStringAsFixed(2)])
-                  : LocaleKeys.dashboard_paid_by.tr(args: [exp.payerName, exp.amount.toStringAsFixed(2)]);
+              final String payerText = LocaleKeys.dashboard_paid_by.tr(
+                args: [exp.payerName, exp.amount.toStringAsFixed(2)],
+              );
 
               return InkWell(
                 onTap: () {},
@@ -72,20 +56,6 @@ class ItemizedExpensesWidget extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      // Icon Container
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHigh,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          categoryIcon,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
                       // Details
                       Expanded(
                         child: Column(
@@ -112,7 +82,9 @@ class ItemizedExpensesWidget extends StatelessWidget {
                       // Dispute Warning
                       if (exp.isDisputed)
                         Tooltip(
-                          message: exp.disputeReason ?? LocaleKeys.dashboard_dispute_open.tr(),
+                          message:
+                              exp.disputeReason ??
+                              LocaleKeys.dashboard_dispute_open.tr(),
                           child: Icon(
                             Icons.warning_amber_rounded,
                             color: colorScheme.error,

@@ -23,7 +23,6 @@ class ExpenseModel {
   final double amount;
   final String payerId;
   final String payerName;
-  final String category;
 
   @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
   final DateTime date;
@@ -42,7 +41,6 @@ class ExpenseModel {
     required this.amount,
     required this.payerId,
     required this.payerName,
-    required this.category,
     required this.date,
     required this.isDisputed,
     this.disputeReason,
@@ -57,7 +55,6 @@ class ExpenseModel {
       amount: entity.amount,
       payerId: entity.payerId,
       payerName: entity.payerName,
-      category: entity.category,
       date: entity.date,
       isDisputed: entity.isDisputed,
       disputeReason: entity.disputeReason,
@@ -73,7 +70,6 @@ class ExpenseModel {
       amount: amount,
       payerId: payerId,
       payerName: payerName,
-      category: category,
       date: date,
       isDisputed: isDisputed,
       disputeReason: disputeReason,

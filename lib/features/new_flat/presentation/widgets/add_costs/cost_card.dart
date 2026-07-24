@@ -167,12 +167,12 @@ class CostCard extends HookConsumerWidget {
                     ),
 
                     const SizedBox(height: 4),
-                    DropdownButtonFormField<String>(
-                      value: selectedMember.id,
+                    DropdownButtonFormField<FlatMemberEntity>(
+                      value: selectedMember,
                       items: allMembers
                           .map(
-                            (member) => DropdownMenuItem(
-                              value: member.id,
+                            (member) => DropdownMenuItem<FlatMemberEntity>(
+                              value: member,
                               child: Text(
                                 member.name,
                                 style: textTheme.bodyMedium,
@@ -180,11 +180,15 @@ class CostCard extends HookConsumerWidget {
                             ),
                           )
                           .toList(),
-                      onChanged: (selectedId) {
-                        if (selectedId == null) return;
+                      onChanged: (member) {
+                        if (member == null) return;
                         ref
                             .read(flatSetupProvider.notifier)
-                            .updateCost(index, payerId: selectedId);
+                            .updateCost(
+                              index,
+                              payerId: member.id,
+                              payerName: member.name,
+                            );
                       },
                       decoration: InputDecoration(
                         isDense: true,

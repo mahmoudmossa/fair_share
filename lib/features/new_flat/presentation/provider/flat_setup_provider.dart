@@ -17,7 +17,8 @@ class FlatSetup extends _$FlatSetup {
     return FlatEntity.empty().copyWith(
       id: const Uuid().v4(), // Autogenerate unique Flat ID at startup
       createdBy: user?.id ?? '',
-      createdByName: '', // Starts empty so the user enters their name first in Step 2
+      createdByName:
+          '', // Starts empty so the user enters their name first in Step 2
     );
   }
 
@@ -46,11 +47,13 @@ class FlatSetup extends _$FlatSetup {
     required double amount,
     required RecurrenceType recurrenceType,
     required String payerId,
+    required String payerName,
   }) {
     final updatedCosts = List<FlatCostEntity>.from(state.costs)
       ..add(
         FlatCostEntity(
           title: title,
+          payerName: payerName,
           amount: amount,
           recurrenceType: recurrenceType,
           payerId: payerId,
@@ -65,12 +68,14 @@ class FlatSetup extends _$FlatSetup {
     double? amount,
     RecurrenceType? recurrenceType,
     String? payerId,
+    String? payerName,
   }) {
     if (index < 0 || index >= state.costs.length) return;
 
     final updatedCosts = List<FlatCostEntity>.from(state.costs);
     final current = updatedCosts[index];
     updatedCosts[index] = FlatCostEntity(
+      payerName: payerName ?? current.payerName,
       title: title ?? current.title,
       amount: amount ?? current.amount,
       recurrenceType: recurrenceType ?? current.recurrenceType,

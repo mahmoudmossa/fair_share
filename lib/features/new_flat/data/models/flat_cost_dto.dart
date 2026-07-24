@@ -10,6 +10,8 @@ class FlatCostDto {
   final String title;
   final double amount;
   final String payerId;
+  final String payerName;
+
   final RecurrenceType recurrence;
   final DateTime date;
   final bool isDisputed;
@@ -19,6 +21,7 @@ class FlatCostDto {
     required this.amount,
     required this.payerId,
     required this.recurrence,
+    required this.payerName,
     required this.date,
     this.isDisputed = false,
   });
@@ -27,6 +30,7 @@ class FlatCostDto {
     return FlatCostDto(
       title: entity.title,
       amount: entity.amount,
+      payerName: entity.payerName,
       payerId: entity.payerId,
       recurrence: entity.recurrenceType,
       date: DateTime.now(),
@@ -37,6 +41,7 @@ class FlatCostDto {
     return FlatCostEntity(
       title: title,
       amount: amount,
+      payerName: payerName,
       recurrenceType: recurrence,
       payerId: payerId,
     );

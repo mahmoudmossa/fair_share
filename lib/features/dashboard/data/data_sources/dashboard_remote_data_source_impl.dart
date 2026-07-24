@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/core/providers/firebase_providers.dart';
@@ -10,8 +9,6 @@ import '../models/billing_cycle_model.dart';
 import '../models/expense_model.dart';
 import '../models/debt_model.dart';
 import '../models/activity_model.dart';
-import '../models/member_model.dart';
-import 'package:fair_share/features/new_flat/domain/entities/user_role.dart';
 import 'dashboard_remote_data_source.dart';
 
 part 'dashboard_remote_data_source_impl.g.dart';
@@ -130,199 +127,6 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   }
 
   @override
-  Future<String> createFlat(String name, String userId, String userName) async {
-    final flatRef = _firestore.collection(FirestoreConstants.wgs).doc();
-    final invitationCode = (100000 + Random().nextInt(900000)).toString();
-
-    // Create Flat
-    final flat = FlatModel(
-      id: flatRef.id,
-      name: name,
-      invitationCode: invitationCode,
-      createdBy: userId,
-      createdByName: userName,
-    );
-    await flatRef.set(flat.toMap());
-
-    // Update User Flat ID
-    await _firestore.collection(FirestoreConstants.users).doc(userId).set({
-      FirestoreConstants.flatId: flatRef.id,
-    }, SetOptions(merge: true));
-
-    // Add creator as admin member
-    final creatorMember = MemberModel(
-      id: userId,
-      displayName: userName.isEmpty ? 'You' : userName,
-      role: UserRole.admin,
-    );
-    await flatRef
-        .collection(FirestoreConstants.members)
-        .doc(userId)
-        .set(creatorMember.toMap());
-
-    // Seed billing cycle
-    final cycleRef = flatRef
-        .collection(FirestoreConstants.billingCycles)
-        .doc('2024-03');
-    final cycle = BillingCycleModel(
-      id: '2024-03',
-      monthName: 'March 2024',
-      status: 'published',
-      totalCosts: 450.00,
-      settledPercentage: 85.0,
-    );
-    await cycleRef.set(cycle.toMap());
-
-    // Seed Expenses
-    final exp1 = flatRef.collection(FirestoreConstants.expenses).doc();
-    await exp1.set(
-      ExpenseModel(
-        id: exp1.id,
-        title: 'Electricity',
-        amount: 300.0,
-        payerId: 'sarah_123',
-        payerName: 'Sarah',
-        category: 'electricity',
-        date: DateTime.now().subtract(const Duration(days: 5)),
-        isDisputed: true,
-        disputeReason: 'Dispute open',
-      ).toMap(),
-    );
-
-    final exp2 = flatRef.collection(FirestoreConstants.expenses).doc();
-    await exp2.set(
-      ExpenseModel(
-        id: exp2.id,
-        title: 'Internet',
-        amount: 40.0,
-        payerId: userId,
-        payerName: userName.isEmpty ? 'You' : userName,
-        category: 'internet',
-        date: DateTime.now().subtract(const Duration(days: 3)),
-        isDisputed: true,
-        disputeReason: 'Dispute open',
-      ).toMap(),
-    );
-
-    final exp3 = flatRef.collection(FirestoreConstants.expenses).doc();
-    await exp3.set(
-      ExpenseModel(
-        id: exp3.id,
-        title: 'Groceries',
-        amount: 110.0,
-        payerId: userId,
-        payerName: userName.isEmpty ? 'You' : userName,
-        category: 'groceries',
-        date: DateTime.now().subtract(const Duration(days: 1)),
-        isDisputed: false,
-      ).toMap(),
-    );
-
-    // Seed Debts
-    final debt1 = flatRef.collection(FirestoreConstants.debts).doc('debt1');
-    await debt1.set(
-      DebtModel(
-        id: 'debt1',
-        fromId: 'rahoul_123',
-        fromName: 'Rahoul',
-        toId: userId,
-        toName: userName.isEmpty ? 'Mahmoud' : userName,
-        amount: 100.0,
-        isSettled: false,
-      ).toMap(),
-    );
-
-    final debt2 = flatRef.collection(FirestoreConstants.debts).doc('debt2');
-    await debt2.set(
-      DebtModel(
-        id: 'debt2',
-        fromId: 'sarah_123',
-        fromName: 'Sarah',
-        toId: userId,
-        toName: userName.isEmpty ? 'Mahmoud' : userName,
-        amount: 37.50,
-        isSettled: false,
-      ).toMap(),
-    );
-
-    // Seed Activities
-    final act1 = flatRef.collection(FirestoreConstants.activities).doc();
-    await act1.set(
-      ActivityModel(
-        id: act1.id,
-        userId: userId,
-        userName: userName.isEmpty ? 'Mahmoud' : userName,
-        action: 'uploaded the Electricity bill from Stadtwerke.',
-        timestamp: DateTime.now().subtract(const Duration(hours: 12)),
-      ).toMap(),
-    );
-
-    final act2 = flatRef.collection(FirestoreConstants.activities).doc();
-    await act2.set(
-      ActivityModel(
-        id: act2.id,
-        userId: 'sarah_123',
-        userName: 'Sarah',
-        action: 'disputed the Internet split ratio.',
-        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      ).toMap(),
-    );
-
-    return flatRef.id;
-  }
-
-  @override
-  Future<bool> joinFlat(
-    String invitationCode,
-    String userId,
-    String userName,
-  ) async {
-    final query = await _firestore
-        .collection(FirestoreConstants.wgs)
-        .where(FirestoreConstants.invitationCode, isEqualTo: invitationCode)
-        .limit(1)
-        .get();
-
-    if (query.docs.isEmpty) {
-      return false;
-    }
-
-    final flatId = query.docs.first.id;
-
-    // Update User Flat ID
-    await _firestore.collection(FirestoreConstants.users).doc(userId).set({
-      FirestoreConstants.flatId: flatId,
-    }, SetOptions(merge: true));
-
-    // Add as member using MemberModel
-    final member = MemberModel(id: userId, displayName: userName, role: UserRole.user);
-    await _firestore
-        .collection(FirestoreConstants.wgs)
-        .doc(flatId)
-        .collection(FirestoreConstants.members)
-        .doc(userId)
-        .set(member.toJson());
-
-    // Log Activity
-    final actRef = _firestore
-        .collection(FirestoreConstants.wgs)
-        .doc(flatId)
-        .collection(FirestoreConstants.activities)
-        .doc();
-    await actRef.set(
-      ActivityModel(
-        id: actRef.id,
-        userId: userId,
-        userName: userName,
-        action: 'joined the flat.',
-        timestamp: DateTime.now(),
-      ).toMap(),
-    );
-
-    return true;
-  }
-
-  @override
   Future<void> addExpense(
     String flatId,
     String title,
@@ -341,10 +145,9 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       ExpenseModel(
         id: expRef.id,
         title: title,
+        payerName: payerName,
         amount: amount,
         payerId: payerId,
-        payerName: payerName,
-        category: category,
         date: DateTime.now(),
         isDisputed: false,
       ).toMap(),

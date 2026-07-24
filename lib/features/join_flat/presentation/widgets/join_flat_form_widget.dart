@@ -20,21 +20,6 @@ class JoinFlatFormWidget extends HookConsumerWidget {
     // PIN code controller logic (6 digits)
     final controllers = List.generate(6, (_) => useTextEditingController());
     final focusNodes = List.generate(6, (_) => useFocusNode());
-
-    void submitPin() {
-      final pin = controllers.map((c) => c.text).join();
-      if (pin.length == 6) {
-        ref.read(dashboardActionsProvider.notifier).joinFlat(pin);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(LocaleKeys.dashboard_validation_empty_fields.tr()),
-            backgroundColor: colorScheme.error,
-          ),
-        );
-      }
-    }
-
     return Column(
       key: const ValueKey('join_flat_view'),
       mainAxisAlignment: MainAxisAlignment.center,
@@ -81,16 +66,20 @@ class JoinFlatFormWidget extends HookConsumerWidget {
                   counterText: "",
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colorScheme.outlineVariant, width: 2),
+                    borderSide: BorderSide(
+                      color: colorScheme.outlineVariant,
+                      width: 2,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
+                      width: 2,
+                    ),
                   ),
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onChanged: (value) {
                   if (value.isNotEmpty) {
                     if (index < 5) {
@@ -117,7 +106,9 @@ class JoinFlatFormWidget extends HookConsumerWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.5)),
+            side: BorderSide(
+              color: colorScheme.outlineVariant.withOpacity(0.5),
+            ),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -144,7 +135,7 @@ class JoinFlatFormWidget extends HookConsumerWidget {
         // Primary Button
         ElevatedButton.icon(
           key: const Key('joinFlatButton'),
-          onPressed: isLoading ? null : submitPin,
+          onPressed: () {},
           style: ElevatedButton.styleFrom(
             backgroundColor: colorScheme.primaryContainer,
             foregroundColor: colorScheme.onPrimaryContainer,
