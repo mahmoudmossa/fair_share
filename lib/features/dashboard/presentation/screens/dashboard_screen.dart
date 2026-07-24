@@ -9,6 +9,7 @@ import 'package:fair_share/core/router/providers/app_router_provider.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_notifier_provider.dart';
 import 'package:fair_share/features/dashboard/domain/entities/dashboard_state.dart';
 import '../providers/dashboard_provider.dart';
+import '../providers/flat_debts_provider.dart';
 import '../widgets/bento_summary_widget.dart';
 import '../widgets/debt_matrix_widget.dart';
 import '../widgets/itemized_expenses_widget.dart';
@@ -125,6 +126,7 @@ class DashboardScreen extends HookConsumerWidget {
                 currentTab.value,
                 stateAsync,
                 user.id,
+                ref,
               ),
             ),
           ),
@@ -186,6 +188,7 @@ class DashboardScreen extends HookConsumerWidget {
     int tabIndex,
     AsyncValue<DashboardState?> stateAsync,
     String currentUserId,
+    WidgetRef ref,
   ) {
     if (tabIndex != 0) {
       return Center(
@@ -300,7 +303,14 @@ class DashboardScreen extends HookConsumerWidget {
               ],
 
               // Debt Matrix
-              DebtMatrixWidget(flatId: state.flat.id, debts: state.debts),
+              ref.watch(flatDebtsProvider(state.flat.id)).when(
+                    data: (debts) => DebtMatrixWidget(
+                      flatId: state.flat.id,
+                      debts: debts,
+                    ),
+                    loading: () => const SizedBox.shrink(),
+                    error: (err, stack) => Text(err.toString()),
+                  ),
 
               // Itemized Expenses
               ItemizedExpensesWidget(

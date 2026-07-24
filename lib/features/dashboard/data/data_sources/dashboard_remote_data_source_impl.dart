@@ -8,6 +8,7 @@ import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.
 import 'package:fair_share/features/new_flat/domain/entities/flat_cost.dart';
 import 'package:fair_share/features/new_flat/domain/use_cases/calculate_settlements.dart';
 import '../../domain/entities/dashboard_state.dart';
+import '../../domain/entities/debt_entity.dart';
 import '../models/flat_model.dart';
 import '../models/billing_cycle_model.dart';
 import '../models/expense_model.dart';
@@ -348,6 +349,44 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     await cycleRef.set({
       FirestoreConstants.settledPercentage: percentage,
     }, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> setFlatDebts(String flatId, List<DebtEntity> debts) async {
+    final batch = _firestore.batch();
+    final debtsRef = _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.debts);
+
+    for (final debt in debts) {
+      final docRef = debtsRef.doc(debt.id);
+      final model = DebtModel(
+        id: debt.id,
+        fromId: debt.fromId,
+        fromName: debt.fromName,
+        toId: debt.toId,
+        toName: debt.toName,
+        amount: debt.amount,
+        isSettled: debt.isSettled,
+      );
+      batch.set(docRef, model.toMap(), SetOptions(merge: true));
+    }
+    await batch.commit();
+  }
+
+  @override
+  Stream<List<DebtEntity>> watchFlatDebts(String flatId) {
+    return _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.debts)
+        .snapshots()
+        .map((snap) {
+      return snap.docs
+          .map((d) => DebtModel.fromMap(d.data(), d.id))
+          .toList();
+    });
   }
 
   @override

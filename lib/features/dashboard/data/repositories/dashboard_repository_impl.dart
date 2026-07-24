@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/dashboard_state.dart';
+import '../../domain/entities/debt_entity.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 import '../data_sources/dashboard_remote_data_source.dart';
 
@@ -60,5 +61,15 @@ class DashboardRepositoryImpl implements DashboardRepository {
     } on Exception catch (e) {
       return Left(e);
     }
+  }
+
+  @override
+  Future<void> setFlatDebts(String flatId, List<DebtEntity> debts) async {
+    await _remoteDataSource.setFlatDebts(flatId, debts);
+  }
+
+  @override
+  Stream<List<DebtEntity>> watchFlatDebts(String flatId) {
+    return _remoteDataSource.watchFlatDebts(flatId);
   }
 }

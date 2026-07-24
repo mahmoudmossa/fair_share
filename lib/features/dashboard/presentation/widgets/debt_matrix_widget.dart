@@ -19,8 +19,6 @@ class DebtMatrixWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    print('depts-----------$debts');
-
     if (debts.isEmpty) return const SizedBox.shrink();
 
     return Padding(

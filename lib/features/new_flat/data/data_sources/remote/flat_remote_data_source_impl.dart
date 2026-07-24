@@ -43,7 +43,15 @@ class FlatRemoteDataSourceImpl implements FlatRemoteDataSource {
     final flatRef = _firestore.collection(FirestoreConstants.wgs).doc(flat.id);
     batch.set(flatRef, flat.toJson());
 
-    // 2. Write all setup members
+    // 2. Write all setup members (including creator)
+    final creatorRef = flatRef
+        .collection(FirestoreConstants.members)
+        .doc(flat.createdBy);
+    batch.set(creatorRef, {
+      'id': flat.createdBy,
+      'name': flat.createdByName,
+    });
+
     for (final member in members) {
       final docId = member.id;
       final memberRef = flatRef
