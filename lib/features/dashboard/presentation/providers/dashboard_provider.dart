@@ -30,6 +30,7 @@ Stream<UserEntity?> firestoreUser(Ref ref) {
 @riverpod
 Stream<DashboardState?> dashboardState(Ref ref) {
   final user = ref.watch(firestoreUserProvider).value;
+  print('user------------$user');
   if (user == null || user.flatId == null || user.flatId!.isEmpty) {
     return Stream.value(null);
   }

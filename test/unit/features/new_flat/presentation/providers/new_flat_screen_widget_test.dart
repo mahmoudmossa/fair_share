@@ -1,17 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:easy_localization/src/localization.dart';
-import 'package:easy_localization/src/translations.dart';
 import 'package:fair_share/core/constants/app_keys.dart';
 import 'package:fair_share/features/new_flat/domain/repositories/flat_repository.dart';
 import 'package:fair_share/features/new_flat/presentation/provider/new_flat_repository_provider.dart';
 import 'package:fair_share/features/new_flat/presentation/screens/new_flat_screen.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_state_provider.dart';
-import 'package:fair_share/features/new_flat/presentation/provider/flat_setup_provider.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../../shared/pump_widget.dart';
@@ -70,7 +62,7 @@ void main() {
 
   group('NewFlatScreen tests', () {
     testWidgets('step 1 should have flat name input field', (tester) async {
-      pumpWidget;
+      await pumpWidget(tester);
       await tester.pumpAndSettle();
 
       await completeStep1(tester, flatName: 'flatName');
@@ -82,7 +74,7 @@ void main() {
     testWidgets('step 2 should add member and transition to step 3', (
       tester,
     ) async {
-      pumpWidget;
+      await pumpWidget(tester);
       await tester.pumpAndSettle();
 
       await completeStep1(tester);

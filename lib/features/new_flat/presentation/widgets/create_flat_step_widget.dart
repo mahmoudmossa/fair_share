@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
+import 'package:fair_share/core/constants/app_keys.dart';
 import '../provider/flat_setup_provider.dart';
 
 class CreateFlatStepWidget extends HookConsumerWidget {
@@ -42,7 +43,7 @@ class CreateFlatStepWidget extends HookConsumerWidget {
 
           // Flat Name Input
           TextFormField(
-            key: const Key('flatNameField'),
+            key: AppKeys.newFlat.flatNameField,
             controller: controller,
             style: const TextStyle(fontFamily: 'Inter'),
             textInputAction: TextInputAction.done,

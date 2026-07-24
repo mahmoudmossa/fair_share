@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fair_share/core/constants/app_keys.dart';
 import '../support/base_test_scenario.dart';
 
 class FlatSetupTestScenario extends BaseTestScenario {
@@ -20,10 +21,10 @@ class FlatSetupTestScenario extends BaseTestScenario {
 
     // Verify Create Flat step 1 UI is visible
     await $('Create a new Flat').waitUntilVisible();
-    await $(const Key('flatNameField')).waitUntilVisible();
+    await $(AppKeys.newFlat.flatNameField).waitUntilVisible();
 
     // 2. Step 1: Enter flat name and tap Continue
-    await $(const Key('flatNameField')).enterText('Baker Street 221B');
+    await $(AppKeys.newFlat.flatNameField).enterText('Baker Street 221B');
     await $(const Key('newFlatContinueButton')).tap();
     await $.tester.pumpAndSettle();
 

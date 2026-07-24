@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'package:fair_share/core/constants/firestore_constants.dart';
@@ -19,6 +18,18 @@ class FlatRemoteDataSourceImpl implements FlatRemoteDataSource {
   final FirebaseFirestore _firestore;
 
   FlatRemoteDataSourceImpl(this._firestore);
+
+  String _getMonthId(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}";
+  }
+
+  String _getMonthNameFormatted(DateTime date) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return "${months[date.month - 1]} ${date.year}";
+  }
 
   @override
   Future<void> createFlat({
@@ -44,8 +55,27 @@ class FlatRemoteDataSourceImpl implements FlatRemoteDataSource {
     // 3. Write all setup initial expenses/costs
     for (final cost in costs) {
       final costRef = flatRef.collection(FirestoreConstants.expenses).doc();
-      batch.set(costRef, cost.toJson());
+      final costJson = {
+        ...cost.toJson(),
+        'id': costRef.id,
+      };
+      batch.set(costRef, costJson);
     }
+
+    // Initialize the billing cycle doc in the database for the current month
+    final now = DateTime.now();
+    final currentMonthId = _getMonthId(now);
+    final totalSetupCosts = costs.fold(0.0, (total, cost) => total + cost.amount);
+
+    final cycleRef = flatRef
+        .collection(FirestoreConstants.billingCycles)
+        .doc(currentMonthId);
+    batch.set(cycleRef, {
+      'monthName': _getMonthNameFormatted(now),
+      'status': 'draft',
+      'totalCosts': totalSetupCosts,
+      'settledPercentage': 85.0,
+    });
 
     // 4. Update User profile to set flatId
     final userRef = _firestore

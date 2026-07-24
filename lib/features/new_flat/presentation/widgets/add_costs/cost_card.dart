@@ -168,7 +168,7 @@ class CostCard extends HookConsumerWidget {
 
                     const SizedBox(height: 4),
                     DropdownButtonFormField<FlatMemberEntity>(
-                      value: selectedMember,
+                      initialValue: selectedMember,
                       items: allMembers
                           .map(
                             (member) => DropdownMenuItem<FlatMemberEntity>(
