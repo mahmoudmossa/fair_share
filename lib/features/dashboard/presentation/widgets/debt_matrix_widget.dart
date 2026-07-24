@@ -141,35 +141,22 @@ class DebtMatrixWidget extends ConsumerWidget {
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
                           child: debt.isSettled
-                              ? Container(
+                              ? Chip(
                                   key: const ValueKey('settled'),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.primaryContainer
-                                        .withOpacity(0.15),
+                                  backgroundColor: colorScheme.primary,
+                                  side: BorderSide.none,
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.check,
-                                        size: 16,
-                                        color: colorScheme.primary,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        LocaleKeys.dashboard_settled.tr(),
-                                        style: TextStyle(
-                                          color: colorScheme.primary,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
+                                  padding: EdgeInsets.zero,
+                                  visualDensity: VisualDensity.compact,
+                                  label: Text(
+                                    LocaleKeys.dashboard_settled.tr(),
+                                    style: TextStyle(
+                                      color: colorScheme.onPrimary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 )
                               : ElevatedButton(

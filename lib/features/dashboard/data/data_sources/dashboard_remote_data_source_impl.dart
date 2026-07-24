@@ -109,6 +109,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
             expenses: latestExpenses.map((e) => e.toEntity()).toList(),
             debts: updatedDebts,
             activities: latestActivities,
+            members: latestMembers,
           ),
         );
       }

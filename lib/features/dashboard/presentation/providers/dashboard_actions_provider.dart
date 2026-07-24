@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_core/shared_core.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_state_provider.dart';
+import '../../domain/use_cases/settle_use_case.dart';
 import 'dashboard_repository_provider.dart';
 
 part 'dashboard_actions_provider.g.dart';
@@ -52,12 +53,12 @@ class DashboardActions extends _$DashboardActions {
       return;
     }
 
-    final repository = ref.read(dashboardRepositoryProvider);
-    final result = await repository.settleDebt(
-      flatId,
-      debtId,
-      auth.id,
-      auth.displayName ?? auth.email.split('@').first,
+    final useCase = ref.read(settleUseCaseProvider);
+    final result = await useCase(
+      flatId: flatId,
+      debtId: debtId,
+      userId: auth.id,
+      userName: auth.displayName ?? auth.email.split('@').first,
     );
 
     state = result.fold(

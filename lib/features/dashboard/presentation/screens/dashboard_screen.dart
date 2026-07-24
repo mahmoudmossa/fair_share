@@ -299,7 +299,10 @@ class DashboardScreen extends HookConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
-                BentoSummaryWidget(cycle: cycle),
+                BentoSummaryWidget(
+                  cycle: cycle,
+                  membersCount: state.members.length,
+                ),
               ],
 
               // Debt Matrix
