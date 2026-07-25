@@ -69,17 +69,11 @@ class DebtMatrixWidget extends ConsumerWidget {
                 itemCount: debts.length,
                 itemBuilder: (context, index) {
                   final debt = debts[index];
-                  final initial = debt.fromName.isNotEmpty
-                      ? debt.fromName[0].toUpperCase()
-                      : '?';
+                  final initial = debt.fromName;
 
                   // Select avatar color based on name to match design
                   Color avatarBg = colorScheme.secondaryContainer;
                   Color avatarFg = colorScheme.onSecondaryContainer;
-                  if (initial == 'S') {
-                    avatarBg = colorScheme.tertiaryContainer;
-                    avatarFg = colorScheme.onTertiaryContainer;
-                  }
 
                   return Container(
                     padding: const EdgeInsets.symmetric(
@@ -150,13 +144,23 @@ class DebtMatrixWidget extends ConsumerWidget {
                                   ),
                                   padding: EdgeInsets.zero,
                                   visualDensity: VisualDensity.compact,
-                                  label: Text(
-                                    LocaleKeys.dashboard_settled.tr(),
-                                    style: TextStyle(
-                                      color: colorScheme.onPrimary,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
+                                  label: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.check,
+                                        color: colorScheme.onPrimary,
+                                        size: 12,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        LocaleKeys.dashboard_settled.tr(),
+                                        style: TextStyle(
+                                          color: colorScheme.onPrimary,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 )
                               : ElevatedButton(

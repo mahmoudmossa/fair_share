@@ -1,3 +1,4 @@
+import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
 import 'package:fair_share/features/dashboard/domain/entities/dashboard_state.dart';
 import 'package:fair_share/features/dashboard/domain/entities/debt_entity.dart';
 
@@ -9,7 +10,7 @@ abstract class DashboardRemoteDataSource {
     double amount,
     String payerId,
     String payerName,
-    String category,
+    RecurrenceType recurrence,
   );
   Future<void> settleDebt(
     String flatId,
