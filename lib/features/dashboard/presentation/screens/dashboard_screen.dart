@@ -143,7 +143,10 @@ class DashboardScreen extends HookConsumerWidget {
                         showDialog(
                           context: context,
                           builder: (context) =>
-                              AddExpenseDialog(flatId: state.flat.id),
+                              AddExpenseDialog(
+                                flatId: state.flat.id,
+                                members: state.members,
+                              ),
                         );
                       },
                       child: const Icon(Icons.add, size: 28),

@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
 import '../../domain/entities/dashboard_state.dart';
 import '../../domain/entities/debt_entity.dart';
 import '../../domain/repositories/dashboard_repository.dart';
@@ -21,7 +22,7 @@ class DashboardRepositoryImpl implements DashboardRepository {
     double amount,
     String payerId,
     String payerName,
-    String category,
+    RecurrenceType recurrence,
   ) async {
     try {
       await _remoteDataSource.addExpense(
@@ -30,7 +31,7 @@ class DashboardRepositoryImpl implements DashboardRepository {
         amount,
         payerId,
         payerName,
-        category,
+        recurrence,
       );
       return const Right(null);
     } on Exception catch (e) {
