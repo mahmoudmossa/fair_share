@@ -69,7 +69,9 @@ class DebtMatrixWidget extends ConsumerWidget {
                 itemCount: debts.length,
                 itemBuilder: (context, index) {
                   final debt = debts[index];
-                  final initial = debt.fromName;
+                  final initial = debt.fromName.isNotEmpty
+                      ? debt.fromName[0].toUpperCase()
+                      : '';
 
                   // Select avatar color based on name to match design
                   Color avatarBg = colorScheme.secondaryContainer;
