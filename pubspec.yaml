@@ -30,6 +30,7 @@ dependencies:
   mason: ^0.1.2
   riverpod_annotation: any
   shared_core: any
+  shared_ui: any
   equatable: ^2.0.6
   json_annotation: ^4.9.0
   freezed_annotation: ^3.1.0

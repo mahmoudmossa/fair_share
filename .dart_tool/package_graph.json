@@ -30,6 +30,7 @@
         "mason",
         "riverpod_annotation",
         "shared_core",
+        "shared_ui",
         "uuid"
       ],
       "devDependencies": [

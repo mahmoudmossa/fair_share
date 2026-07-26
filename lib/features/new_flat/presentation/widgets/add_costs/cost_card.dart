@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_ui/shared_ui.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
@@ -76,181 +77,89 @@ class CostCard extends HookConsumerWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocaleKeys.new_flat_setup_cost_title_label.tr(),
-                      style: textTheme.labelMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+          ExpenseFormFields(
+            titleController: titleController,
+            amountController: amountController,
+            titleLabel: LocaleKeys.new_flat_setup_cost_title_label.tr(),
+            titleHint: LocaleKeys.new_flat_setup_cost_title_hint.tr(),
+            amountLabel: LocaleKeys.new_flat_setup_amount_label.tr(),
+            amountHint: '0.00',
+            paidByLabel: LocaleKeys.new_flat_setup_paid_by_label.tr(),
+            frequencyLabel: LocaleKeys.new_flat_setup_frequency_label.tr(),
+            onTitleChanged: (val) => ref
+                .read(flatSetupProvider.notifier)
+                .updateCost(index, title: val),
+            onAmountChanged: (val) => ref
+                .read(flatSetupProvider.notifier)
+                .updateCost(
+                  index,
+                  amount: double.tryParse(val) ?? 0.0,
+                ),
+            payerDropdown: DropdownButtonFormField<FlatMemberEntity>(
+              initialValue: selectedMember,
+              items: allMembers
+                  .map(
+                    (member) => DropdownMenuItem<FlatMemberEntity>(
+                      value: member,
+                      child: Text(
+                        member.name,
+                        style: textTheme.bodyMedium,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    TextField(
-                      controller: titleController,
-                      onChanged: (val) => ref
-                          .read(flatSetupProvider.notifier)
-                          .updateCost(index, title: val),
-                      decoration: InputDecoration(
-                        hintText: LocaleKeys.new_flat_setup_cost_title_hint
-                            .tr(),
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
+                  )
+                  .toList(),
+              onChanged: (member) {
+                if (member == null) return;
+                ref
+                    .read(flatSetupProvider.notifier)
+                    .updateCost(
+                      index,
+                      payerId: member.id,
+                      payerName: member.name,
+                    );
+              },
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocaleKeys.new_flat_setup_amount_label.tr(),
-                      style: textTheme.labelMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    TextField(
-                      controller: amountController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      onChanged: (val) => ref
-                          .read(flatSetupProvider.notifier)
-                          .updateCost(
-                            index,
-                            amount: double.tryParse(val) ?? 0.0,
-                          ),
-                      decoration: InputDecoration(
-                        hintText: '0.00',
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
+            ),
+            frequencySegmentedButton: SegmentedButton<bool>(
+              segments: [
+                ButtonSegment(
+                  value: true,
+                  label: Text(
+                    LocaleKeys.new_flat_setup_recurring_monthly.tr(),
+                    style: const TextStyle(fontSize: 11),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocaleKeys.new_flat_setup_paid_by_label.tr(),
-                      style: textTheme.labelMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-                    DropdownButtonFormField<FlatMemberEntity>(
-                      initialValue: selectedMember,
-                      items: allMembers
-                          .map(
-                            (member) => DropdownMenuItem<FlatMemberEntity>(
-                              value: member,
-                              child: Text(
-                                member.name,
-                                style: textTheme.bodyMedium,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (member) {
-                        if (member == null) return;
-                        ref
-                            .read(flatSetupProvider.notifier)
-                            .updateCost(
-                              index,
-                              payerId: member.id,
-                              payerName: member.name,
-                            );
-                      },
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
+                ButtonSegment(
+                  value: false,
+                  label: Text(
+                    LocaleKeys.new_flat_setup_one_time.tr(),
+                    style: const TextStyle(fontSize: 11),
+                  ),
                 ),
+              ],
+              selected: {cost.recurrenceType == RecurrenceType.monthly},
+              onSelectionChanged: (val) => ref
+                  .read(flatSetupProvider.notifier)
+                  .updateCost(
+                    index,
+                    recurrenceType: val.first
+                        ? RecurrenceType.monthly
+                        : RecurrenceType.oneTime,
+                  ),
+              style: SegmentedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocaleKeys.new_flat_setup_frequency_label.tr(),
-                      style: textTheme.labelMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    SegmentedButton<bool>(
-                      segments: [
-                        ButtonSegment(
-                          value: true,
-                          label: Text(
-                            LocaleKeys.new_flat_setup_recurring_monthly.tr(),
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                        ),
-                        ButtonSegment(
-                          value: false,
-                          label: Text(
-                            LocaleKeys.new_flat_setup_one_time.tr(),
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                        ),
-                      ],
-                      selected: {cost.recurrenceType == RecurrenceType.monthly},
-                      onSelectionChanged: (val) => ref
-                          .read(flatSetupProvider.notifier)
-                          .updateCost(
-                            index,
-                            recurrenceType: val.first
-                                ? RecurrenceType.monthly
-                                : RecurrenceType.oneTime,
-                          ),
-                      style: SegmentedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
