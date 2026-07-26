@@ -5,16 +5,20 @@ import '../../domain/entities/billing_cycle_entity.dart';
 
 class BentoSummaryWidget extends StatelessWidget {
   final BillingCycleEntity cycle;
+  final int membersCount;
 
-  const BentoSummaryWidget({super.key, required this.cycle});
+  const BentoSummaryWidget({
+    super.key,
+    required this.cycle,
+    required this.membersCount,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    // Hardcode 4 members to match 450€ / 112.50€ ratio of mockup
-    final double yourShare = cycle.totalCosts / 4;
+    final double yourShare = membersCount > 0 ? cycle.totalCosts / membersCount : 0.0;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0),
@@ -155,12 +159,13 @@ class BentoSummaryWidget extends StatelessWidget {
                             Text(
                               LocaleKeys.dashboard_settled_msg.tr(args: [
                                 cycle.settledPercentage.toStringAsFixed(0),
-                                'March'
+                                cycle.monthName,
                               ]),
                               style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onPrimary.withOpacity(0.85),
                               ),
                             ),
+
                           ],
                         ),
                       ),

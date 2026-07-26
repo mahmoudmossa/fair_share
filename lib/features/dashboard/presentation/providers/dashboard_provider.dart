@@ -3,7 +3,7 @@ import 'package:fair_share/features/auth/presentation/provider/auth_state_provid
 import 'package:fair_share/features/auth/domain/entities/user_entity.dart';
 import 'package:fair_share/core/providers/firebase_providers.dart';
 import '../../domain/entities/dashboard_state.dart';
-import '../../data/repositories/dashboard_repository_impl.dart';
+import 'dashboard_repository_provider.dart';
 
 part 'dashboard_provider.g.dart';
 

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'package:fair_share/core/router/providers/app_router_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +19,8 @@ void main() async {
 
   // Initialize Firebase options
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+  // 2. Configure Local Emulators immediately after SDK init if USE_EMULATORS=true
+  await configureFirebaseEmulators();
   // Detect build flavor
   final String? rawFlavor = appFlavor;
   final Flavor flavor = rawFlavor == 'production'

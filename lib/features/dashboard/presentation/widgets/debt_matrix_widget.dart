@@ -19,7 +19,6 @@ class DebtMatrixWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
     if (debts.isEmpty) return const SizedBox.shrink();
 
     return Padding(
@@ -70,20 +69,17 @@ class DebtMatrixWidget extends ConsumerWidget {
                 itemCount: debts.length,
                 itemBuilder: (context, index) {
                   final debt = debts[index];
-                  final initial = debt.fromName.isNotEmpty
-                      ? debt.fromName[0].toUpperCase()
-                      : '?';
+                  final initial = debt.fromName;
 
                   // Select avatar color based on name to match design
                   Color avatarBg = colorScheme.secondaryContainer;
                   Color avatarFg = colorScheme.onSecondaryContainer;
-                  if (initial == 'S') {
-                    avatarBg = colorScheme.tertiaryContainer;
-                    avatarFg = colorScheme.onTertiaryContainer;
-                  }
 
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: colorScheme.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(16),
@@ -139,22 +135,27 @@ class DebtMatrixWidget extends ConsumerWidget {
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
                           child: debt.isSettled
-                              ? Container(
+                              ? Chip(
                                   key: const ValueKey('settled'),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.primaryContainer.withOpacity(0.15),
+                                  backgroundColor: colorScheme.primary,
+                                  side: BorderSide.none,
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                  padding: EdgeInsets.zero,
+                                  visualDensity: VisualDensity.compact,
+                                  label: Row(
                                     children: [
-                                      Icon(Icons.check, size: 16, color: colorScheme.primary),
+                                      Icon(
+                                        Icons.check,
+                                        color: colorScheme.onPrimary,
+                                        size: 12,
+                                      ),
                                       const SizedBox(width: 4),
                                       Text(
                                         LocaleKeys.dashboard_settled.tr(),
                                         style: TextStyle(
-                                          color: colorScheme.primary,
+                                          color: colorScheme.onPrimary,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 12,
                                         ),
@@ -165,7 +166,9 @@ class DebtMatrixWidget extends ConsumerWidget {
                               : ElevatedButton(
                                   key: Key('settleButton_${debt.id}'),
                                   onPressed: () {
-                                    ref.read(dashboardActionsProvider.notifier).settleDebt(
+                                    ref
+                                        .read(dashboardActionsProvider.notifier)
+                                        .settleDebt(
                                           flatId: flatId,
                                           debtId: debt.id,
                                         );
@@ -173,7 +176,10 @@ class DebtMatrixWidget extends ConsumerWidget {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: colorScheme.primary,
                                     foregroundColor: colorScheme.onPrimary,
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 8,
+                                    ),
                                     minimumSize: Size.zero,
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(

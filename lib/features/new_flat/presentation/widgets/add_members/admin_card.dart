@@ -1,10 +1,10 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'admin_badge.dart';
 
 class AdminCard extends StatelessWidget {
-  const AdminCard({super.key});
+  const AdminCard({super.key, required this.name});
+
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class AdminCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  LocaleKeys.new_flat_setup_you_label.tr(),
+                  name,
                   style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onPrimaryContainer,

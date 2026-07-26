@@ -27,6 +27,22 @@ class DashboardRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [JoinFlatScreen]
+class JoinFlatRoute extends PageRouteInfo<void> {
+  const JoinFlatRoute({List<PageRouteInfo>? children})
+    : super(JoinFlatRoute.name, initialChildren: children);
+
+  static const String name = 'JoinFlatRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const JoinFlatScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [JoinOrCreateFlatScreen]
 class JoinOrCreateFlatRoute extends PageRouteInfo<void> {
   const JoinOrCreateFlatRoute({List<PageRouteInfo>? children})

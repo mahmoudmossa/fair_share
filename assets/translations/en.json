@@ -42,7 +42,19 @@
     "expense_category": "Category",
     "save": "Save",
     "cancel": "Cancel",
-    "validation_empty_fields": "Please fill out all fields"
+    "validation_empty_fields": "Please fill out all fields",
+    "history_tab": "History",
+    "admin_tab": "Admin",
+    "profile_tab": "Profile",
+    "history_coming_soon": "History Screen coming soon!",
+    "admin_coming_soon": "Admin Screen coming soon!",
+    "profile_coming_soon": "Profile Settings coming soon!",
+    "error_loading_user": "Error loading user profile: {}",
+    "error_loading_dashboard": "Error loading dashboard: {}",
+    "category_electricity": "Electricity",
+    "category_internet": "Internet",
+    "category_groceries": "Groceries",
+    "category_other": "Other"
   },
   "flat_setup": {
     "title": "Join your Flat",
@@ -87,12 +99,26 @@
     "recurring_monthly": "Recurring (Monthly)",
     "one_time": "One-Time",
     "add_another_cost": "+ Add another cost",
-    "almost_there": "Almost there!"
+    "almost_there": "Almost there!",
+    "no_members_attention": "No members added yet. Start with your name.",
+    "member_exists_error": "Member name already exists",
+    "your_name_hint": "Your Name",
+    "enter_flat_name_error": "Please enter a name for your flat",
+    "add_member_error": "Please add at least one member to your household",
+    "session_not_found_error": "User session not found. Please log in again.",
+    "invalid_costs_error": "Please enter valid titles and amounts for all costs",
+    "cost_number": "Cost #{}"
   },
   "errors": {
     "permission_denied": "Permission denied",
     "unauthenticated": "Unauthenticated",
     "unavailable": "Unavailable",
     "unknown": "Unknown"
+  },
+  "occupants": {
+    "title": "Occupants View",
+    "subtitle": "This is the Occupants view",
+    "widget": "Occupants Widget"
   }
 }
+

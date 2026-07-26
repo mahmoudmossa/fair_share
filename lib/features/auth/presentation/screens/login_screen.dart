@@ -61,8 +61,12 @@ class _LoginContent extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final emailController = useTextEditingController();
-    final passwordController = useTextEditingController();
+    final emailController = useTextEditingController(
+      text: const String.fromEnvironment('USER_NAME'),
+    );
+    final passwordController = useTextEditingController(
+      text: const String.fromEnvironment('PASSWORD'),
+    );
     final confirmPasswordController = useTextEditingController();
     final isLoginMode = useState(true);
     final state = ref.watch(authProvider);
