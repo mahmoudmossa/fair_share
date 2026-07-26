@@ -1,7 +1,11 @@
 import '../entities/notifications_entity.dart';
 
 abstract class NotificationsRepository {
-  // TODO: Define repository contract methods
-  // Example:
-  // Future<Either<Exception, NotificationsEntity>> getNotifications(String id);
+  Stream<List<NotificationsEntity>> watchNotifications(String userId);
+  Future<void> markAsRead(String userId, String notificationId);
+  Future<void> markAllAsRead(String userId);
+  Future<void> notifyFlatMembers({
+    required List<String> userIds,
+    required NotificationsEntity notification,
+  });
 }
