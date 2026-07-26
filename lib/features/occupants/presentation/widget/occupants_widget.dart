@@ -8,8 +8,6 @@ class OccupantsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text(LocaleKeys.occupants_widget.tr()),
-    );
+    return Text(LocaleKeys.occupants_widget.tr());
   }
 }

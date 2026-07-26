@@ -1,0 +1,18 @@
+name: feature
+description: Generates a full Clean Architecture feature with Domain, Data, and Presentation layers following FairShare conventions.
+version: 0.1.0+1
+
+environment:
+  mason: ">=0.1.0-dev.52 <0.2.0"
+
+vars:
+  feature_name:
+    type: string
+    description: "Feature name in PascalCase (e.g. DebtDetails). All file/class names are derived from this."
+    prompt: "What is the feature name? (PascalCase, e.g. DebtDetails)"
+
+  with_routing:
+    type: boolean
+    description: "Add @RoutePage() annotation to the screen and generate an AutoRoute snippet."
+    prompt: "Should this feature have routing (AutoRoute)?"
+    default: true
