@@ -7,6 +7,7 @@ class FirestoreConstants {
   static const String expenses = 'expenses';
   static const String debts = 'debts';
   static const String activities = 'activities';
+  static const String monthlyHistory = 'monthly_history';
 
   // Fields / Keys
   static const String flatId = 'flatId';

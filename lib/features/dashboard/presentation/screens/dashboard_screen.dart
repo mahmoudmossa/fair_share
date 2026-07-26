@@ -15,6 +15,7 @@ import '../widgets/debt_matrix_widget.dart';
 import '../widgets/itemized_expenses_widget.dart';
 import '../widgets/activity_feed_widget.dart';
 import '../widgets/add_expense_dialog.dart';
+import 'package:fair_share/features/history/presentation/screens/history_screen.dart';
 
 @RoutePage()
 class DashboardScreen extends HookConsumerWidget {
@@ -165,6 +166,7 @@ class DashboardScreen extends HookConsumerWidget {
                 label: LocaleKeys.dashboard_title.tr(),
               ),
               NavigationDestination(
+                key: const Key('historyNavTab'),
                 icon: const Icon(Icons.receipt_long_outlined),
                 selectedIcon: const Icon(Icons.receipt_long),
                 label: LocaleKeys.dashboard_history_tab.tr(),
@@ -193,7 +195,13 @@ class DashboardScreen extends HookConsumerWidget {
     String currentUserId,
     WidgetRef ref,
   ) {
-    if (tabIndex != 0) {
+    if (tabIndex == 1) {
+      return const HistoryScreen(
+        key: ValueKey('tab_1'),
+      );
+    }
+
+    if (tabIndex == 2 || tabIndex == 3) {
       return Center(
         key: ValueKey('tab_$tabIndex'),
         child: Padding(
@@ -202,22 +210,18 @@ class DashboardScreen extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                tabIndex == 1
-                    ? Icons.receipt_long
-                    : tabIndex == 2
-                    ? Icons.group
-                    : Icons.settings,
+                tabIndex == 2 ? Icons.group : Icons.settings,
                 size: 64,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               const SizedBox(height: 16),
               Text(
-                tabIndex == 1
-                    ? LocaleKeys.dashboard_history_coming_soon.tr()
-                    : tabIndex == 2
+                tabIndex == 2
                     ? LocaleKeys.dashboard_admin_coming_soon.tr()
                     : LocaleKeys.dashboard_profile_coming_soon.tr(),
-                style: const TextStyle(fontSize: 18, color: Colors.grey),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),

@@ -1,20 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:fair_share/core/utils/date_utils_converter.dart';
 import '../../domain/entities/expense_entity.dart';
 import '../../../new_flat/domain/entities/recurrence_type.dart';
 
 part 'expense_model.g.dart';
-
-DateTime _dateFromJson(dynamic json) {
-  if (json is Timestamp) {
-    return json.toDate();
-  } else if (json is String) {
-    return DateTime.tryParse(json) ?? DateTime.now();
-  }
-  return DateTime.now();
-}
-
-dynamic _dateToJson(DateTime date) => Timestamp.fromDate(date);
 
 @JsonSerializable()
 class ExpenseModel {
@@ -24,7 +13,10 @@ class ExpenseModel {
   final String payerId;
   final String payerName;
 
-  @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
+  @JsonKey(
+    fromJson: DateUtilsConverter.dateFromJson,
+    toJson: DateUtilsConverter.dateToJson,
+  )
   final DateTime date;
 
   final bool isDisputed;
