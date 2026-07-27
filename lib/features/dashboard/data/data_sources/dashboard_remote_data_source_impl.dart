@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'package:fair_share/core/constants/firestore_constants.dart';
+import 'package:fair_share/core/utils/monthly_history_helper.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_member_dto.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_cost.dart';
@@ -63,24 +64,15 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
           costs: flatCosts,
         );
 
-        // Match the settled status of each debt by matching the pair-wise ID (fromId_toId)
-        // with the list of settled debts from the DB
-        final settledDebtIds = latestDebts
-            .where((d) => d.isSettled)
-            .map((d) => d.id)
-            .toSet();
+        // Match settled status of each pair (fromId_toId) with stored debts in Firestore
+        final Map<String, bool> settledMap = {
+          for (final d in latestDebts) '${d.fromId}_${d.toId}': d.isSettled,
+        };
 
-        final updatedDebts = calculatedDebts.map((d) {
-          final isSettled = settledDebtIds.contains(d.id);
-          return DebtModel(
-            id: d.id,
-            fromId: d.fromId,
-            fromName: d.fromName,
-            toId: d.toId,
-            toName: d.toName,
-            amount: d.amount,
-            isSettled: isSettled,
-          );
+        final List<DebtModel> displayDebts = calculatedDebts.map((d) {
+          final pairKey = '${d.fromId}_${d.toId}';
+          final isSettled = settledMap[pairKey] ?? false;
+          return DebtModel.fromEntity(d).copyWith(isSettled: isSettled);
         }).toList();
 
         // Resolve active billing cycle dynamically if it's missing or out of sync
@@ -88,8 +80,8 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         final currentMonthId = _getMonthId(now);
         
         final totalCosts = latestExpenses.fold(0.0, (total, exp) => total + exp.amount);
-        final settledCount = updatedDebts.where((d) => d.isSettled).length;
-        final totalCount = updatedDebts.length;
+        final settledCount = displayDebts.where((d) => d.isSettled).length;
+        final totalCount = displayDebts.length;
         double percentage = 85.0;
         if (totalCount > 0) {
           percentage = 85.0 + (15.0 * (settledCount / totalCount));
@@ -108,7 +100,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
             flat: latestFlat!,
             activeCycle: activeCycle,
             expenses: latestExpenses.map((e) => e.toEntity()).toList(),
-            debts: updatedDebts,
+            debts: displayDebts.map((d) => d.toEntity()).toList(),
             activities: latestActivities,
             members: latestMembers,
           ),
@@ -219,30 +211,16 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   @override
   Future<void> addExpense(
     String flatId,
-    String title,
-    double amount,
-    String payerId,
-    String payerName,
-    RecurrenceType recurrence,
+    ExpenseModel expense,
   ) async {
     // Add expense doc
     final expRef = _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
         .collection(FirestoreConstants.expenses)
-        .doc();
-    await expRef.set(
-      ExpenseModel(
-        id: expRef.id,
-        title: title,
-        payerName: payerName,
-        amount: amount,
-        payerId: payerId,
-        date: DateTime.now(),
-        isDisputed: false,
-        recurrence: recurrence,
-      ).toMap(),
-    );
+        .doc(expense.id.isEmpty ? null : expense.id);
+    final modelToSave = expense.copyWith(id: expRef.id);
+    await expRef.set(modelToSave.toJson());
 
     // Log Activity
     final actRef = _firestore
@@ -253,9 +231,10 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     await actRef.set(
       ActivityModel(
         id: actRef.id,
-        userId: payerId,
-        userName: payerName,
-        action: 'added expense "$title" of ${amount.toStringAsFixed(2)}€.',
+        userId: expense.payerId,
+        userName: expense.payerName,
+        action:
+            'added expense "${expense.title}" of ${expense.amount.toStringAsFixed(2)}€.',
         timestamp: DateTime.now(),
       ).toMap(),
     );
@@ -277,17 +256,113 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
                 ?.toDouble() ??
             0.0;
         transaction.update(cycleRef, {
-          FirestoreConstants.totalCosts: currentTotal + amount,
+          FirestoreConstants.totalCosts: currentTotal + expense.amount,
         });
       } else {
         transaction.set(cycleRef, {
           'monthName': _getMonthNameFormatted(now),
           'status': 'draft',
-          'totalCosts': amount,
+          'totalCosts': expense.amount,
           'settledPercentage': 85.0,
         });
       }
     });
+
+    // Recalculate member debt matrix amounts and reset isSettled to false
+    await _recalculateAndSaveDebts(flatId);
+
+    // Recalculate billing cycle settled percentage
+    await _recalculateBillingCycleSettlement(flatId);
+
+    // Keep the monthly history summary in sync
+    await upsertMonthlyHistory(_firestore, flatId);
+  }
+
+  /// Private helper to recalculate debts after costs/expenses change,
+  /// reset `isSettled` to `false` for all debt matrix items, and update Firestore.
+  Future<void> _recalculateAndSaveDebts(String flatId) async {
+    final membersSnap = await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.members)
+        .get();
+
+    final members = membersSnap.docs.map<FlatMemberEntity>((d) {
+      return FlatMemberDto.fromJson(d.data()).toEntity();
+    }).toList();
+
+    final expensesSnap = await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.expenses)
+        .get();
+
+    final costs = expensesSnap.docs.map<FlatCostEntity>((d) {
+      final model = ExpenseModel.fromMap(d.data(), d.id);
+      return FlatCostEntity(
+        title: model.title,
+        amount: model.amount,
+        recurrenceType: model.recurrence,
+        payerId: model.payerId,
+        payerName: model.payerName,
+      );
+    }).toList();
+
+    final calculatedDebts = SettlementCalculator.calculateDebts(
+      members: members,
+      costs: costs,
+    );
+
+    // Delete existing debt documents in wgs/{flatId}/debts
+    final debtsRef = _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.debts);
+
+    final existingDebtsSnap = await debtsRef.get();
+    final batch = _firestore.batch();
+    for (final doc in existingDebtsSnap.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // Save newly calculated debts (all reset to isSettled = false)
+    for (final debt in calculatedDebts) {
+      final model = DebtModel.fromEntity(debt).copyWith(isSettled: false);
+      final docRef = debtsRef.doc(model.id);
+      batch.set(docRef, model.toJson());
+    }
+    await batch.commit();
+  }
+
+  /// Private helper to update the billing cycle settled percentage.
+  Future<void> _recalculateBillingCycleSettlement(String flatId) async {
+    final debtsSnap = await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.debts)
+        .get();
+
+    final allDebts = debtsSnap.docs
+        .map((d) => DebtModel.fromMap(d.data(), d.id))
+        .toList();
+    final settledCount = allDebts.where((d) => d.isSettled).length;
+    final totalCount = allDebts.length;
+
+    double percentage = 85.0;
+    if (totalCount > 0) {
+      percentage = 85.0 + (15.0 * (settledCount / totalCount));
+    }
+
+    final now = DateTime.now();
+    final currentMonthId = _getMonthId(now);
+    final cycleRef = _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.billingCycles)
+        .doc(currentMonthId);
+    await cycleRef.set({
+      FirestoreConstants.settledPercentage: percentage,
+    }, SetOptions(merge: true));
   }
 
   @override
@@ -323,35 +398,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       ).toMap(),
     );
 
-    // Recalculate Settled Percentage of Billing Cycle
-    final debtsSnap = await _firestore
-        .collection(FirestoreConstants.wgs)
-        .doc(flatId)
-        .collection(FirestoreConstants.debts)
-        .get();
-
-    final allDebts = debtsSnap.docs
-        .map((d) => DebtModel.fromMap(d.data(), d.id))
-        .toList();
-    final settledCount = allDebts.where((d) => d.isSettled).length;
-    final totalCount = allDebts.length;
-
-    // Default starts at 85% settled. If 1/2 is settled, let's show 92.5%, if 2/2 is settled show 100%
-    double percentage = 85.0;
-    if (totalCount > 0) {
-      percentage = 85.0 + (15.0 * (settledCount / totalCount));
-    }
-
-    final now = DateTime.now();
-    final currentMonthId = _getMonthId(now);
-    final cycleRef = _firestore
-        .collection(FirestoreConstants.wgs)
-        .doc(flatId)
-        .collection(FirestoreConstants.billingCycles)
-        .doc(currentMonthId);
-    await cycleRef.set({
-      FirestoreConstants.settledPercentage: percentage,
-    }, SetOptions(merge: true));
+    await _recalculateBillingCycleSettlement(flatId);
   }
 
   @override
@@ -387,7 +434,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .snapshots()
         .map((snap) {
       return snap.docs
-          .map((d) => DebtModel.fromMap(d.data(), d.id))
+          .map((d) => DebtModel.fromMap(d.data(), d.id).toEntity())
           .toList();
     });
   }

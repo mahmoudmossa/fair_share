@@ -1,18 +1,14 @@
 import 'dart:async';
 import 'package:dartz/dartz.dart';
-import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
 import '../entities/dashboard_state.dart';
 import '../entities/debt_entity.dart';
+import '../entities/expense_entity.dart';
 
 abstract class DashboardRepository {
   Stream<DashboardState?> watchDashboardState(String flatId);
   Future<Either<Exception, void>> addExpense(
     String flatId,
-    String title,
-    double amount,
-    String payerId,
-    String payerName,
-    RecurrenceType recurrence,
+    ExpenseEntity expense,
   );
   Future<Either<Exception, void>> settleDebt(
     String flatId,

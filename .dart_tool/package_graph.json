@@ -12,6 +12,7 @@
       "dependencies": [
         "auto_route",
         "cloud_firestore",
+        "copy_with_extension",
         "dartz",
         "easy_localization",
         "equatable",
@@ -37,6 +38,7 @@
         "auto_route_generator",
         "build_runner",
         "clean_architecture_with_state_management",
+        "copy_with_extension_gen",
         "flutter_lints",
         "flutter_test",
         "freezed",
@@ -183,6 +185,17 @@
       ]
     },
     {
+      "name": "copy_with_extension_gen",
+      "version": "15.0.1",
+      "dependencies": [
+        "analyzer",
+        "build",
+        "copy_with_extension",
+        "meta",
+        "source_gen"
+      ]
+    },
+    {
       "name": "json_serializable",
       "version": "6.13.0",
       "dependencies": [
@@ -317,6 +330,13 @@
       "dependencies": [
         "collection",
         "json_annotation",
+        "meta"
+      ]
+    },
+    {
+      "name": "copy_with_extension",
+      "version": "15.0.1",
+      "dependencies": [
         "meta"
       ]
     },

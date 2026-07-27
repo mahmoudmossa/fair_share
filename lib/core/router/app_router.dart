@@ -1,10 +1,14 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fair_share/features/auth/presentation/screens/login_screen.dart';
 import 'package:fair_share/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:fair_share/features/history/domain/entities/month_summary_entity.dart';
+import 'package:fair_share/features/history/presentation/screens/history_screen.dart';
 import 'package:fair_share/features/join_or_create_flat/presentation/screens/join_or_create_flat_screen.dart';
 import 'package:fair_share/features/join_flat/presentation/screens/join_flat_screen.dart';
 import 'package:fair_share/features/new_flat/presentation/screens/new_flat_screen.dart';
+import 'package:fair_share/features/history/presentation/screens/month_detail_screen.dart';
 import 'package:fair_share/core/router/guards/auth_guard.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'app_router.gr.dart';
@@ -37,6 +41,11 @@ class AppRouter extends RootStackRouter {
     AutoRoute(
       path: '/create-flat',
       page: NewFlatRoute.page,
+      guards: [AuthGuard(ref: ref)],
+    ),
+    AutoRoute(
+      path: '/history/month/:monthId',
+      page: MonthDetailRoute.page,
       guards: [AuthGuard(ref: ref)],
     ),
   ];

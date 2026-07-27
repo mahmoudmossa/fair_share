@@ -27,6 +27,22 @@ class DashboardRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [HistoryScreen]
+class HistoryRoute extends PageRouteInfo<void> {
+  const HistoryRoute({List<PageRouteInfo>? children})
+    : super(HistoryRoute.name, initialChildren: children);
+
+  static const String name = 'HistoryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const HistoryScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [JoinFlatScreen]
 class JoinFlatRoute extends PageRouteInfo<void> {
   const JoinFlatRoute({List<PageRouteInfo>? children})
@@ -72,6 +88,71 @@ class LoginRoute extends PageRouteInfo<void> {
       return const LoginScreen();
     },
   );
+}
+
+/// generated route for
+/// [MonthDetailScreen]
+class MonthDetailRoute extends PageRouteInfo<MonthDetailRouteArgs> {
+  MonthDetailRoute({
+    Key? key,
+    required String monthId,
+    MonthSummaryEntity? summary,
+    List<PageRouteInfo>? children,
+  }) : super(
+         MonthDetailRoute.name,
+         args: MonthDetailRouteArgs(
+           key: key,
+           monthId: monthId,
+           summary: summary,
+         ),
+         rawPathParams: {'monthId': monthId},
+         initialChildren: children,
+       );
+
+  static const String name = 'MonthDetailRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<MonthDetailRouteArgs>(
+        orElse: () =>
+            MonthDetailRouteArgs(monthId: pathParams.getString('monthId')),
+      );
+      return MonthDetailScreen(
+        key: args.key,
+        monthId: args.monthId,
+        summary: args.summary,
+      );
+    },
+  );
+}
+
+class MonthDetailRouteArgs {
+  const MonthDetailRouteArgs({this.key, required this.monthId, this.summary});
+
+  final Key? key;
+
+  final String monthId;
+
+  final MonthSummaryEntity? summary;
+
+  @override
+  String toString() {
+    return 'MonthDetailRouteArgs{key: $key, monthId: $monthId, summary: $summary}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MonthDetailRouteArgs) return false;
+    return key == other.key &&
+        monthId == other.monthId &&
+        summary == other.summary;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ monthId.hashCode ^ summary.hashCode;
 }
 
 /// generated route for

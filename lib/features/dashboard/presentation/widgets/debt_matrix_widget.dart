@@ -19,6 +19,7 @@ class DebtMatrixWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final notifier = ref.watch(dashboardActionsProvider.notifier);
     if (debts.isEmpty) return const SizedBox.shrink();
 
     return Padding(
@@ -69,7 +70,9 @@ class DebtMatrixWidget extends ConsumerWidget {
                 itemCount: debts.length,
                 itemBuilder: (context, index) {
                   final debt = debts[index];
-                  final initial = debt.fromName;
+                  final initial = debt.fromName.isNotEmpty
+                      ? debt.fromName[0].toUpperCase()
+                      : '';
 
                   // Select avatar color based on name to match design
                   Color avatarBg = colorScheme.secondaryContainer;
@@ -166,12 +169,10 @@ class DebtMatrixWidget extends ConsumerWidget {
                               : ElevatedButton(
                                   key: Key('settleButton_${debt.id}'),
                                   onPressed: () {
-                                    ref
-                                        .read(dashboardActionsProvider.notifier)
-                                        .settleDebt(
-                                          flatId: flatId,
-                                          debtId: debt.id,
-                                        );
+                                    notifier.settleDebt(
+                                      flatId: flatId,
+                                      debtId: debt.id,
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: colorScheme.primary,

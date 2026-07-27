@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
+import '../../domain/entities/expense_entity.dart';
+import '../models/expense_model.dart';
 import '../../domain/entities/dashboard_state.dart';
 import '../../domain/entities/debt_entity.dart';
 import '../../domain/repositories/dashboard_repository.dart';
@@ -18,20 +19,12 @@ class DashboardRepositoryImpl implements DashboardRepository {
   @override
   Future<Either<Exception, void>> addExpense(
     String flatId,
-    String title,
-    double amount,
-    String payerId,
-    String payerName,
-    RecurrenceType recurrence,
+    ExpenseEntity expense,
   ) async {
     try {
       await _remoteDataSource.addExpense(
         flatId,
-        title,
-        amount,
-        payerId,
-        payerName,
-        recurrence,
+        ExpenseModel.fromEntity(expense),
       );
       return const Right(null);
     } on Exception catch (e) {

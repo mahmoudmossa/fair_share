@@ -7,6 +7,7 @@ import 'package:shared_ui/shared_ui.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
+import '../../domain/entities/expense_entity.dart';
 import '../providers/dashboard_actions_provider.dart';
 import '../providers/dashboard_provider.dart';
 
@@ -63,15 +64,22 @@ class AddExpenseDialog extends HookConsumerWidget {
 
         if (payer == null) return;
 
+        final expense = ExpenseEntity(
+          id: '',
+          title: title,
+          amount: amount,
+          payerId: payer.id,
+          payerName: payer.name,
+          date: DateTime.now(),
+          isDisputed: false,
+          recurrence: recurrence.value,
+        );
+
         ref
             .read(dashboardActionsProvider.notifier)
             .addExpense(
               flatId: flatId,
-              title: title,
-              amount: amount,
-              payerId: payer.id,
-              payerName: payer.name,
-              recurrence: recurrence.value,
+              expense: expense,
             );
       }
     }
