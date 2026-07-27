@@ -63,33 +63,20 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
           costs: flatCosts,
         );
 
-        // Match the settled status of each debt by matching the pair-wise ID (fromId_toId)
-        // with the list of settled debts from the DB
-        final settledDebtIds = latestDebts
-            .where((d) => d.isSettled)
-            .map((d) => d.id)
-            .toSet();
-
-        final updatedDebts = calculatedDebts.map((d) {
-          final isSettled = settledDebtIds.contains(d.id);
-          return DebtModel(
-            id: d.id,
-            fromId: d.fromId,
-            fromName: d.fromName,
-            toId: d.toId,
-            toName: d.toName,
-            amount: d.amount,
-            isSettled: isSettled,
-          );
-        }).toList();
+        // Use stored debts from Firestore if available, otherwise fallback to calculated debts
+        final List<DebtModel> displayDebts = latestDebts.isNotEmpty
+            ? latestDebts
+            : calculatedDebts
+                .map((d) => DebtModel.fromEntity(d).copyWith(isSettled: false))
+                .toList();
 
         // Resolve active billing cycle dynamically if it's missing or out of sync
         final now = DateTime.now();
         final currentMonthId = _getMonthId(now);
         
         final totalCosts = latestExpenses.fold(0.0, (total, exp) => total + exp.amount);
-        final settledCount = updatedDebts.where((d) => d.isSettled).length;
-        final totalCount = updatedDebts.length;
+        final settledCount = displayDebts.where((d) => d.isSettled).length;
+        final totalCount = displayDebts.length;
         double percentage = 85.0;
         if (totalCount > 0) {
           percentage = 85.0 + (15.0 * (settledCount / totalCount));
@@ -108,7 +95,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
             flat: latestFlat!,
             activeCycle: activeCycle,
             expenses: latestExpenses.map((e) => e.toEntity()).toList(),
-            debts: updatedDebts,
+            debts: displayDebts.map((d) => d.toEntity()).toList(),
             activities: latestActivities,
             members: latestMembers,
           ),
@@ -318,7 +305,25 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       costs: costs,
     );
 
-    await setFlatDebts(flatId, calculatedDebts);
+    // Delete existing debt documents in wgs/{flatId}/debts
+    final debtsRef = _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.debts);
+
+    final existingDebtsSnap = await debtsRef.get();
+    final batch = _firestore.batch();
+    for (final doc in existingDebtsSnap.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // Save newly calculated debts (all reset to isSettled = false)
+    for (final debt in calculatedDebts) {
+      final model = DebtModel.fromEntity(debt).copyWith(isSettled: false);
+      final docRef = debtsRef.doc(model.id);
+      batch.set(docRef, model.toJson());
+    }
+    await batch.commit();
   }
 
   /// Private helper to update the billing cycle settled percentage.
@@ -421,7 +426,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .snapshots()
         .map((snap) {
       return snap.docs
-          .map((d) => DebtModel.fromMap(d.data(), d.id))
+          .map((d) => DebtModel.fromMap(d.data(), d.id).toEntity())
           .toList();
     });
   }
