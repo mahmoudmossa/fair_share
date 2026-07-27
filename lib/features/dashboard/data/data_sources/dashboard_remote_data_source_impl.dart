@@ -63,12 +63,16 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
           costs: flatCosts,
         );
 
-        // Use stored debts from Firestore if available, otherwise fallback to calculated debts
-        final List<DebtModel> displayDebts = latestDebts.isNotEmpty
-            ? latestDebts
-            : calculatedDebts
-                .map((d) => DebtModel.fromEntity(d).copyWith(isSettled: false))
-                .toList();
+        // Match settled status of each pair (fromId_toId) with stored debts in Firestore
+        final Map<String, bool> settledMap = {
+          for (final d in latestDebts) '${d.fromId}_${d.toId}': d.isSettled,
+        };
+
+        final List<DebtModel> displayDebts = calculatedDebts.map((d) {
+          final pairKey = '${d.fromId}_${d.toId}';
+          final isSettled = settledMap[pairKey] ?? false;
+          return DebtModel.fromEntity(d).copyWith(isSettled: isSettled);
+        }).toList();
 
         // Resolve active billing cycle dynamically if it's missing or out of sync
         final now = DateTime.now();
