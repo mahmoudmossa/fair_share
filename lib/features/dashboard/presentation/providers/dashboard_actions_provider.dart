@@ -2,8 +2,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_core/shared_core.dart';
 import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_state_provider.dart';
+import '../../domain/entities/expense_entity.dart';
+import 'add_new_expense_use_case_provider.dart';
 import '../../domain/use_cases/settle_use_case.dart';
-import 'dashboard_repository_provider.dart';
 
 part 'dashboard_actions_provider.g.dart';
 
@@ -16,11 +17,7 @@ class DashboardActions extends _$DashboardActions {
 
   Future<void> addExpense({
     required String flatId,
-    required String title,
-    required double amount,
-    required String payerId,
-    required String payerName,
-    required RecurrenceType recurrence,
+    required ExpenseEntity expense,
   }) async {
     state = const ActionLoading();
     final auth = ref.read(authStateProvider).value;
@@ -29,14 +26,10 @@ class DashboardActions extends _$DashboardActions {
       return;
     }
 
-    final repository = ref.read(dashboardRepositoryProvider);
-    final result = await repository.addExpense(
-      flatId,
-      title,
-      amount,
-      payerId,
-      payerName,
-      recurrence,
+    final useCase = ref.read(addNewExpenseUseCaseProvider);
+    final result = await useCase(
+      flatId: flatId,
+      expense: expense,
     );
 
     state = result.fold(

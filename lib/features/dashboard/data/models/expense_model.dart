@@ -1,3 +1,4 @@
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:fair_share/core/utils/date_utils_converter.dart';
 import '../../domain/entities/expense_entity.dart';
@@ -5,6 +6,7 @@ import '../../../new_flat/domain/entities/recurrence_type.dart';
 
 part 'expense_model.g.dart';
 
+@CopyWith()
 @JsonSerializable()
 class ExpenseModel {
   final String id;
