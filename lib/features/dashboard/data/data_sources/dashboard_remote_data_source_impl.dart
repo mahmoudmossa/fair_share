@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'package:fair_share/core/constants/firestore_constants.dart';
+import 'package:fair_share/core/utils/monthly_history_helper.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_member_dto.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_cost.dart';
@@ -272,6 +273,9 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
     // Recalculate billing cycle settled percentage
     await _recalculateBillingCycleSettlement(flatId);
+
+    // Keep the monthly history summary in sync
+    await upsertMonthlyHistory(_firestore, flatId);
   }
 
   /// Private helper to recalculate debts after costs/expenses change,

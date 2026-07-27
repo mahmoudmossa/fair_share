@@ -27,12 +27,8 @@ class DashboardActions extends _$DashboardActions {
     }
 
     final useCase = ref.read(addNewExpenseUseCaseProvider);
-    final result = await useCase(
-      flatId: flatId,
-      expense: expense,
-    );
+    final result = await useCase(flatId: flatId, expense: expense);
 
-    if (!ref.mounted) return;
     state = result.fold(
       (error) => ActionError(error),
       (_) => const ActionSuccess(null),
@@ -58,7 +54,6 @@ class DashboardActions extends _$DashboardActions {
       userName: auth.displayName ?? auth.email.split('@').first,
     );
 
-    if (!ref.mounted) return;
     state = result.fold(
       (error) => ActionError(error),
       (_) => const ActionSuccess(null),
