@@ -6,6 +6,8 @@ enum ServerFailureType {
   unauthenticated,
   unavailable,
   unknown,
+  alreadyClaimed,
+  invalidInvite,
 }
 
 extension ServerFailureTypeX on ServerFailureType {
@@ -19,6 +21,10 @@ extension ServerFailureTypeX on ServerFailureType {
         return LocaleKeys.errors_unavailable.tr();
       case ServerFailureType.unknown:
         return LocaleKeys.errors_unknown.tr();
+      case ServerFailureType.alreadyClaimed:
+        return LocaleKeys.errors_already_claimed.tr();
+      case ServerFailureType.invalidInvite:
+        return LocaleKeys.errors_invalid_invite.tr();
     }
   }
 }

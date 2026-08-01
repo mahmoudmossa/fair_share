@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_cost.dart';
 import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';

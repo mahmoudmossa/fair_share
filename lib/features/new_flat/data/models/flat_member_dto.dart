@@ -8,19 +8,31 @@ class FlatMemberDto {
   final String id;
   final String name;
   final String? userId;
+  final String? invitationCode;
 
-  const FlatMemberDto({required this.id, required this.name, this.userId});
+  const FlatMemberDto({
+    required this.id,
+    required this.name,
+    this.userId,
+    this.invitationCode,
+  });
 
   factory FlatMemberDto.fromEntity(FlatMemberEntity entity) {
     return FlatMemberDto(
       id: entity.id,
       name: entity.name,
       userId: entity.userId,
+      invitationCode: entity.invitationCode,
     );
   }
 
   FlatMemberEntity toEntity() {
-    return FlatMemberEntity(id: id, name: name, userId: userId);
+    return FlatMemberEntity(
+      id: id,
+      name: name,
+      userId: userId,
+      invitationCode: invitationCode,
+    );
   }
 
   factory FlatMemberDto.fromJson(Map<String, dynamic> json) =>

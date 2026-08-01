@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:fair_share/core/errors/server_failure_type.dart';
-import 'package:fair_share/core/providers/firebase_error_mapper_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_core/shared_core.dart';
 import 'package:fair_share/core/errors/failures.dart';
