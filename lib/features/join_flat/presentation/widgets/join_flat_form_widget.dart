@@ -15,7 +15,7 @@ class JoinFlatFormWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    
+
     final actionState = ref.watch(joinFlatProvider);
     final joinFlatNotifier = ref.watch(joinFlatProvider.notifier);
     final isLoading = actionState.maybeWhen(
@@ -62,7 +62,8 @@ class JoinFlatFormWidget extends HookConsumerWidget {
                 focusNode: focusNodes[index],
                 autofocus: index == 0,
                 textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.characters,
                 style: textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.primary,
@@ -85,7 +86,7 @@ class JoinFlatFormWidget extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+
                 onChanged: (value) {
                   if (value.isNotEmpty) {
                     if (index < 5) {
@@ -149,7 +150,9 @@ class JoinFlatFormWidget extends HookConsumerWidget {
                     joinFlatNotifier.joinFlat(code);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter a complete 6-digit code')),
+                      const SnackBar(
+                        content: Text('Please enter a complete 6-digit code'),
+                      ),
                     );
                   }
                 },

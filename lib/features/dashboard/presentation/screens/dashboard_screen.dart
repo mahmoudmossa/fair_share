@@ -214,6 +214,8 @@ class DashboardScreen extends HookConsumerWidget {
               .map((m) => Occupant(
                     id: m.id,
                     name: m.name,
+                    userId: m.userId,
+                    invitationCode: m.invitationCode,
                   ))
               .toList();
 

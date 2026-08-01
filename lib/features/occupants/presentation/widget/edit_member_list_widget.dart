@@ -1,5 +1,6 @@
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -76,6 +77,7 @@ class _MemberTileWidget extends HookWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEditing = useState(false);
+    final isCopied = useState(false);
     final controller = useTextEditingController(text: occupant.name);
 
     void saveEdit() {
@@ -84,6 +86,28 @@ class _MemberTileWidget extends HookWidget {
       }
       isEditing.value = false;
     }
+
+    void copyToClipboard(String code) {
+      Clipboard.setData(ClipboardData(text: code));
+      isCopied.value = true;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: const [
+              Icon(Icons.check_circle_outline, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Invite Code Copied'),
+            ],
+          ),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+      Future.delayed(const Duration(seconds: 2), () {
+        isCopied.value = false;
+      });
+    }
+
+    final hasJoined = occupant.userId != null && occupant.userId!.isNotEmpty;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -126,6 +150,63 @@ class _MemberTileWidget extends HookWidget {
                     occupant.name,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                const SizedBox(height: 4),
+                if (!hasJoined)
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'Pending',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.error,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      if (occupant.invitationCode != null &&
+                          occupant.invitationCode!.isNotEmpty) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          'Code: ${occupant.invitationCode}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: () => copyToClipboard(occupant.invitationCode!),
+                          child: Icon(
+                            isCopied.value ? Icons.check : Icons.copy_rounded,
+                            size: 14,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ],
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'Active',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
               ],

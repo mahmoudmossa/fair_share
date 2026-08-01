@@ -1,117 +1,86 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
-class InvitationCardWidget extends HookWidget {
-  final String inviteCode;
-  final VoidCallback? onShareInvite;
-
-  const InvitationCardWidget({
-    super.key,
-    this.inviteCode = 'FAIR-8924',
-    this.onShareInvite,
-  });
+class InvitationCardWidget extends StatelessWidget {
+  const InvitationCardWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isCopied = useState(false);
-
-    void copyToClipboard() {
-      Clipboard.setData(ClipboardData(text: inviteCode));
-      isCopied.value = true;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: const [
-              Icon(Icons.check_circle_outline, color: Colors.white),
-              SizedBox(width: 8),
-              Text('Code Copied to Clipboard'),
-            ],
-          ),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-      Future.delayed(const Duration(seconds: 2), () {
-        isCopied.value = false;
-      });
-    }
-
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF006B46), // Primary green background
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFF006B46), // Primary premium green background
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF006B46).withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Invite Members to Flat',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Share this code with your housemates to sync expenses.',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Text(
-                inviteCode,
-                style: const TextStyle(
-                  color: Color(0xFF006B46),
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2.0,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton.filledTonal(
-                onPressed: copyToClipboard,
-                icon: Icon(
-                  isCopied.value ? Icons.check : Icons.copy_rounded,
-                  color: Colors.white,
-                ),
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withValues(alpha: 0.2),
-                ),
-              ),
-              const SizedBox(width: 12),
-              ElevatedButton.icon(
-                onPressed: onShareInvite,
-                icon: const Icon(Icons.share_outlined, color: Colors.white, size: 18),
-                label: const Text(
-                  'Share Invite',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF004D32),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Invite Members to Flat',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  'Each housemate joins using their unique 6-digit invite code to link their account directly to their name.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.info_outline, color: Colors.white, size: 14),
+                      SizedBox(width: 8),
+                      Text(
+                        'Copy codes from the list below',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.vpn_key_outlined,
+              color: Colors.white,
+              size: 28,
+            ),
           ),
         ],
       ),

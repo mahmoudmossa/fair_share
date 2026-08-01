@@ -42,10 +42,7 @@ class OccupantsWidget extends HookConsumerWidget {
         child: Column(
           children: [
             // 1. Invitation Card Widget
-            InvitationCardWidget(
-              inviteCode: inviteCode,
-              onShareInvite: () {},
-            ),
+            const InvitationCardWidget(),
             const SizedBox(height: 24),
             // 2. Edit Members List Widget
             EditMemberListWidget(
