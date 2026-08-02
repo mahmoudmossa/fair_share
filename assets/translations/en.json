@@ -155,7 +155,11 @@
     "cancel": "Cancel",
     "logout": "Log Out",
     "update_success": "Profile updated successfully!",
-    "update_error": "Failed to update profile: {}"
+    "update_error": "Failed to update profile: {}",
+    "pick_photo_title": "Update Profile Photo",
+    "pick_from_gallery": "Choose from Gallery",
+    "take_photo": "Take a Photo",
+    "photo_too_large": "Image is too large. Please select a smaller image."
   }
 }
 

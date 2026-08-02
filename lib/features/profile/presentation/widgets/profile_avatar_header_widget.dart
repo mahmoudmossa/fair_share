@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_ui/shared_ui.dart';
 import 'package:fair_share/core/constants/app_keys.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'package:fair_share/features/auth/domain/entities/user_entity.dart';
 import '../providers/profile_notifier_provider.dart';
+import 'profile_avatar_picker_widget.dart';
 
 class ProfileAvatarHeaderWidget extends HookConsumerWidget {
   final UserEntity user;
   final String displayName;
+  final String? photoBase64;
 
   const ProfileAvatarHeaderWidget({
     super.key,
     required this.user,
     required this.displayName,
+    this.photoBase64,
   });
 
   @override
@@ -49,6 +53,16 @@ class ProfileAvatarHeaderWidget extends HookConsumerWidget {
       }
     }
 
+    void showAvatarPicker() {
+      showModalBottomSheet<void>(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (_) => ProfileAvatarPickerWidget(user: user),
+      );
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -63,31 +77,30 @@ class ProfileAvatarHeaderWidget extends HookConsumerWidget {
         children: [
           Stack(
             children: [
-              CircleAvatar(
+              MemberAvatarWidget(
+                key: AppKeys.profile.avatarImage,
+                displayName: effectiveDisplayName,
+                photoBase64: photoBase64,
                 radius: 44,
-                backgroundColor: colorScheme.primaryContainer,
-                child: Text(
-                  effectiveDisplayName.substring(0, 1).toUpperCase(),
-                  style: textTheme.headlineMedium?.copyWith(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ),
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: colorScheme.surface, width: 2),
-                  ),
-                  child: Icon(
-                    Icons.photo_camera,
-                    size: 16,
-                    color: colorScheme.onPrimary,
+                child: GestureDetector(
+                  onTap: showAvatarPicker,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary,
+                      shape: BoxShape.circle,
+                      border:
+                          Border.all(color: colorScheme.surface, width: 2),
+                    ),
+                    child: Icon(
+                      Icons.photo_camera,
+                      size: 16,
+                      color: colorScheme.onPrimary,
+                    ),
                   ),
                 ),
               ),

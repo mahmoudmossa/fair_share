@@ -12,4 +12,7 @@ class ProfileKeys {
   final logoutButton = const Key('profileLogoutButton');
   final flatDetailsTile = const Key('profileFlatDetailsTile');
   final securityPrivacyTile = const Key('profileSecurityPrivacyTile');
+  final avatarImage = const Key('profileAvatarImage');
+  final cameraButton = const Key('profileCameraButton');
+  final galleryButton = const Key('profileGalleryButton');
 }

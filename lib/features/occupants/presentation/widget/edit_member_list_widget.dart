@@ -37,7 +37,9 @@ class EditMemberListWidget extends HookConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                color: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -92,7 +94,8 @@ class _MemberTileWidget extends HookWidget {
     final controller = useTextEditingController(text: occupant.name);
 
     void saveEdit() async {
-      if (controller.text.trim().isNotEmpty && controller.text != occupant.name) {
+      if (controller.text.trim().isNotEmpty &&
+          controller.text != occupant.name) {
         isSaving.value = true;
         await onSave?.call(occupant.copyWith(name: controller.text.trim()));
         if (context.mounted) {
@@ -123,7 +126,9 @@ class _MemberTileWidget extends HookWidget {
     }
 
     final hasJoined = occupant.userId != null && occupant.userId!.isNotEmpty;
-    final canEdit = isCurrentAdmin || (occupant.userId != null && occupant.userId == currentUserId);
+    final canEdit =
+        isCurrentAdmin ||
+        (occupant.userId != null && occupant.userId == currentUserId);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -140,7 +145,9 @@ class _MemberTileWidget extends HookWidget {
                 : null,
             child: occupant.avatarUrl == null
                 ? Text(
-                    occupant.name.isNotEmpty ? occupant.name[0].toUpperCase() : '?',
+                    occupant.name.isNotEmpty
+                        ? occupant.name[0].toUpperCase()
+                        : '?',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 : null,
@@ -156,7 +163,10 @@ class _MemberTileWidget extends HookWidget {
                     autofocus: true,
                     decoration: const InputDecoration(
                       isDense: true,
-                      contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 8,
+                      ),
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (_) => saveEdit(),
@@ -173,9 +183,14 @@ class _MemberTileWidget extends HookWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
+                          color: theme.colorScheme.errorContainer.withValues(
+                            alpha: 0.3,
+                          ),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -199,7 +214,8 @@ class _MemberTileWidget extends HookWidget {
                         ),
                         const SizedBox(width: 4),
                         GestureDetector(
-                          onTap: () => copyToClipboard(occupant.invitationCode!),
+                          onTap: () =>
+                              copyToClipboard(occupant.invitationCode!),
                           child: Icon(
                             isCopied.value ? Icons.check : Icons.copy_rounded,
                             size: 14,
@@ -211,9 +227,14 @@ class _MemberTileWidget extends HookWidget {
                   )
                 else
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                      color: theme.colorScheme.primaryContainer.withValues(
+                        alpha: 0.3,
+                      ),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -246,7 +267,9 @@ class _MemberTileWidget extends HookWidget {
                   )
                 : IconButton(
                     icon: Icon(
-                      isEditing.value ? Icons.check_circle : Icons.edit_outlined,
+                      isEditing.value
+                          ? Icons.check_circle
+                          : Icons.edit_outlined,
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                     onPressed: () {

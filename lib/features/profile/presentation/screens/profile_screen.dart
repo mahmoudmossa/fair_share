@@ -80,6 +80,7 @@ class ProfileScreen extends HookConsumerWidget {
 
           final currentMember = members.where((m) => m.id == user.id).firstOrNull;
           final displayName = currentMember?.name ?? user.email.split('@').first;
+          final photoBase64 = currentMember?.photoBase64;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -88,6 +89,7 @@ class ProfileScreen extends HookConsumerWidget {
                 ProfileAvatarHeaderWidget(
                   user: user,
                   displayName: displayName,
+                  photoBase64: photoBase64,
                 ),
                 const SizedBox(height: 20),
                 ProfileMembershipCardWidget(

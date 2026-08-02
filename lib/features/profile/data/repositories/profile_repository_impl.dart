@@ -14,4 +14,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }) async {
     await _remoteDataSource.updateDisplayName(userId, flatId, newName);
   }
+
+  @override
+  Future<void> updateProfilePhoto({
+    required String userId,
+    String? flatId,
+    required String base64Photo,
+  }) async {
+    await _remoteDataSource.updateProfilePhoto(userId, flatId, base64Photo);
+  }
 }
