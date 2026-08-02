@@ -1,4 +1,3 @@
-import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:fair_share/features/occupants/presentation/providers/edit_member_provider.dart';
 import 'package:fair_share/features/occupants/presentation/widget/deep_link_invitation_widget.dart';
@@ -70,6 +69,5 @@ class OccupantsWidget extends HookConsumerWidget {
         ),
       ),
     );
->>>>>>> origin/main
   }
 }
