@@ -1,33 +1,38 @@
-import 'package:fair_share/core/errors/failures.dart';
+import 'package:fair_share/features/notifications/data/data_sources/notifications_remote_data_source.dart';
 import 'package:fair_share/features/notifications/data/models/notifications_dto.dart';
 import 'package:fair_share/features/notifications/domain/entities/notifications_entity.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:shared_core/shared_core.dart';
-
-import '../../domain/repositories/notifications_repository.dart';
-import '../data_sources/notifications_remote_data_source.dart';
+import 'package:fair_share/features/notifications/domain/repositories/notifications_repository.dart';
 
 class NotificationsRepositoryImpl implements NotificationsRepository {
   final NotificationsRemoteDataSource _remoteDataSource;
-  final AppErrorHandler errorHandler;
-  final FirebaseErrorMapper firebaseErrorMapper;
 
-  NotificationsRepositoryImpl({
-    required this._remoteDataSource,
-    required this.errorHandler,
-    required this.firebaseErrorMapper,
-  });
+  NotificationsRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<void> markAllAsRead(String userId) {
-    // TODO: implement markAllAsRead
-    throw UnimplementedError();
+  Future<void> saveFcmToken(String userId, String token) async {
+    await _remoteDataSource.saveFcmToken(userId, token);
   }
 
   @override
-  Future<void> markAsRead(String userId, String notificationId) {
-    // TODO: implement markAsRead
-    throw UnimplementedError();
+  Future<void> removeFcmToken(String userId, String token) async {
+    await _remoteDataSource.removeFcmToken(userId, token);
+  }
+
+  @override
+  Stream<List<NotificationsEntity>> watchNotifications(String userId) {
+    return _remoteDataSource
+        .watchNotifications(userId)
+        .map((dtos) => dtos.map((dto) => dto.toEntity()).toList());
+  }
+
+  @override
+  Future<void> markAsRead(String userId, String notificationId) async {
+    await _remoteDataSource.markAsRead(userId, notificationId);
+  }
+
+  @override
+  Future<void> markAllAsRead(String userId) async {
+    await _remoteDataSource.markAllAsRead(userId);
   }
 
   @override
@@ -35,25 +40,10 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
     required List<String> userIds,
     required NotificationsEntity notification,
   }) async {
-    try {
-      await _remoteDataSource.notifyFlatMembers(
-        userIds: userIds,
-        notification: NotificationsDto.fromEntity(notification),
-      );
-    } on FirebaseException catch (e, stackTrace) {
-      errorHandler.handle(
-        e,
-        stackTrace,
-        context: 'FlatRepositoryImpl.createFlat',
-      );
-    }
+    final dto = NotificationsDto.fromEntity(notification);
+    await _remoteDataSource.notifyFlatMembers(
+      userIds: userIds,
+      notification: dto,
+    );
   }
-
-  @override
-  Stream<List<NotificationsEntity>> watchNotifications(String userId) {
-    // TODO: implement watchNotifications
-    throw UnimplementedError();
-  }
-
-  // TODO: Implement repository methods delegating to _remoteDataSource
 }

@@ -15,6 +15,16 @@
             ]
         },
         {
+            "name": "fair_share_dev_ios",
+            "type": "dart",
+            "request": "launch",
+            "deviceId": "C249CCE4-FF24-4B24-80C5-DDBB11139D69",
+            "program": "lib/main.dart",
+            "args": [
+                "--dart-define-from-file=.env.dev",
+            ]
+        },
+        {
             "name": "fair_share_dev",
             "type": "dart",
             "request": "launch",

@@ -24,4 +24,6 @@ class FirestoreConstants {
   static const String createdByName = 'createdByName';
   static const String timestamp = 'timestamp';
   static const String occupants = 'occupants';
+  static const String fcmTokens = 'fcmTokens';
 }
+
