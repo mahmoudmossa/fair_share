@@ -17,7 +17,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return UserEntity(
         id: user.uid,
         email: user.email ?? '',
-        displayName: user.displayName,
       );
     });
   }
@@ -37,7 +36,6 @@ class AuthRepositoryImpl implements AuthRepository {
         UserEntity(
           id: user.uid,
           email: user.email ?? '',
-          displayName: user.displayName,
         ),
       );
     } on Exception catch (e) {
@@ -59,7 +57,6 @@ class AuthRepositoryImpl implements AuthRepository {
       final userEntity = UserEntity(
         id: user.uid,
         email: user.email ?? '',
-        displayName: user.displayName,
       );
       await _userRemoteDataSource.createUser(userEntity);
       return Right(userEntity);

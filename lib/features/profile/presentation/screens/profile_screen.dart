@@ -75,13 +75,20 @@ class ProfileScreen extends HookConsumerWidget {
           }
 
           final flatName = dashboardStateAsync.value?.flat.name ?? '';
-          final membersCount = dashboardStateAsync.value?.members.length ?? 1;
+          final members = dashboardStateAsync.value?.members ?? [];
+          final membersCount = members.isNotEmpty ? members.length : 1;
+
+          final currentMember = members.where((m) => m.id == user.id).firstOrNull;
+          final displayName = currentMember?.name ?? user.email.split('@').first;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
             child: Column(
               children: [
-                ProfileAvatarHeaderWidget(user: user),
+                ProfileAvatarHeaderWidget(
+                  user: user,
+                  displayName: displayName,
+                ),
                 const SizedBox(height: 20),
                 ProfileMembershipCardWidget(
                   flatName: flatName,

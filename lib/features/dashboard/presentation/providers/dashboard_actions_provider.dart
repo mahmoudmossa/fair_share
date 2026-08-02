@@ -50,7 +50,7 @@ class DashboardActions extends _$DashboardActions {
       flatId: flatId,
       debtId: debtId,
       userId: auth.id,
-      userName: auth.displayName ?? auth.email.split('@').first,
+      userName: auth.email.split('@').first,
     );
 
     state = result.fold(

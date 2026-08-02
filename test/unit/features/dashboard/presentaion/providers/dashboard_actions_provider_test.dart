@@ -27,7 +27,6 @@ void main() {
                 const UserEntity(
                   id: 'mahmoud',
                   email: 'mahmoud@example.com',
-                  displayName: 'Medo',
                 ),
               );
             }

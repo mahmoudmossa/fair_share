@@ -33,7 +33,6 @@ void main() {
   const testUser = UserEntity(
     id: 'user-123',
     email: 'test@example.com',
-    displayName: 'Max',
   );
 
   Future<void> pumpWidget(WidgetTester tester) async {

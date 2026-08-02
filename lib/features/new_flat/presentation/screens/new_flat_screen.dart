@@ -34,12 +34,7 @@ class NewFlatScreen extends HookConsumerWidget {
     final flatSetup = ref.watch(flatSetupProvider);
     final currentUser = ref.watch(authStateProvider).value;
     final submissionState = ref.watch(newFlatProvider);
-<<<<<<< HEAD
-    final notifier = ref.read(newFlatProvider.notifier);
-    final finalFlat = ref.watch(flatSetupProvider);
-=======
     final notifier = ref.watch(newFlatProvider.notifier);
->>>>>>> origin/main
 
     // Listen to submission status
     ref.listen<ActionState>(newFlatProvider, (previous, next) {
@@ -119,11 +114,7 @@ class NewFlatScreen extends HookConsumerWidget {
         setupNotifier.generateInvitationCode();
 
         // Submit final Flat payload to server
-<<<<<<< HEAD
-
-=======
         final finalFlat = ref.read(flatSetupProvider);
->>>>>>> origin/main
         await notifier.submitNewFlat(finalFlat);
       }
     }

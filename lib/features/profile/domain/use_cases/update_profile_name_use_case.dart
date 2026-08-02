@@ -7,8 +7,13 @@ class UpdateProfileNameUseCase {
 
   Future<void> call({
     required String userId,
+    String? flatId,
     required String newName,
   }) {
-    return _repository.updateDisplayName(userId: userId, newName: newName);
+    return _repository.updateDisplayName(
+      userId: userId,
+      flatId: flatId,
+      newName: newName,
+    );
   }
 }

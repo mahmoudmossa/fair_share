@@ -10,13 +10,17 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   ProfileRemoteDataSourceImpl(this._firestore, this._firebaseAuth);
 
   @override
-  Future<void> updateDisplayName(String userId, String newName) async {
-    await _firestore
-        .collection(FirestoreConstants.users)
-        .doc(userId)
-        .update({
-      FirestoreConstants.displayName: newName,
-    });
+  Future<void> updateDisplayName(String userId, String? flatId, String newName) async {
+    if (flatId != null && flatId.isNotEmpty) {
+      await _firestore
+          .collection(FirestoreConstants.wgs)
+          .doc(flatId)
+          .collection(FirestoreConstants.members)
+          .doc(userId)
+          .update({
+        FirestoreConstants.displayName: newName,
+      });
+    }
 
     final currentUser = _firebaseAuth.currentUser;
     if (currentUser != null && currentUser.uid == userId) {

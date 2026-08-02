@@ -2,12 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fair_share/core/constants/firestore_constants.dart';
 import 'package:fair_share/features/occupants/data/models/occupants_response.dart';
 import 'package:fair_share/features/occupants/data/sources/ouccpants_data_source.dart';
-<<<<<<< HEAD
-=======
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_member_dto.dart';
 import 'package:fair_share/features/auth/data/models/user_dto.dart';
->>>>>>> origin/main
 
 class OccupantsDataSourceImp implements OuccpantsDataSource {
   final FirebaseFirestore _fireStore;
@@ -51,7 +48,6 @@ class OccupantsDataSourceImp implements OuccpantsDataSource {
         final updatedUserDto = UserDto(
           id: userDto.id,
           email: userDto.email,
-          displayName: occupant.name,
           flatId: userDto.flatId,
         );
         batch.set(userRef, updatedUserDto.toJson(), SetOptions(merge: true));

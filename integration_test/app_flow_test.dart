@@ -8,11 +8,8 @@ import 'scenarios/login_test_scenario.dart';
 import 'scenarios/flat_setup_test_scenario.dart';
 import 'scenarios/dashboard_test_scenario.dart';
 import 'scenarios/history_test_scenario.dart';
-<<<<<<< HEAD
 import 'scenarios/profile_test_scenario.dart';
-=======
 import 'scenarios/join_flat_test_scenario.dart';
->>>>>>> origin/main
 
 void main() {
   // patrolTest = real device runner. It does NOT use pumpWidgetAndSettle.

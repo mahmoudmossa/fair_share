@@ -21,7 +21,7 @@ void main() {
     late SignInUseCase useCase;
     const email = 'test@example.com';
     const password = 'password';
-    const user = UserEntity(id: '123', email: email, displayName: 'Test User');
+    const user = UserEntity(id: '123', email: email);
 
     setUp(() {
       useCase = SignInUseCase(mockAuthRepository);
@@ -42,7 +42,7 @@ void main() {
     late SignUpUseCase useCase;
     const email = 'test@example.com';
     const password = 'password';
-    const user = UserEntity(id: '123', email: email, displayName: 'Test User');
+    const user = UserEntity(id: '123', email: email);
 
     setUp(() {
       useCase = SignUpUseCase(mockAuthRepository);
@@ -78,7 +78,7 @@ void main() {
 
   group('AuthStateChangesUseCase', () {
     late AuthStateChangesUseCase useCase;
-    const user = UserEntity(id: '123', email: 'test@example.com', displayName: 'Test User');
+    const user = UserEntity(id: '123', email: 'test@example.com');
 
     setUp(() {
       useCase = AuthStateChangesUseCase(mockAuthRepository);

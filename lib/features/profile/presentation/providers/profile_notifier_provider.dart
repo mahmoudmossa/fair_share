@@ -13,12 +13,13 @@ class ProfileNotifier extends _$ProfileNotifier {
 
   Future<void> updateDisplayName({
     required String userId,
+    String? flatId,
     required String newName,
   }) async {
     state = const ActionLoading();
     try {
       final useCase = ref.read(updateProfileNameUseCaseProvider);
-      await useCase(userId: userId, newName: newName);
+      await useCase(userId: userId, flatId: flatId, newName: newName);
       state = const ActionSuccess(null);
     } catch (error, stackTrace) {
       state = ActionError(error, stackTrace);

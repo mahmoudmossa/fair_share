@@ -9,8 +9,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<void> updateDisplayName({
     required String userId,
+    String? flatId,
     required String newName,
   }) async {
-    await _remoteDataSource.updateDisplayName(userId, newName);
+    await _remoteDataSource.updateDisplayName(userId, flatId, newName);
   }
 }

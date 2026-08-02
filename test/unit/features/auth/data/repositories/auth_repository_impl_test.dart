@@ -39,7 +39,7 @@ void main() {
           .thenAnswer((_) => Stream.fromIterable([mockFirebaseUser, null]));
 
       final expectedEntities = [
-        const UserEntity(id: '123', email: 'test@example.com', displayName: 'Test User'),
+        const UserEntity(id: '123', email: 'test@example.com'),
         null,
       ];
 
@@ -67,7 +67,7 @@ void main() {
 
       expect(
         result,
-        const Right(UserEntity(id: '123', email: email, displayName: 'Test User')),
+        const Right(UserEntity(id: '123', email: email)),
       );
       verify(() => mockRemoteDataSource.signInWithEmail(email, password)).called(1);
     });
@@ -86,7 +86,7 @@ void main() {
   group('signUpWithEmailAndPassword', () {
     const email = 'test@example.com';
     const password = 'password';
-    const userEntity = UserEntity(id: '123', email: email, displayName: 'Test User');
+    const userEntity = UserEntity(id: '123', email: email);
 
     test('should return Right(UserEntity) when sign up and firestore creation is successful', () async {
       final mockFirebaseUser = MockUser();

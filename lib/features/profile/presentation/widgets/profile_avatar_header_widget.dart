@@ -9,10 +9,12 @@ import '../providers/profile_notifier_provider.dart';
 
 class ProfileAvatarHeaderWidget extends HookConsumerWidget {
   final UserEntity user;
+  final String displayName;
 
   const ProfileAvatarHeaderWidget({
     super.key,
     required this.user,
+    required this.displayName,
   });
 
   @override
@@ -20,27 +22,28 @@ class ProfileAvatarHeaderWidget extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final displayName = (user.displayName != null && user.displayName!.isNotEmpty)
-        ? user.displayName!
-        : 'User';
+    final effectiveDisplayName =
+        displayName.isNotEmpty ? displayName : 'User';
 
     final isEditing = useState(false);
-    final nameController = useTextEditingController(text: displayName);
+    final nameController = useTextEditingController(text: effectiveDisplayName);
 
     useEffect(() {
       if (!isEditing.value) {
-        nameController.text = displayName;
+        nameController.text = effectiveDisplayName;
       }
       return null;
-    }, [displayName]);
+    }, [effectiveDisplayName]);
 
     Future<void> submitSave() async {
       final newName = nameController.text.trim();
-      if (newName.isNotEmpty && newName != displayName) {
+      if (newName.isNotEmpty && newName != effectiveDisplayName) {
         isEditing.value = false;
-        await ref
-            .read(profileProvider.notifier)
-            .updateDisplayName(userId: user.id, newName: newName);
+        await ref.read(profileProvider.notifier).updateDisplayName(
+              userId: user.id,
+              flatId: user.flatId,
+              newName: newName,
+            );
       } else {
         isEditing.value = false;
       }
@@ -64,7 +67,7 @@ class ProfileAvatarHeaderWidget extends HookConsumerWidget {
                 radius: 44,
                 backgroundColor: colorScheme.primaryContainer,
                 child: Text(
-                  displayName.substring(0, 1).toUpperCase(),
+                  effectiveDisplayName.substring(0, 1).toUpperCase(),
                   style: textTheme.headlineMedium?.copyWith(
                     color: colorScheme.onPrimaryContainer,
                     fontWeight: FontWeight.bold,
@@ -135,7 +138,7 @@ class ProfileAvatarHeaderWidget extends HookConsumerWidget {
                     key: AppKeys.profile.cancelNameButton,
                     onPressed: () {
                       isEditing.value = false;
-                      nameController.text = displayName;
+                      nameController.text = effectiveDisplayName;
                     },
                     icon: Icon(
                       Icons.cancel_outlined,
@@ -154,7 +157,7 @@ class ProfileAvatarHeaderWidget extends HookConsumerWidget {
               children: [
                 Flexible(
                   child: Text(
-                    displayName,
+                    effectiveDisplayName,
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurface,
@@ -166,7 +169,7 @@ class ProfileAvatarHeaderWidget extends HookConsumerWidget {
                 IconButton(
                   key: AppKeys.profile.editNameButton,
                   onPressed: () {
-                    nameController.text = displayName;
+                    nameController.text = effectiveDisplayName;
                     isEditing.value = true;
                   },
                   icon: Icon(

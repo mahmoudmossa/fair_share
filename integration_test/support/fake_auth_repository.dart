@@ -16,14 +16,14 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<Either<Exception, UserEntity>> signInWithEmailAndPassword(String email, String password) async {
-    _currentUser = UserEntity(id: 'fake_uid_123', email: email, displayName: 'Fake User');
+    _currentUser = UserEntity(id: 'fake_uid_123', email: email);
     _controller.add(_currentUser);
     return Right(_currentUser!);
   }
 
   @override
   Future<Either<Exception, UserEntity>> signUpWithEmailAndPassword(String email, String password) async {
-    _currentUser = UserEntity(id: 'fake_uid_123', email: email, displayName: 'Fake User');
+    _currentUser = UserEntity(id: 'fake_uid_123', email: email);
     _controller.add(_currentUser);
     return Right(_currentUser!);
   }

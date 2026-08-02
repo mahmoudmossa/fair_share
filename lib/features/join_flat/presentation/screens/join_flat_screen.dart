@@ -1,10 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-<<<<<<< HEAD
-import 'package:shared_core/shared_core.dart';
-=======
->>>>>>> origin/main
+
 import 'package:fair_share/core/router/app_router.dart';
 import 'package:fair_share/features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'package:fair_share/features/join_flat/presentation/providers/join_flat_notifier_provider.dart';
