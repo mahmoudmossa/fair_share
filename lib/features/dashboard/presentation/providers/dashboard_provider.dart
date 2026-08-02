@@ -1,3 +1,4 @@
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_state_provider.dart';
 import 'package:fair_share/features/auth/domain/entities/user_entity.dart';
@@ -29,11 +30,13 @@ Stream<UserEntity?> firestoreUser(Ref ref) {
 
 @riverpod
 Stream<DashboardState?> dashboardState(Ref ref) {
-  final user = ref.watch(firestoreUserProvider).value;
-  if (user == null || user.flatId == null || user.flatId!.isEmpty) {
+  final flatId = ref.watch(
+    firestoreUserProvider.select((user) => user.value?.flatId),
+  );
+  if (flatId == null || flatId.isEmpty) {
     return Stream.value(null);
   }
 
   final repository = ref.watch(dashboardRepositoryProvider);
-  return repository.watchDashboardState(user.flatId!);
+  return repository.watchDashboardState(flatId);
 }

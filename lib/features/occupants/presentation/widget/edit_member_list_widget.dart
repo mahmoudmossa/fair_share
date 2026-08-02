@@ -6,12 +6,16 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EditMemberListWidget extends HookConsumerWidget {
   final List<Occupant> occupants;
-  final Function(Occupant updatedOccupant)? onEditMember;
+  final Future<void> Function(Occupant updatedOccupant)? onEditMember;
+  final bool isCurrentAdmin;
+  final String currentUserId;
 
   const EditMemberListWidget({
     super.key,
     required this.occupants,
     this.onEditMember,
+    this.isCurrentAdmin = false,
+    this.currentUserId = '',
   });
 
   @override
@@ -56,6 +60,8 @@ class EditMemberListWidget extends HookConsumerWidget {
             return _MemberTileWidget(
               occupant: occupants[index],
               onSave: onEditMember,
+              isCurrentAdmin: isCurrentAdmin,
+              currentUserId: currentUserId,
             );
           },
         ),
@@ -66,11 +72,15 @@ class EditMemberListWidget extends HookConsumerWidget {
 
 class _MemberTileWidget extends HookWidget {
   final Occupant occupant;
-  final Function(Occupant updatedOccupant)? onSave;
+  final Future<void> Function(Occupant updatedOccupant)? onSave;
+  final bool isCurrentAdmin;
+  final String currentUserId;
 
   const _MemberTileWidget({
     required this.occupant,
     this.onSave,
+    required this.isCurrentAdmin,
+    required this.currentUserId,
   });
 
   @override
@@ -78,11 +88,16 @@ class _MemberTileWidget extends HookWidget {
     final theme = Theme.of(context);
     final isEditing = useState(false);
     final isCopied = useState(false);
+    final isSaving = useState(false);
     final controller = useTextEditingController(text: occupant.name);
 
-    void saveEdit() {
+    void saveEdit() async {
       if (controller.text.trim().isNotEmpty && controller.text != occupant.name) {
-        onSave?.call(occupant.copyWith(name: controller.text.trim()));
+        isSaving.value = true;
+        await onSave?.call(occupant.copyWith(name: controller.text.trim()));
+        if (context.mounted) {
+          isSaving.value = false;
+        }
       }
       isEditing.value = false;
     }
@@ -108,6 +123,7 @@ class _MemberTileWidget extends HookWidget {
     }
 
     final hasJoined = occupant.userId != null && occupant.userId!.isNotEmpty;
+    final canEdit = isCurrentAdmin || (occupant.userId != null && occupant.userId == currentUserId);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -212,19 +228,35 @@ class _MemberTileWidget extends HookWidget {
               ],
             ),
           ),
-          IconButton(
-            icon: Icon(
-              isEditing.value ? Icons.check_circle : Icons.edit_outlined,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            onPressed: () {
-              if (isEditing.value) {
-                saveEdit();
-              } else {
-                isEditing.value = true;
-              }
-            },
-          ),
+          if (canEdit)
+            isSaving.value
+                ? SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  )
+                : IconButton(
+                    icon: Icon(
+                      isEditing.value ? Icons.check_circle : Icons.edit_outlined,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    onPressed: () {
+                      if (isEditing.value) {
+                        saveEdit();
+                      } else {
+                        isEditing.value = true;
+                      }
+                    },
+                  ),
         ],
       ),
     );

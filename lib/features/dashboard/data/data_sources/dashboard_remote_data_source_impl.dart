@@ -7,7 +7,6 @@ import 'package:fair_share/core/utils/monthly_history_helper.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_member_dto.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_cost.dart';
-import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
 import 'package:fair_share/features/new_flat/domain/use_cases/calculate_settlements.dart';
 import '../../domain/entities/dashboard_state.dart';
 import '../../domain/entities/debt_entity.dart';

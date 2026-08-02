@@ -216,13 +216,18 @@ class DashboardScreen extends HookConsumerWidget {
                     name: m.name,
                     userId: m.userId,
                     invitationCode: m.invitationCode,
+                    flatId: state.flat.id,
                   ))
               .toList();
+
+          final isCurrentAdmin = state.flat.createdBy == currentUserId;
 
           return OccupantsWidget(
             key: const ValueKey('tab_2_admin'),
             occupantsList: occupantsList,
             inviteCode: state.flat.id,
+            isCurrentAdmin: isCurrentAdmin,
+            currentUserId: currentUserId,
           );
         },
       );

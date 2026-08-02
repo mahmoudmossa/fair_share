@@ -1,4 +1,6 @@
 import 'package:fair_share/core/modles/action_state.dart';
+import 'package:fair_share/core/errors/failures.dart';
+import 'package:fair_share/core/errors/server_failure_type.dart';
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:fair_share/features/occupants/domain/usecases/edit_member_usecase.dart';
 import 'package:fair_share/features/occupants/presentation/providers/occupants_repository_provider.dart';
@@ -17,11 +19,16 @@ class EditMemberNotifier extends _$EditMemberNotifier {
     state = const ActionState.loading();
     final repository = ref.read(occupantsRepositoryProvider);
     final useCase = EditMemberUseCase(repository);
-    final result = await useCase.call(occupant);
-    if (!ref.mounted) return;
-    state = result.fold(
-      (failure) => ActionState.failure(failure),
-      (_) => const ActionState.success(),
-    );
+    try {
+      await useCase.call(occupant);
+      if (!ref.mounted) return;
+      state = const ActionState.success();
+    } on Failure catch (e) {
+      if (!ref.mounted) return;
+      state = ActionState.failure(e);
+    } catch (e) {
+      if (!ref.mounted) return;
+      state = ActionState.failure(ServerFailure(ServerFailureType.unknown));
+    }
   }
 }

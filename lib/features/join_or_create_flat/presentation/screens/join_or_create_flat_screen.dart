@@ -65,7 +65,7 @@ class JoinOrCreateFlatScreen extends HookConsumerWidget {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withOpacity(0.2),
+                      color: colorScheme.primaryContainer.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

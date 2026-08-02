@@ -10,11 +10,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class OccupantsWidget extends HookConsumerWidget {
   final List<Occupant>? occupantsList;
   final String inviteCode;
+  final bool isCurrentAdmin;
+  final String currentUserId;
 
   const OccupantsWidget({
     super.key,
     this.occupantsList,
     this.inviteCode = 'FAIR-8924',
+    this.isCurrentAdmin = false,
+    this.currentUserId = '',
   });
 
   @override
@@ -47,8 +51,10 @@ class OccupantsWidget extends HookConsumerWidget {
             // 2. Edit Members List Widget
             EditMemberListWidget(
               occupants: defaultOccupants,
-              onEditMember: (updatedOccupant) {
-                ref
+              isCurrentAdmin: isCurrentAdmin,
+              currentUserId: currentUserId,
+              onEditMember: (updatedOccupant) async {
+                await ref
                     .read(editMemberProvider.notifier)
                     .editMember(updatedOccupant);
               },

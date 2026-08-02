@@ -4,6 +4,7 @@ class Occupant {
   final String? avatarUrl;
   final String? userId;
   final String? invitationCode;
+  final String? flatId;
 
   Occupant({
     required this.id,
@@ -11,6 +12,7 @@ class Occupant {
     this.avatarUrl,
     this.userId,
     this.invitationCode,
+    this.flatId,
   });
 
   Occupant copyWith({
@@ -19,6 +21,7 @@ class Occupant {
     String? avatarUrl,
     String? userId,
     String? invitationCode,
+    String? flatId,
   }) {
     return Occupant(
       id: id ?? this.id,
@@ -26,6 +29,7 @@ class Occupant {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       userId: userId ?? this.userId,
       invitationCode: invitationCode ?? this.invitationCode,
+      flatId: flatId ?? this.flatId,
     );
   }
 }

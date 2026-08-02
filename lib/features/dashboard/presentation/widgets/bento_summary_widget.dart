@@ -37,10 +37,10 @@ class BentoSummaryWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+                    border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
                     boxShadow: [
                       BoxShadow(
-                        color: colorScheme.shadow.withOpacity(0.02),
+                        color: colorScheme.shadow.withValues(alpha: 0.02),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -77,7 +77,7 @@ class BentoSummaryWidget extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: colorScheme.primaryContainer.withOpacity(0.15),
+                          color: colorScheme.primaryContainer.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -111,7 +111,7 @@ class BentoSummaryWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: colorScheme.primary.withOpacity(0.2),
+                        color: colorScheme.primary.withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 6),
                       ),
@@ -128,7 +128,7 @@ class BentoSummaryWidget extends StatelessWidget {
                           height: 140,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: colorScheme.onPrimary.withOpacity(0.1),
+                            color: colorScheme.onPrimary.withValues(alpha: 0.1),
                           ),
                         ),
                       ),
@@ -138,7 +138,7 @@ class BentoSummaryWidget extends StatelessWidget {
                         child: CircularProgressIndicator(
                           value: cycle.settledPercentage / 100.0,
                           strokeWidth: 8,
-                          backgroundColor: colorScheme.onPrimary.withOpacity(0.1),
+                          backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.1),
                           valueColor: AlwaysStoppedAnimation<Color>(colorScheme.onPrimaryContainer),
                         ),
                       ),
@@ -162,7 +162,7 @@ class BentoSummaryWidget extends StatelessWidget {
                                 cycle.monthName,
                               ]),
                               style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onPrimary.withOpacity(0.85),
+                                color: colorScheme.onPrimary.withValues(alpha: 0.85),
                               ),
                             ),
 
