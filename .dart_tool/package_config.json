@@ -362,6 +362,24 @@
       "languageVersion": "3.6"
     },
     {
+      "name": "firebase_messaging",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_messaging-16.4.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "firebase_messaging_platform_interface",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_messaging_platform_interface-4.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "firebase_messaging_web",
+      "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_messaging_web-4.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
       "name": "fixnum",
       "rootUri": "file:///C:/Users/mahmed/AppData/Local/Pub/Cache/hosted/pub.dev/fixnum-1.1.1",
       "packageUri": "lib/",
