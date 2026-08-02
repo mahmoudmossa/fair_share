@@ -1,9 +1,11 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 import 'package:dartz/dartz.dart';
 import 'package:fair_share/core/errors/server_failure_type.dart';
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:fair_share/features/occupants/domain/repositories/occupants_repository.dart';
-import 'package:fair_share/features/occupants/domain/usecases/get_occupants_usecase.dart';
 import 'package:fair_share/features/occupants/presentation/providers/get_occupants_provider.dart';
 import 'package:fair_share/features/occupants/presentation/providers/occupants_repository_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,11 +18,9 @@ class MockOccupantsRepository extends Mock implements OccupantsRepository {}
 
 void main() {
   late MockOccupantsRepository repo;
-  late GetOccupantUseCase useCase;
 
   setUp(() {
     repo = MockOccupantsRepository();
-    useCase = GetOccupantUseCase(repo);
   });
 
   ProviderContainer makeContainer(MockOccupantsRepository mockRepo) {

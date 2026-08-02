@@ -113,7 +113,9 @@
     "permission_denied": "Keine Berechtigung",
     "unauthenticated": "Nicht authentifiziert",
     "unavailable": "Nicht verfügbar",
-    "unknown": "Unbekannter Fehler"
+    "unknown": "Unbekannter Fehler",
+    "already_claimed": "Diese Einladung wurde bereits eingelöst",
+    "invalid_invite": "Ungültiger oder abgelaufener Einladungscode"
   },
   "occupants": {
     "title": "Bewohner-Ansicht",

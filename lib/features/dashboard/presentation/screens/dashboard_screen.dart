@@ -17,7 +17,12 @@ import '../widgets/itemized_expenses_widget.dart';
 import '../widgets/activity_feed_widget.dart';
 import 'package:fair_share/core/constants/app_keys.dart';
 import 'package:fair_share/features/history/presentation/screens/history_screen.dart';
+<<<<<<< HEAD
 import 'package:fair_share/features/profile/presentation/screens/profile_screen.dart';
+=======
+import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
+import 'package:fair_share/features/occupants/presentation/widget/occupants_widget.dart';
+>>>>>>> origin/main
 
 @RoutePage()
 class DashboardScreen extends HookConsumerWidget {
@@ -201,26 +206,68 @@ class DashboardScreen extends HookConsumerWidget {
       return const HistoryScreen(key: ValueKey('tab_1'));
     }
 
+<<<<<<< HEAD
     if (tabIndex == 3) {
       return const ProfileScreen(key: ValueKey('tab_3'));
     }
 
     if (tabIndex == 2) {
+=======
+    if (tabIndex == 2) {
+      return stateAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text(err.toString())),
+        data: (state) {
+          if (state == null) return const Center(child: CircularProgressIndicator());
+          
+          final occupantsList = state.members
+              .map((m) => Occupant(
+                    id: m.id,
+                    name: m.name,
+                    userId: m.userId,
+                    invitationCode: m.invitationCode,
+                    flatId: state.flat.id,
+                  ))
+              .toList();
+
+          final isCurrentAdmin = state.flat.createdBy == currentUserId;
+
+          return OccupantsWidget(
+            key: const ValueKey('tab_2_admin'),
+            occupantsList: occupantsList,
+            inviteCode: state.flat.id,
+            isCurrentAdmin: isCurrentAdmin,
+            currentUserId: currentUserId,
+          );
+        },
+      );
+    }
+
+    if (tabIndex == 3) {
+>>>>>>> origin/main
       return Center(
-        key: ValueKey('tab_$tabIndex'),
+        key: const ValueKey('tab_3'),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
+<<<<<<< HEAD
                 Icons.group,
+=======
+                Icons.settings,
+>>>>>>> origin/main
                 size: 64,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               const SizedBox(height: 16),
               Text(
+<<<<<<< HEAD
                 LocaleKeys.dashboard_admin_coming_soon.tr(),
+=======
+                LocaleKeys.dashboard_profile_coming_soon.tr(),
+>>>>>>> origin/main
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
