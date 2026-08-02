@@ -38,7 +38,7 @@ class ExpenseModel {
     required this.date,
     required this.isDisputed,
     this.disputeReason,
-    this.recurrence = RecurrenceType.oneTime,
+    this.recurrence = RecurrenceType.monthly,
     this.specificMonths,
   });
 
