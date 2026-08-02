@@ -113,12 +113,28 @@
     "permission_denied": "Keine Berechtigung",
     "unauthenticated": "Nicht authentifiziert",
     "unavailable": "Nicht verfügbar",
-    "unknown": "Unbekannter Fehler"
+    "unknown": "Unbekannter Fehler",
+    "already_claimed": "Diese Einladung wurde bereits eingelöst",
+    "invalid_invite": "Ungültiger oder abgelaufener Einladungscode"
   },
   "occupants": {
     "title": "Bewohner-Ansicht",
     "subtitle": "Dies ist die Bewohner-Ansicht",
     "widget": "Bewohner-Widget"
+  },
+  "history": {
+    "title": "Ausgabenverlauf",
+    "col_month": "Monat",
+    "col_total": "Gesamt",
+    "col_my_share": "Mein Anteil",
+    "no_data": "Keine Daten für diesen Monat verfügbar",
+    "detail_title": "Monatsdetails",
+    "detail_summary_total": "Gesamt",
+    "detail_summary_my_share": "Mein Anteil",
+    "detail_empty": "Keine Ausgaben in diesem Monat erfasst",
+    "detail_paid_by": "Bezahlt von {}",
+    "loading_error": "Fehler beim Laden des Verlaufs: {}",
+    "detail_loading_error": "Fehler beim Laden der Ausgaben: {}"
   }
 }
 

@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'package:fair_share/core/constants/firestore_constants.dart';
+import 'package:fair_share/core/utils/monthly_history_helper.dart';
 import 'package:fair_share/features/new_flat/data/data_sources/remote/flat_remote_data_source.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_dto.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_member_dto.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_cost_dto.dart';
+import 'package:fair_share/features/join_flat/data/models/invitation_dto.dart';
 
 part 'flat_remote_data_source_impl.g.dart';
 
@@ -47,10 +49,12 @@ class FlatRemoteDataSourceImpl implements FlatRemoteDataSource {
     final creatorRef = flatRef
         .collection(FirestoreConstants.members)
         .doc(flat.createdBy);
-    batch.set(creatorRef, {
-      'id': flat.createdBy,
-      'name': flat.createdByName,
-    });
+    final creatorDto = FlatMemberDto(
+      id: flat.createdBy,
+      name: flat.createdByName,
+      userId: flat.createdBy,
+    );
+    batch.set(creatorRef, creatorDto.toJson());
 
     for (final member in members) {
       final docId = member.id;
@@ -58,6 +62,20 @@ class FlatRemoteDataSourceImpl implements FlatRemoteDataSource {
           .collection(FirestoreConstants.members)
           .doc(docId);
       batch.set(memberRef, member.toJson());
+
+      // Write global invitation document if code is present
+      final code = member.invitationCode;
+      if (code != null && code.isNotEmpty) {
+        final inviteRef = _firestore.collection('invitations').doc(code);
+        final inviteDto = InvitationDto(
+          inviteCode: code,
+          flatId: flat.id,
+          memberId: member.id,
+          memberName: member.name,
+          status: 'pending',
+        );
+        batch.set(inviteRef, inviteDto.toJson());
+      }
     }
 
     // 3. Write all setup initial expenses/costs
@@ -93,6 +111,9 @@ class FlatRemoteDataSourceImpl implements FlatRemoteDataSource {
 
     // Commit batch transaction
     await batch.commit();
+
+    // Seed the monthly history summary now that expenses + members are stored
+    await upsertMonthlyHistory(_firestore, flat.id);
   }
 
   @override

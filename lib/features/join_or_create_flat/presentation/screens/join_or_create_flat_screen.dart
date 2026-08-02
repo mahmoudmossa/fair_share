@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
+import 'package:fair_share/core/constants/app_keys.dart';
 import 'package:fair_share/core/router/app_router.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_notifier_provider.dart';
 import 'package:fair_share/features/dashboard/presentation/providers/dashboard_provider.dart';
@@ -103,7 +104,7 @@ class JoinOrCreateFlatScreen extends HookConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 SetupOptionCardWidget(
-                  cardKey: const Key('goToJoinFlatButton'),
+                  cardKey: AppKeys.joinFlat.goToJoinFlatButton,
                   icon: Icons.vpn_key_outlined,
                   title: LocaleKeys.flat_setup_title.tr(),
                   description: LocaleKeys.flat_setup_subtitle.tr(),

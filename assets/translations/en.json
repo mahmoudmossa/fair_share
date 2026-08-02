@@ -113,12 +113,28 @@
     "permission_denied": "Permission denied",
     "unauthenticated": "Unauthenticated",
     "unavailable": "Unavailable",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "already_claimed": "This invitation has already been claimed",
+    "invalid_invite": "Invalid or expired invite code"
   },
   "occupants": {
     "title": "Occupants View",
     "subtitle": "This is the Occupants view",
     "widget": "Occupants Widget"
+  },
+  "history": {
+    "title": "Expense History",
+    "col_month": "Month",
+    "col_total": "Total",
+    "col_my_share": "My Share",
+    "no_data": "No history available for this month",
+    "detail_title": "Month Detail",
+    "detail_summary_total": "Total",
+    "detail_summary_my_share": "My Share",
+    "detail_empty": "No expenses recorded for this month",
+    "detail_paid_by": "Paid by {}",
+    "loading_error": "Error loading history: {}",
+    "detail_loading_error": "Error loading expenses: {}"
   }
 }
 

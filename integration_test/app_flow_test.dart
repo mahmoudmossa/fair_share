@@ -7,11 +7,13 @@ import 'package:fair_share/main.dart' as app;
 import 'scenarios/login_test_scenario.dart';
 import 'scenarios/flat_setup_test_scenario.dart';
 import 'scenarios/dashboard_test_scenario.dart';
+import 'scenarios/history_test_scenario.dart';
+import 'scenarios/join_flat_test_scenario.dart';
 
 void main() {
   // patrolTest = real device runner. It does NOT use pumpWidgetAndSettle.
   // Patrol boots the app via app.main() automatically.
-  patrolTest('Complete User Journey: Login -> Setup Flat -> Dashboard', (
+  patrolTest('Complete User Journey: Login -> Setup Flat -> Dashboard -> History', (
     $,
   ) async {
     // 1. Boot the real app on the device.
@@ -24,11 +26,28 @@ void main() {
       $,
       next: FlatSetupTestScenario(
         $,
-        next: DashboardTestScenario($, next: null),
+        next: DashboardTestScenario(
+          $,
+          next: HistoryTestScenario($, next: null),
+        ),
       ),
     );
 
     // 3. Start the chain reaction
+    await flow.startFlow();
+  });
+
+  patrolTest('Alternative User Journey: Login -> Join Flat with Invite Code', (
+    $,
+  ) async {
+    app.main();
+    await $.pumpAndSettle();
+
+    final flow = LoginTestScenario(
+      $,
+      next: JoinFlatTestScenario($, next: null),
+    );
+
     await flow.startFlow();
   });
 }

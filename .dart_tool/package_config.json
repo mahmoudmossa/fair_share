@@ -200,6 +200,18 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "copy_with_extension",
+      "rootUri": "file:///Users/mahmoudgamalahmed/.pub-cache/hosted/pub.dev/copy_with_extension-15.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "copy_with_extension_gen",
+      "rootUri": "file:///Users/mahmoudgamalahmed/.pub-cache/hosted/pub.dev/copy_with_extension_gen-15.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
       "name": "coverage",
       "rootUri": "file:///Users/mahmoudgamalahmed/.pub-cache/hosted/pub.dev/coverage-1.15.1",
       "packageUri": "lib/",

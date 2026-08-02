@@ -15,6 +15,9 @@ import '../widgets/debt_matrix_widget.dart';
 import '../widgets/itemized_expenses_widget.dart';
 import '../widgets/activity_feed_widget.dart';
 import '../widgets/add_expense_dialog.dart';
+import 'package:fair_share/features/history/presentation/screens/history_screen.dart';
+import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
+import 'package:fair_share/features/occupants/presentation/widget/occupants_widget.dart';
 
 @RoutePage()
 class DashboardScreen extends HookConsumerWidget {
@@ -165,6 +168,7 @@ class DashboardScreen extends HookConsumerWidget {
                 label: LocaleKeys.dashboard_title.tr(),
               ),
               NavigationDestination(
+                key: const Key('historyNavTab'),
                 icon: const Icon(Icons.receipt_long_outlined),
                 selectedIcon: const Icon(Icons.receipt_long),
                 label: LocaleKeys.dashboard_history_tab.tr(),
@@ -193,31 +197,61 @@ class DashboardScreen extends HookConsumerWidget {
     String currentUserId,
     WidgetRef ref,
   ) {
-    if (tabIndex != 0) {
+    if (tabIndex == 1) {
+      return const HistoryScreen(
+        key: ValueKey('tab_1'),
+      );
+    }
+
+    if (tabIndex == 2) {
+      return stateAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text(err.toString())),
+        data: (state) {
+          if (state == null) return const Center(child: CircularProgressIndicator());
+          
+          final occupantsList = state.members
+              .map((m) => Occupant(
+                    id: m.id,
+                    name: m.name,
+                    userId: m.userId,
+                    invitationCode: m.invitationCode,
+                    flatId: state.flat.id,
+                  ))
+              .toList();
+
+          final isCurrentAdmin = state.flat.createdBy == currentUserId;
+
+          return OccupantsWidget(
+            key: const ValueKey('tab_2_admin'),
+            occupantsList: occupantsList,
+            inviteCode: state.flat.id,
+            isCurrentAdmin: isCurrentAdmin,
+            currentUserId: currentUserId,
+          );
+        },
+      );
+    }
+
+    if (tabIndex == 3) {
       return Center(
-        key: ValueKey('tab_$tabIndex'),
+        key: const ValueKey('tab_3'),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                tabIndex == 1
-                    ? Icons.receipt_long
-                    : tabIndex == 2
-                    ? Icons.group
-                    : Icons.settings,
+                Icons.settings,
                 size: 64,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               const SizedBox(height: 16),
               Text(
-                tabIndex == 1
-                    ? LocaleKeys.dashboard_history_coming_soon.tr()
-                    : tabIndex == 2
-                    ? LocaleKeys.dashboard_admin_coming_soon.tr()
-                    : LocaleKeys.dashboard_profile_coming_soon.tr(),
-                style: const TextStyle(fontSize: 18, color: Colors.grey),
+                LocaleKeys.dashboard_profile_coming_soon.tr(),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),

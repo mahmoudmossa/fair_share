@@ -30,9 +30,22 @@ class FlatSetup extends _$FlatSetup {
     state = state.copyWith(createdByName: name);
   }
 
+  String _generate6DigitCode() {
+    final random = Random();
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    return List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
+  }
+
   void addMember(String name) {
+    final code = _generate6DigitCode();
     final updatedMembers = List<FlatMemberEntity>.from(state.members)
-      ..add(FlatMemberEntity(id: const Uuid().v4(), name: name));
+      ..add(
+        FlatMemberEntity(
+          id: const Uuid().v4(),
+          name: name,
+          invitationCode: code,
+        ),
+      );
     state = state.copyWith(members: updatedMembers);
   }
 

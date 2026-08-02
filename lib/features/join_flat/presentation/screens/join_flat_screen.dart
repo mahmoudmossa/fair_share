@@ -4,7 +4,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_core/shared_core.dart';
 import 'package:fair_share/core/router/app_router.dart';
 import 'package:fair_share/features/dashboard/presentation/providers/dashboard_provider.dart';
-import 'package:fair_share/features/dashboard/presentation/providers/dashboard_actions_provider.dart';
+import 'package:fair_share/features/join_flat/presentation/providers/join_flat_notifier_provider.dart';
+import 'package:fair_share/core/modles/action_state.dart';
+import 'package:fair_share/core/errors/server_failure_type.dart';
 import '../widgets/join_flat_form_widget.dart';
 
 @RoutePage()
@@ -24,17 +26,21 @@ class JoinFlatScreen extends HookConsumerWidget {
     });
 
     // Listen to action result
-    ref.listen(dashboardActionsProvider, (prev, next) {
-      if (next is ActionSuccess<void>) {
-        context.router.replace(const DashboardRoute());
-      } else if (next is ActionError<void>) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error.toString().replaceAll('Exception: ', '')),
-            backgroundColor: colorScheme.error,
-          ),
-        );
-      }
+    ref.listen(joinFlatProvider, (prev, next) {
+      next.maybeWhen(
+        success: () {
+          context.router.replace(const DashboardRoute());
+        },
+        failure: (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(failure.type.localizedMessage),
+              backgroundColor: colorScheme.error,
+            ),
+          );
+        },
+        orElse: () {},
+      );
     });
 
     return Scaffold(
@@ -50,7 +56,10 @@ class JoinFlatScreen extends HookConsumerWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 16.0,
+            ),
             child: const JoinFlatFormWidget(),
           ),
         ),
