@@ -41,7 +41,9 @@ class OccupantsDataSourceImp implements OuccpantsDataSource {
     batch.set(memberRef, memberDto.toJson(), SetOptions(merge: true));
 
     if (occupant.userId != null && occupant.userId!.isNotEmpty) {
-      final userRef = _fireStore.collection(FirestoreConstants.users).doc(occupant.userId);
+      final userRef = _fireStore
+          .collection(FirestoreConstants.users)
+          .doc(occupant.userId);
       final userSnap = await userRef.get();
       if (userSnap.exists && userSnap.data() != null) {
         final userDto = UserDto.fromJson(userSnap.data()!);

@@ -24,7 +24,7 @@ class OccupantsWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final defaultOccupants = occupantsList ??
-        [
+        [ 
           Occupant(id: '1', name: 'Alex Thompson'),
           Occupant(id: '2', name: 'Elena Rodriguez'),
           Occupant(id: '3', name: 'Jordan Chen'),
