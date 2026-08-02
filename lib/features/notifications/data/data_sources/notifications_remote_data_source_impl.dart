@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fair_share/core/constants/firestore_constants.dart';
 import 'package:fair_share/features/notifications/data/models/notifications_dto.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'notifications_remote_data_source.dart';
 
 class NotificationsRemoteDataSourceImpl

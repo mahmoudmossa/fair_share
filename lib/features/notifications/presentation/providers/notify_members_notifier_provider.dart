@@ -9,20 +9,20 @@ part 'notify_members_notifier_provider.g.dart';
 @riverpod
 class NotifyMembersNotifier extends _$NotifyMembersNotifier {
   @override
-  ActionState build() => ActionInitial();
+  ActionState<void> build() => const ActionState.initial();
 
   Future<void> notify(
     List<String> userIds,
     NotificationsEntity notification,
   ) async {
-    state = const ActionLoading();
+    state = const ActionState.loading();
     try {
       final repository = ref.read(notificationsRepositoryProvider);
       final notifyUsecase = NotifyFlatMembersUseCase(repository);
       await notifyUsecase(userIds: userIds, notification: notification);
-      state = const ActionSuccess(null);
-    } catch (e) {
-      state = ActionError(e);
+      state = const ActionState.success(null);
+    } catch (e, st) {
+      state = ActionState.error(e, st);
     }
   }
 }

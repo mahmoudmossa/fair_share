@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_core/shared_core.dart';
-import 'notifications_repository_provider.dart';
 
 part 'notifications_actions_provider.g.dart';
 

@@ -1,4 +1,3 @@
-import 'package:dartz/dartz.dart';
 import 'package:fair_share/features/notifications/domain/repositories/notifications_repository.dart';
 
 class MarkNotificationAsReadUseCase {
