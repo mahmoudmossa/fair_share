@@ -9,6 +9,9 @@ class MemberModel {
   final String id;
   final String displayName;
 
+  @JsonKey(includeIfNull: false)
+  final String? photoBase64;
+
   @JsonKey(unknownEnumValue: UserRole.user)
   final UserRole role;
 
@@ -16,6 +19,7 @@ class MemberModel {
     required this.id,
     required this.displayName,
     required this.role,
+    this.photoBase64,
   });
 
   factory MemberModel.fromEntity(MemberEntity entity) {
@@ -23,6 +27,7 @@ class MemberModel {
       id: entity.id,
       displayName: entity.displayName,
       role: entity.role,
+      photoBase64: entity.photoBase64,
     );
   }
 
@@ -31,6 +36,7 @@ class MemberModel {
       id: id,
       displayName: displayName,
       role: role,
+      photoBase64: photoBase64,
     );
   }
 

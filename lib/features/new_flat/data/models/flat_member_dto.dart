@@ -10,11 +10,15 @@ class FlatMemberDto {
   final String? userId;
   final String? invitationCode;
 
+  @JsonKey(includeIfNull: false)
+  final String? photoBase64;
+
   const FlatMemberDto({
     required this.id,
     required this.name,
     this.userId,
     this.invitationCode,
+    this.photoBase64,
   });
 
   factory FlatMemberDto.fromEntity(FlatMemberEntity entity) {
@@ -23,6 +27,7 @@ class FlatMemberDto {
       name: entity.name,
       userId: entity.userId,
       invitationCode: entity.invitationCode,
+      photoBase64: entity.photoBase64,
     );
   }
 
@@ -32,6 +37,7 @@ class FlatMemberDto {
       name: name,
       userId: userId,
       invitationCode: invitationCode,
+      photoBase64: photoBase64,
     );
   }
 

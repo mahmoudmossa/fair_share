@@ -50,7 +50,6 @@ class OccupantsDataSourceImp implements OuccpantsDataSource {
         final updatedUserDto = UserDto(
           id: userDto.id,
           email: userDto.email,
-          displayName: occupant.name,
           flatId: userDto.flatId,
         );
         batch.set(userRef, updatedUserDto.toJson(), SetOptions(merge: true));

@@ -7,13 +7,11 @@ part 'user_dto.g.dart';
 class UserDto {
   final String id;
   final String email;
-  final String? displayName;
   final String? flatId;
 
   const UserDto({
     required this.id,
     required this.email,
-    this.displayName,
     this.flatId,
   });
 
@@ -21,7 +19,6 @@ class UserDto {
     return UserDto(
       id: entity.id,
       email: entity.email,
-      displayName: entity.displayName,
       flatId: entity.flatId,
     );
   }
@@ -30,7 +27,6 @@ class UserDto {
     return UserEntity(
       id: id,
       email: email,
-      displayName: displayName,
       flatId: flatId,
     );
   }

@@ -23,7 +23,7 @@ void main() {
   });
 
   group('createUser', () {
-    const user = UserEntity(id: '123', email: 'test@example.com', displayName: 'Test User');
+    const user = UserEntity(id: '123', email: 'test@example.com');
 
     test('should call set on collection reference to save user info to firestore', () async {
       when(() => mockFirestore.collection(any())).thenReturn(mockCollectionReference);
@@ -37,7 +37,6 @@ void main() {
       verify(() => mockDocumentReference.set({
             'id': '123',
             'email': 'test@example.com',
-            'displayName': 'Test User',
           })).called(1);
     });
   });

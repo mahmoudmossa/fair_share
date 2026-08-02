@@ -44,7 +44,6 @@ class JoinFlatRemoteDataSourceImpl implements JoinFlatRemoteDataSource {
     final userDto = UserDto(
       id: userId,
       email: userEmail,
-      displayName: userName,
       flatId: flatId,
     );
     batch.set(userRef, userDto.toJson(), SetOptions(merge: true));

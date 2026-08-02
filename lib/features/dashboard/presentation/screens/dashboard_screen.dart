@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:fair_share/features/dashboard/presentation/widgets/add_expense_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -14,8 +15,9 @@ import '../widgets/bento_summary_widget.dart';
 import '../widgets/debt_matrix_widget.dart';
 import '../widgets/itemized_expenses_widget.dart';
 import '../widgets/activity_feed_widget.dart';
-import '../widgets/add_expense_dialog.dart';
+import 'package:fair_share/core/constants/app_keys.dart';
 import 'package:fair_share/features/history/presentation/screens/history_screen.dart';
+import 'package:fair_share/features/profile/presentation/screens/profile_screen.dart';
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:fair_share/features/occupants/presentation/widget/occupants_widget.dart';
 
@@ -145,11 +147,10 @@ class DashboardScreen extends HookConsumerWidget {
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (context) =>
-                              AddExpenseDialog(
-                                flatId: state.flat.id,
-                                members: state.members,
-                              ),
+                          builder: (context) => AddExpenseDialog(
+                            flatId: state.flat.id,
+                            members: state.members,
+                          ),
                         );
                       },
                       child: const Icon(Icons.add, size: 28),
@@ -179,6 +180,7 @@ class DashboardScreen extends HookConsumerWidget {
                 label: LocaleKeys.dashboard_admin_tab.tr(),
               ),
               NavigationDestination(
+                key: AppKeys.profile.profileTab,
                 icon: const Icon(Icons.settings_outlined),
                 selectedIcon: const Icon(Icons.settings),
                 label: LocaleKeys.dashboard_profile_tab.tr(),
@@ -198,9 +200,7 @@ class DashboardScreen extends HookConsumerWidget {
     WidgetRef ref,
   ) {
     if (tabIndex == 1) {
-      return const HistoryScreen(
-        key: ValueKey('tab_1'),
-      );
+      return const HistoryScreen(key: ValueKey('tab_1'));
     }
 
     if (tabIndex == 2) {
@@ -234,30 +234,9 @@ class DashboardScreen extends HookConsumerWidget {
     }
 
     if (tabIndex == 3) {
-      return Center(
-        key: const ValueKey('tab_3'),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.settings,
-                size: 64,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                LocaleKeys.dashboard_profile_coming_soon.tr(),
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      return const ProfileScreen(key: ValueKey('tab_3'));
     }
+
 
     return stateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -343,11 +322,11 @@ class DashboardScreen extends HookConsumerWidget {
               ],
 
               // Debt Matrix
-              ref.watch(flatDebtsProvider(state.flat.id)).when(
-                    data: (debts) => DebtMatrixWidget(
-                      flatId: state.flat.id,
-                      debts: debts,
-                    ),
+              ref
+                  .watch(flatDebtsProvider(state.flat.id))
+                  .when(
+                    data: (debts) =>
+                        DebtMatrixWidget(flatId: state.flat.id, debts: debts),
                     loading: () => const SizedBox.shrink(),
                     error: (err, stack) => Text(err.toString()),
                   ),

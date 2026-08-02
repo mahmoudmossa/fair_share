@@ -135,6 +135,31 @@
     "detail_paid_by": "Paid by {}",
     "loading_error": "Error loading history: {}",
     "detail_loading_error": "Error loading expenses: {}"
+  },
+  "profile": {
+    "title": "My Profile",
+    "membership_status": "MEMBERSHIP STATUS",
+    "premium_flat": "Premium Flat",
+    "active_housemate": "Active Housemate",
+    "members_count": "{} Members",
+    "general_settings": "General Settings",
+    "flat_details": "Flat Details",
+    "security_privacy": "Security & Privacy",
+    "biometrics_data_splitting": "Biometrics and Data splitting",
+    "app_tagline": "FairShare for iOS & Android",
+    "app_version": "Version {}",
+    "edit_name_title": "Edit Display Name",
+    "name_label": "Display Name",
+    "name_empty_error": "Display name cannot be empty",
+    "save": "Save",
+    "cancel": "Cancel",
+    "logout": "Log Out",
+    "update_success": "Profile updated successfully!",
+    "update_error": "Failed to update profile: {}",
+    "pick_photo_title": "Update Profile Photo",
+    "pick_from_gallery": "Choose from Gallery",
+    "take_photo": "Take a Photo",
+    "photo_too_large": "Image is too large. Please select a smaller image."
   }
 }
 

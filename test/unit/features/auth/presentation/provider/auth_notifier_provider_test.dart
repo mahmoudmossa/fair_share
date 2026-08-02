@@ -42,7 +42,7 @@ void main() {
   group('signIn', () {
     const email = 'test@example.com';
     const password = 'password';
-    const user = UserEntity(id: '123', email: email, displayName: 'Test User');
+    const user = UserEntity(id: '123', email: email);
 
     test('should emit [ActionLoading, ActionSuccess] when sign in is successful', () async {
       when(() => mockSignInUseCase(email, password))

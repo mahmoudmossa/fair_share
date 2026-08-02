@@ -1,4 +1,3 @@
-// TODO: Define the repository interface for Occupants feature.
 import 'package:dartz/dartz.dart';
 import 'package:fair_share/core/errors/failures.dart';
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
