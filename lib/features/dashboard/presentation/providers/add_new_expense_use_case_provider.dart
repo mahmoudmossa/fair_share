@@ -1,4 +1,3 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/use_cases/add_new_expense_use_case.dart';
 import 'dashboard_repository_provider.dart';

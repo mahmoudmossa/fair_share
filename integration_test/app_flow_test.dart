@@ -8,6 +8,7 @@ import 'scenarios/login_test_scenario.dart';
 import 'scenarios/flat_setup_test_scenario.dart';
 import 'scenarios/dashboard_test_scenario.dart';
 import 'scenarios/history_test_scenario.dart';
+import 'scenarios/join_flat_test_scenario.dart';
 
 void main() {
   // patrolTest = real device runner. It does NOT use pumpWidgetAndSettle.
@@ -33,6 +34,20 @@ void main() {
     );
 
     // 3. Start the chain reaction
+    await flow.startFlow();
+  });
+
+  patrolTest('Alternative User Journey: Login -> Join Flat with Invite Code', (
+    $,
+  ) async {
+    app.main();
+    await $.pumpAndSettle();
+
+    final flow = LoginTestScenario(
+      $,
+      next: JoinFlatTestScenario($, next: null),
+    );
+
     await flow.startFlow();
   });
 }

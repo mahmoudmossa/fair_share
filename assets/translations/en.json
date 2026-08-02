@@ -113,7 +113,9 @@
     "permission_denied": "Permission denied",
     "unauthenticated": "Unauthenticated",
     "unavailable": "Unavailable",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "already_claimed": "This invitation has already been claimed",
+    "invalid_invite": "Invalid or expired invite code"
   },
   "occupants": {
     "title": "Occupants View",

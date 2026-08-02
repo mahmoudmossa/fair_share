@@ -26,6 +26,7 @@
         "freezed_annotation",
         "get_it",
         "hooks_riverpod",
+        "intl",
         "json_annotation",
         "logger",
         "mason",
@@ -314,6 +315,15 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "intl",
+      "version": "0.20.2",
+      "dependencies": [
+        "clock",
+        "meta",
+        "path"
       ]
     },
     {
@@ -1265,15 +1275,6 @@
       "version": "0.0.2",
       "dependencies": [
         "flutter"
-      ]
-    },
-    {
-      "name": "intl",
-      "version": "0.20.2",
-      "dependencies": [
-        "clock",
-        "meta",
-        "path"
       ]
     },
     {

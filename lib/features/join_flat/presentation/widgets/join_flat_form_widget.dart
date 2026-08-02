@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
-import 'package:fair_share/features/dashboard/presentation/providers/dashboard_actions_provider.dart';
-import 'package:shared_core/shared_core.dart';
+import 'package:fair_share/core/constants/app_keys.dart';
+import 'package:fair_share/features/join_flat/presentation/providers/join_flat_notifier_provider.dart';
+import 'package:fair_share/core/modles/action_state.dart';
 
 class JoinFlatFormWidget extends HookConsumerWidget {
   const JoinFlatFormWidget({super.key});
@@ -14,14 +14,19 @@ class JoinFlatFormWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final state = ref.watch(dashboardActionsProvider);
-    final isLoading = state is ActionLoading;
+
+    final actionState = ref.watch(joinFlatProvider);
+    final joinFlatNotifier = ref.watch(joinFlatProvider.notifier);
+    final isLoading = actionState.maybeWhen(
+      loading: () => true,
+      orElse: () => false,
+    );
 
     // PIN code controller logic (6 digits)
     final controllers = List.generate(6, (_) => useTextEditingController());
     final focusNodes = List.generate(6, (_) => useFocusNode());
     return Column(
-      key: const ValueKey('join_flat_view'),
+      key: AppKeys.joinFlat.joinFlatView,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: 16),
@@ -51,12 +56,13 @@ class JoinFlatFormWidget extends HookConsumerWidget {
               width: 48,
               height: 64,
               child: TextFormField(
-                key: Key('pinDigitField$index'),
+                key: AppKeys.joinFlat.pinDigitField(index),
                 controller: controllers[index],
                 focusNode: focusNodes[index],
                 autofocus: index == 0,
                 textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.characters,
                 style: textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.primary,
@@ -79,7 +85,7 @@ class JoinFlatFormWidget extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+
                 onChanged: (value) {
                   if (value.isNotEmpty) {
                     if (index < 5) {
@@ -107,7 +113,7 @@ class JoinFlatFormWidget extends HookConsumerWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: colorScheme.outlineVariant.withOpacity(0.5),
+              color: colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
           ),
           child: Padding(
@@ -134,8 +140,21 @@ class JoinFlatFormWidget extends HookConsumerWidget {
 
         // Primary Button
         ElevatedButton.icon(
-          key: const Key('joinFlatButton'),
-          onPressed: () {},
+          key: AppKeys.joinFlat.joinFlatButton,
+          onPressed: isLoading
+              ? null
+              : () {
+                  final code = controllers.map((c) => c.text).join();
+                  if (code.length == 6) {
+                    joinFlatNotifier.joinFlat(code);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter a complete 6-digit code'),
+                      ),
+                    );
+                  }
+                },
           style: ElevatedButton.styleFrom(
             backgroundColor: colorScheme.primaryContainer,
             foregroundColor: colorScheme.onPrimaryContainer,

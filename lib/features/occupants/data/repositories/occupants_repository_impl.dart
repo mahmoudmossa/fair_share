@@ -33,8 +33,15 @@ class OccupantsRepositoryImpl implements OccupantsRepository {
   }
 
   @override
-  Future<Either<Failure, void>> updateOccupant(Occupant occupant) {
-    // TODO: implement updateOccupant
-    throw UnimplementedError();
+  Future<void> updateOccupant(Occupant occupant) async {
+    try {
+      final flatId = occupant.flatId;
+      if (flatId == null || flatId.isEmpty) {
+        throw ServerFailure(ServerFailureType.unknown);
+      }
+      await _dataSource.updateOccupant(flatId, occupant);
+    } catch (e) {
+      throw ServerFailure(ServerFailureType.unknown);
+    }
   }
 }
