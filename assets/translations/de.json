@@ -133,6 +133,27 @@
     "detail_paid_by": "Bezahlt von {}",
     "loading_error": "Fehler beim Laden des Verlaufs: {}",
     "detail_loading_error": "Fehler beim Laden der Ausgaben: {}"
+  },
+  "profile": {
+    "title": "Mein Profil",
+    "membership_status": "MITGLIEDSCHAFTSSTATUS",
+    "premium_flat": "Premium WG",
+    "active_housemate": "Aktiver Mitbewohner",
+    "members_count": "{} Mitglieder",
+    "general_settings": "Allgemeine Einstellungen",
+    "flat_details": "WG-Details",
+    "security_privacy": "Sicherheit & Datenschutz",
+    "biometrics_data_splitting": "Biometrie & Datenaufteilung",
+    "app_tagline": "FairShare für iOS & Android",
+    "app_version": "Version {}",
+    "edit_name_title": "Anzeigenamen bearbeiten",
+    "name_label": "Anzeigename",
+    "name_empty_error": "Anzeigename darf nicht leer sein",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "logout": "Abmelden",
+    "update_success": "Profil erfolgreich aktualisiert!",
+    "update_error": "Fehler beim Aktualisieren des Profils: {}"
   }
 }
 

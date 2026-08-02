@@ -8,13 +8,14 @@ import 'scenarios/login_test_scenario.dart';
 import 'scenarios/flat_setup_test_scenario.dart';
 import 'scenarios/dashboard_test_scenario.dart';
 import 'scenarios/history_test_scenario.dart';
+import 'scenarios/profile_test_scenario.dart';
 
 void main() {
   // patrolTest = real device runner. It does NOT use pumpWidgetAndSettle.
   // Patrol boots the app via app.main() automatically.
-  patrolTest('Complete User Journey: Login -> Setup Flat -> Dashboard -> History', (
-    $,
-  ) async {
+  patrolTest(
+      'Complete User Journey: Login -> Setup Flat -> Dashboard -> History -> Profile',
+      ($) async {
     // 1. Boot the real app on the device.
     // Patrol will call app.main() which initialises Firebase etc.
     app.main(); // main() returns void, cannot be awaited
@@ -27,7 +28,10 @@ void main() {
         $,
         next: DashboardTestScenario(
           $,
-          next: HistoryTestScenario($, next: null),
+          next: HistoryTestScenario(
+            $,
+            next: ProfileTestScenario($, next: null),
+          ),
         ),
       ),
     );

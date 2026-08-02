@@ -34,6 +34,8 @@ class NewFlatScreen extends HookConsumerWidget {
     final flatSetup = ref.watch(flatSetupProvider);
     final currentUser = ref.watch(authStateProvider).value;
     final submissionState = ref.watch(newFlatProvider);
+    final notifier = ref.read(newFlatProvider.notifier);
+    final finalFlat = ref.watch(flatSetupProvider);
 
     // Listen to submission status
     ref.listen<ActionState>(newFlatProvider, (previous, next) {
@@ -75,9 +77,7 @@ class NewFlatScreen extends HookConsumerWidget {
         if (currentStep.value == 1 && flatSetup.members.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                LocaleKeys.new_flat_setup_add_member_error.tr(),
-              ),
+              content: Text(LocaleKeys.new_flat_setup_add_member_error.tr()),
             ),
           );
           return;
@@ -103,14 +103,11 @@ class NewFlatScreen extends HookConsumerWidget {
         if (invalidExpense) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                LocaleKeys.new_flat_setup_invalid_costs_error.tr(),
-              ),
+              content: Text(LocaleKeys.new_flat_setup_invalid_costs_error.tr()),
             ),
           );
           return;
         }
-
 
         final setupNotifier = ref.read(flatSetupProvider.notifier);
 
@@ -118,8 +115,8 @@ class NewFlatScreen extends HookConsumerWidget {
         setupNotifier.generateInvitationCode();
 
         // Submit final Flat payload to server
-        final finalFlat = ref.read(flatSetupProvider);
-        await ref.read(newFlatProvider.notifier).submitNewFlat(finalFlat);
+
+        await notifier.submitNewFlat(finalFlat);
       }
     }
 

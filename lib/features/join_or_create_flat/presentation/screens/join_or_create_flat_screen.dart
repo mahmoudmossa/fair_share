@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:shared_core/shared_core.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'package:fair_share/core/router/app_router.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_notifier_provider.dart';
@@ -65,7 +64,7 @@ class JoinOrCreateFlatScreen extends HookConsumerWidget {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withOpacity(0.2),
+                      color: colorScheme.primaryContainer.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

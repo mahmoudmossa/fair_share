@@ -28,7 +28,7 @@ class SetupOptionCardWidget extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: colorScheme.outlineVariant.withOpacity(0.5),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
           width: 1.5,
         ),
       ),
@@ -36,8 +36,8 @@ class SetupOptionCardWidget extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        splashColor: colorScheme.primary.withOpacity(0.08),
-        highlightColor: colorScheme.primary.withOpacity(0.04),
+        splashColor: colorScheme.primary.withValues(alpha: 0.08),
+        highlightColor: colorScheme.primary.withValues(alpha: 0.04),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Row(
@@ -46,7 +46,7 @@ class SetupOptionCardWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.4),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -80,7 +80,7 @@ class SetupOptionCardWidget extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right,
-                color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ],
           ),

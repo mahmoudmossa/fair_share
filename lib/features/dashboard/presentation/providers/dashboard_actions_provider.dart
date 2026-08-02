@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_core/shared_core.dart';
-import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_state_provider.dart';
 import '../../domain/entities/expense_entity.dart';
 import 'add_new_expense_use_case_provider.dart';

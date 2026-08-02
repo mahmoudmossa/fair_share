@@ -40,7 +40,7 @@ You are an expert Flutter developer and software architect. When writing, refact
 
 ## 5. Additional Best Practices
 * **Immutability:** All state classes and models MUST be immutable. Use the `freezed` package or standard `copyWith` methods to mutate state.
-* **Error Handling:** Never swallow exceptions. Server calls must be wrapped in `try/catch` blocks, mapping errors explicitly to the `ActionState.error` state to be handled by the UI.
+* **Error Handling & Direct Async Return Types:** Never swallow exceptions. Server calls in Notifiers must be wrapped in `try/catch` blocks, mapping caught errors directly to `ActionState.error(e, stackTrace)` to be handled by the UI. Avoid wrapping repository or use-case return types in `Either<Exception, T>` or `Either<Failure, T>` unless explicitly required by architectural constraints. Prefer clean, direct async return signatures (`Future<T>` / `Future<void>`).
 * **Null Safety:** Utilize strict null safety. Avoid using the `!` (bang) operator unless absolutely mathematically certain the value is not null. Use early returns and null-coalescing (`??`) instead.
 * **Firebase Error Mapping & Active Research:** When integrating with Firebase, do not catch raw network exceptions (like `SocketException`) for Firestore operations. Firestore catches connection issues internally and propagates them as a `FirebaseException` with code `'unavailable'` or `'deadline-exceeded'`. You MUST inspect `e.code` to differentiate between database/security failures (`ServerFailure`) and network connection issues (`NetworkFailure`). Always search web documentation for up-to-date SDK behavior rather than assuming standard REST patterns.
 
@@ -49,3 +49,6 @@ You are an expert Flutter developer and software architect. When writing, refact
 * **Chaining Scenarios:** Screens must be tested in sequence by passing the next scenario to run in the `next` constructor argument (e.g., `SplashTestScenario($, next: AuthTestScenario($, next: HomeTestScenario($, next: null)))`).
 * **Mandatory Flow Addition:** Whenever a NEW screen or major feature is introduced, you MUST create a corresponding `BaseTestScenario` implementation for it and append it to the main application testing flow (e.g., `integration_test/app_flow_test.dart`). This prevents missing UI flows from coverage.
 * **Testing Keys & Centralized Key Management:** Ensure all interactive elements have unique and descriptive `Key` annotations. ALL `Key` objects MUST be declared in dedicated feature key classes under `lib/core/constants/` (e.g. `history_keys.dart`) and exposed via the central `AppKeys` class (`AppKeys.history`). Never hardcode inline `Key('...')` strings directly in UI widgets or test scenarios.
+
+## 7. Centralized Database Key & Constant Management
+* **No Hardcoded Firestore/Database Keys:** NEVER hardcode Firestore collection names, document field keys, or database parameter strings directly as inline string literals in data sources or repositories. ALWAYS retrieve them from the central `FirestoreConstants` class (in `lib/core/constants/firestore_constants.dart`) or dedicated constant files.
