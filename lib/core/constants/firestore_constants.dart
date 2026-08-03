@@ -26,4 +26,5 @@ class FirestoreConstants {
   static const String occupants = 'occupants';
   static const String photoBase64 = 'photoBase64';
   static const String fcmTokens = 'fcmTokens';
+  static const String billingCalculationDay = 'billingCalculationDay';
 }

@@ -66,4 +66,15 @@ class DashboardRepositoryImpl implements DashboardRepository {
   Stream<List<DebtEntity>> watchFlatDebts(String flatId) {
     return _remoteDataSource.watchFlatDebts(flatId);
   }
+
+  @override
+  Future<void> updateBillingCalculationDay(String flatId, int day) async {
+    await _remoteDataSource.updateBillingCalculationDay(flatId, day);
+  }
+
+  @override
+  Future<void> calculateMonthlyExpensesAndNotify(String flatId) async {
+    await _remoteDataSource.calculateMonthlyExpensesAndNotify(flatId);
+  }
 }
+

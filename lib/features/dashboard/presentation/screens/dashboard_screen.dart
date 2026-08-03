@@ -208,16 +208,20 @@ class DashboardScreen extends HookConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text(err.toString())),
         data: (state) {
-          if (state == null) return const Center(child: CircularProgressIndicator());
-          
+          if (state == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           final occupantsList = state.members
-              .map((m) => Occupant(
-                    id: m.id,
-                    name: m.name,
-                    userId: m.userId,
-                    invitationCode: m.invitationCode,
-                    flatId: state.flat.id,
-                  ))
+              .map(
+                (m) => Occupant(
+                  id: m.id,
+                  name: m.name,
+                  userId: m.userId,
+                  invitationCode: m.invitationCode,
+                  flatId: state.flat.id,
+                ),
+              )
               .toList();
 
           final isCurrentAdmin = state.flat.createdBy == currentUserId;
@@ -228,6 +232,8 @@ class DashboardScreen extends HookConsumerWidget {
             inviteCode: state.flat.id,
             isCurrentAdmin: isCurrentAdmin,
             currentUserId: currentUserId,
+            flatId: state.flat.id,
+            initialBillingDay: state.flat.billingCalculationDay,
           );
         },
       );
@@ -236,7 +242,6 @@ class DashboardScreen extends HookConsumerWidget {
     if (tabIndex == 3) {
       return const ProfileScreen(key: ValueKey('tab_3'));
     }
-
 
     return stateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -290,25 +295,6 @@ class DashboardScreen extends HookConsumerWidget {
                         ),
                         style: textTheme.labelMedium?.copyWith(
                           color: colorScheme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        cycle.status == 'published'
-                            ? LocaleKeys.dashboard_status_published.tr()
-                            : LocaleKeys.dashboard_status_draft.tr(),
-                        style: textTheme.labelMedium?.copyWith(
-                          color: colorScheme.colorScheme.onSecondaryContainer,
                         ),
                       ),
                     ),

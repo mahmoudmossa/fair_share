@@ -4,6 +4,7 @@ class FlatEntity {
   final String invitationCode;
   final String createdBy;
   final String createdByName;
+  final int billingCalculationDay;
 
   const FlatEntity({
     required this.id,
@@ -11,6 +12,7 @@ class FlatEntity {
     required this.invitationCode,
     required this.createdBy,
     required this.createdByName,
+    this.billingCalculationDay = 1,
   });
 
   @override
@@ -22,7 +24,8 @@ class FlatEntity {
           name == other.name &&
           invitationCode == other.invitationCode &&
           createdBy == other.createdBy &&
-          createdByName == other.createdByName;
+          createdByName == other.createdByName &&
+          billingCalculationDay == other.billingCalculationDay;
 
   @override
   int get hashCode =>
@@ -30,5 +33,7 @@ class FlatEntity {
       name.hashCode ^
       invitationCode.hashCode ^
       createdBy.hashCode ^
-      createdByName.hashCode;
+      createdByName.hashCode ^
+      billingCalculationDay.hashCode;
 }
+

@@ -7,6 +7,7 @@ class FlatModel extends FlatEntity {
     required super.invitationCode,
     required super.createdBy,
     required super.createdByName,
+    super.billingCalculationDay,
   });
 
   factory FlatModel.fromMap(Map<String, dynamic> map, String id) {
@@ -16,6 +17,7 @@ class FlatModel extends FlatEntity {
       invitationCode: map['invitationCode'] as String? ?? '',
       createdBy: map['createdBy'] as String? ?? '',
       createdByName: map['createdByName'] as String? ?? '',
+      billingCalculationDay: (map['billingCalculationDay'] as num?)?.toInt() ?? 1,
     );
   }
 
@@ -25,6 +27,7 @@ class FlatModel extends FlatEntity {
       'invitationCode': invitationCode,
       'createdBy': createdBy,
       'createdByName': createdByName,
+      'billingCalculationDay': billingCalculationDay,
     };
   }
 }

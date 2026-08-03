@@ -1,5 +1,6 @@
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:fair_share/features/occupants/presentation/providers/edit_member_provider.dart';
+import 'package:fair_share/features/occupants/presentation/widget/billing_calculation_day_widget.dart';
 import 'package:fair_share/features/occupants/presentation/widget/deep_link_invitation_widget.dart';
 import 'package:fair_share/features/occupants/presentation/widget/edit_member_list_widget.dart';
 import 'package:fair_share/features/occupants/presentation/widget/encrypted_ledger_card_widget.dart';
@@ -12,6 +13,8 @@ class OccupantsWidget extends HookConsumerWidget {
   final String inviteCode;
   final bool isCurrentAdmin;
   final String currentUserId;
+  final String flatId;
+  final int initialBillingDay;
 
   const OccupantsWidget({
     super.key,
@@ -19,6 +22,8 @@ class OccupantsWidget extends HookConsumerWidget {
     this.inviteCode = 'FAIR-8924',
     this.isCurrentAdmin = false,
     this.currentUserId = '',
+    this.flatId = '',
+    this.initialBillingDay = 1,
   });
 
   @override
@@ -48,7 +53,7 @@ class OccupantsWidget extends HookConsumerWidget {
             // 1. Invitation Card Widget
             const InvitationCardWidget(),
             const SizedBox(height: 24),
-            // 2. Edit Members List Widget
+            // 2. Edit Members List Widget (Active Household)
             EditMemberListWidget(
               occupants: defaultOccupants,
               isCurrentAdmin: isCurrentAdmin,
@@ -60,10 +65,17 @@ class OccupantsWidget extends HookConsumerWidget {
               },
             ),
             const SizedBox(height: 24),
-            // 3. Deep Link Invitation Widget
+            // 3. Billing Calculation Day Widget (1-30 month calendar selector)
+            BillingCalculationDayWidget(
+              flatId: flatId,
+              initialDay: initialBillingDay,
+              isCurrentAdmin: isCurrentAdmin,
+            ),
+            const SizedBox(height: 24),
+            // 4. Deep Link Invitation Widget
             const DeepLinkInvitationWidget(),
             const SizedBox(height: 24),
-            // 4. Encrypted Shared Ledger Card Widget
+            // 5. Encrypted Shared Ledger Card Widget
             const EncryptedLedgerCardWidget(),
           ],
         ),

@@ -7,6 +7,7 @@ import 'package:fair_share/core/utils/monthly_history_helper.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_member_dto.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_cost.dart';
+import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
 import 'package:fair_share/features/new_flat/domain/use_cases/calculate_settlements.dart';
 import '../../domain/entities/dashboard_state.dart';
 import '../../domain/entities/debt_entity.dart';
@@ -16,6 +17,7 @@ import '../models/expense_model.dart';
 import '../models/debt_model.dart';
 import '../models/activity_model.dart';
 import 'dashboard_remote_data_source.dart';
+
 
 part 'dashboard_remote_data_source_impl.g.dart';
 
@@ -30,8 +32,18 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
   String _getMonthNameFormatted(DateTime date) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return "${months[date.month - 1]} ${date.year}";
   }
@@ -50,13 +62,17 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     void emitLatest() {
       if (latestFlat != null && !controller.isClosed) {
         // Calculate debts dynamically on the fly
-        final List<FlatCostEntity> flatCosts = latestExpenses.map((e) => FlatCostEntity(
-          title: e.title,
-          amount: e.amount,
-          recurrenceType: e.recurrence,
-          payerId: e.payerId,
-          payerName: e.payerName,
-        )).toList();
+        final List<FlatCostEntity> flatCosts = latestExpenses
+            .map(
+              (e) => FlatCostEntity(
+                title: e.title,
+                amount: e.amount,
+                recurrenceType: e.recurrence,
+                payerId: e.payerId,
+                payerName: e.payerName,
+              ),
+            )
+            .toList();
 
         final calculatedDebts = SettlementCalculator.calculateDebts(
           members: latestMembers,
@@ -77,8 +93,11 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         // Resolve active billing cycle dynamically if it's missing or out of sync
         final now = DateTime.now();
         final currentMonthId = _getMonthId(now);
-        
-        final totalCosts = latestExpenses.fold(0.0, (total, exp) => total + exp.amount);
+
+        final totalCosts = latestExpenses.fold(
+          0.0,
+          (total, exp) => total + exp.amount,
+        );
         final settledCount = displayDebts.where((d) => d.isSettled).length;
         final totalCount = displayDebts.length;
         double percentage = 85.0;
@@ -86,13 +105,14 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
           percentage = 85.0 + (15.0 * (settledCount / totalCount));
         }
 
-        final activeCycle = latestCycle ?? BillingCycleModel(
-          id: currentMonthId,
-          monthName: _getMonthNameFormatted(now),
-          status: 'draft',
-          totalCosts: totalCosts,
-          settledPercentage: percentage,
-        );
+        final activeCycle =
+            latestCycle ??
+            BillingCycleModel(
+              id: currentMonthId,
+              monthName: _getMonthNameFormatted(now),
+              totalCosts: totalCosts,
+              settledPercentage: percentage,
+            );
 
         controller.add(
           DashboardState(
@@ -208,10 +228,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   }
 
   @override
-  Future<void> addExpense(
-    String flatId,
-    ExpenseModel expense,
-  ) async {
+  Future<void> addExpense(String flatId, ExpenseModel expense) async {
     // Add expense doc
     final expRef = _firestore
         .collection(FirestoreConstants.wgs)
@@ -432,10 +449,10 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .collection(FirestoreConstants.debts)
         .snapshots()
         .map((snap) {
-      return snap.docs
-          .map((d) => DebtModel.fromMap(d.data(), d.id).toEntity())
-          .toList();
-    });
+          return snap.docs
+              .map((d) => DebtModel.fromMap(d.data(), d.id).toEntity())
+              .toList();
+        });
   }
 
   @override
@@ -449,9 +466,107 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     }
     return null;
   }
+
+  @override
+  Future<void> updateBillingCalculationDay(String flatId, int day) async {
+    await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .update({FirestoreConstants.billingCalculationDay: day});
+  }
+
+  @override
+  Future<void> calculateMonthlyExpensesAndNotify(String flatId) async {
+    final now = DateTime.now();
+    final nextMonthDate = DateTime(now.year, now.month + 1, 1);
+    final nextMonthId = _getMonthId(nextMonthDate);
+
+    // 1. Fetch flat expenses
+    final expensesSnap = await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.expenses)
+        .get();
+
+    final allExpenses = expensesSnap.docs
+        .map((d) => ExpenseModel.fromMap(d.data(), d.id))
+        .toList();
+
+    // 2. Fetch members
+    final membersSnap = await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.members)
+        .get();
+
+    final members = membersSnap.docs
+        .map((d) => FlatMemberDto.fromJson(d.data()).toEntity())
+        .toList();
+
+    // 3. Filter monthly recurring expenses
+    final monthlyExpenses = allExpenses
+        .where((e) => e.recurrence == RecurrenceType.monthly)
+        .toList();
+
+    final flatCosts = monthlyExpenses
+        .map(
+          (e) => FlatCostEntity(
+            title: e.title,
+            amount: e.amount,
+            recurrenceType: e.recurrence,
+            payerId: e.payerId,
+            payerName: e.payerName,
+          ),
+        )
+        .toList();
+
+    final calculatedDebts = SettlementCalculator.calculateDebts(
+      members: members,
+      costs: flatCosts,
+    );
+
+    final totalCosts = monthlyExpenses.fold(
+      0.0,
+      (acc, e) => acc + e.amount,
+    );
+
+    // Save calculated debts into debts collection
+    await setFlatDebts(
+      flatId,
+      calculatedDebts,
+    );
+
+    // 4. Archive current month to history
+    await upsertMonthlyHistory(_firestore, flatId);
+
+    // 5. Create new billing cycle for next month
+    await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.billingCycles)
+        .doc(nextMonthId)
+        .set({
+      'monthName': _getMonthNameFormatted(nextMonthDate),
+      'totalCosts': totalCosts,
+      'settledPercentage': 0.0,
+    }, SetOptions(merge: true));
+
+    // 6. Write notification doc for members
+    await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.notifications)
+        .add({
+      'title': 'Monthly Cost Calculated',
+      'body':
+          'Monthly costs for ${_getMonthNameFormatted(now)} have been calculated and processed.',
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
 }
 
 @riverpod
 DashboardRemoteDataSource dashboardRemoteDataSource(Ref ref) {
   return DashboardRemoteDataSourceImpl(ref.watch(firebaseFirestoreProvider));
 }
+

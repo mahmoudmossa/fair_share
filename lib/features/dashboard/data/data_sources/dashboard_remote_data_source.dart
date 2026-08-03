@@ -17,4 +17,7 @@ abstract class DashboardRemoteDataSource {
   Future<String?> getUserFlatId(String userId);
   Future<void> setFlatDebts(String flatId, List<DebtEntity> debts);
   Stream<List<DebtEntity>> watchFlatDebts(String flatId);
+  Future<void> updateBillingCalculationDay(String flatId, int day);
+  Future<void> calculateMonthlyExpensesAndNotify(String flatId);
 }
+
