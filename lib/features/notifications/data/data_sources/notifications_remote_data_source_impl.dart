@@ -15,9 +15,10 @@ class NotificationsRemoteDataSourceImpl implements NotificationsRemoteDataSource
   Future<void> saveFcmToken(String userId, String token) async {
     try {
       final userRef = _firestore.collection(FirestoreConstants.users).doc(userId);
-      await userRef.update({
-        FirestoreConstants.fcmTokens: FieldValue.arrayUnion([token]),
-      });
+      await userRef.set(
+        {FirestoreConstants.fcmTokens: FieldValue.arrayUnion([token])},
+        SetOptions(merge: true),
+      );
     } on FirebaseException catch (e) {
       throw _errorMapper.mapException(e);
     } catch (e) {
@@ -29,9 +30,10 @@ class NotificationsRemoteDataSourceImpl implements NotificationsRemoteDataSource
   Future<void> removeFcmToken(String userId, String token) async {
     try {
       final userRef = _firestore.collection(FirestoreConstants.users).doc(userId);
-      await userRef.update({
-        FirestoreConstants.fcmTokens: FieldValue.arrayRemove([token]),
-      });
+      await userRef.set(
+        {FirestoreConstants.fcmTokens: FieldValue.arrayRemove([token])},
+        SetOptions(merge: true),
+      );
     } on FirebaseException catch (e) {
       throw _errorMapper.mapException(e);
     } catch (e) {

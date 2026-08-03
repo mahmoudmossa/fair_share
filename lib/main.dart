@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'package:fair_share/core/router/providers/app_router_provider.dart';
+import 'package:fair_share/features/notifications/data/services/push_notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +18,11 @@ void main() async {
 
   // Initialize easy_localization
   await EasyLocalization.ensureInitialized();
+
+  // ⚠️ MUST be registered before runApp() and before any async gap.
+  // FCM background handler runs in a separate Dart isolate and requires
+  // the registration to happen at the top level of main().
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   // Initialize Firebase options
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

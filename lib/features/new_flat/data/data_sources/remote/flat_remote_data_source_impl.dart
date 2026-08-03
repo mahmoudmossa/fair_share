@@ -107,7 +107,7 @@ class FlatRemoteDataSourceImpl implements FlatRemoteDataSource {
     final userRef = _firestore
         .collection(FirestoreConstants.users)
         .doc(flat.createdBy);
-    batch.update(userRef, {FirestoreConstants.flatId: flat.id});
+    batch.set(userRef, {FirestoreConstants.flatId: flat.id}, SetOptions(merge: true));
 
     // Commit batch transaction
     await batch.commit();

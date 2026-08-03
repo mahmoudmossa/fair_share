@@ -49,8 +49,9 @@ class PushNotificationService {
       sound: true,
     );
 
-    // Set background messaging handler
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    // NOTE: FirebaseMessaging.onBackgroundMessage() is registered in main()
+    // before runApp() — do NOT register it here as it would be too late for
+    // background / terminated state messages.
 
     // Listen to foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {

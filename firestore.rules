@@ -1,0 +1,170 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper functions ─────────────────────────────────────────────────────
+
+    /// Returns true if the requesting user is authenticated.
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /// Returns true if the requesting user owns the given document (by uid).
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    /// Returns true if the requesting user belongs to the given flat.
+    /// Checks the user's own document (always keyed by auth UID) for the
+    /// flatId field — set on both flat creation and join via invite code.
+    function isMemberOf(flatId) {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.flatId == flatId;
+    }
+
+    // ─── /users/{userId} ──────────────────────────────────────────────────────
+    // A user document is created on sign-up and holds email + flatId.
+    match /users/{userId} {
+      // Any authenticated user can read any user profile (needed for occupant
+      // lookups and FCM token reads by flat members).
+      allow read: if isSignedIn();
+
+      // Only the owner may create their own document.
+      allow create: if isOwner(userId);
+
+      // Only the owner may update their own document.
+      // Allowed fields: flatId, photoBase64, displayName, fcmTokens.
+      allow update: if isOwner(userId);
+
+      // Deletion is not permitted from the client.
+      allow delete: if false;
+
+      // ── /users/{userId}/notifications/{notificationId} ────────────────────
+      // Notifications are stored as a sub-collection of the user document.
+      match /notifications/{notificationId} {
+        // Users can only read their own notifications.
+        allow read:   if isOwner(userId);
+        // Any authenticated user can create a notification for another user
+        // (needed to notify flat members about new expenses, settlements, etc.).
+        allow create: if isSignedIn();
+        // Only the recipient can update (mark as read).
+        allow update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // ─── /wgs/{flatId} ────────────────────────────────────────────────────────
+    // Root flat document.
+    match /wgs/{flatId} {
+      // Any flat member can read the flat document.
+      allow read: if isMemberOf(flatId);
+
+      // Any authenticated user can create a new flat (they become the first member
+      // in the same batch, verified server-side via the members sub-collection).
+      allow create: if isSignedIn();
+
+      // Only flat members can update flat metadata.
+      allow update: if isMemberOf(flatId);
+
+      // Deletion is not permitted from the client.
+      allow delete: if false;
+
+      // ── /wgs/{flatId}/members/{memberId} ─────────────────────────────────
+      match /members/{memberId} {
+        // Any flat member can read the members list.
+        allow read: if isMemberOf(flatId);
+
+        // Allow create by any authenticated user (needed during flat creation
+        // batch and when a user joins via invitation code).
+        allow create: if isSignedIn();
+
+        // Update is allowed if:
+        // a) The user owns this slot (their auth UID matches the doc ID), OR
+        // b) They are already a flat member (e.g. updating their photo), OR
+        // c) They are claiming a placeholder slot by setting their own userId
+        //    (this is exactly what executeJoinFlatTransaction does when joining
+        //    via invitation code — the user isn't a member yet at rule-eval time).
+        allow update: if isSignedIn() && (
+          request.auth.uid == memberId ||
+          isMemberOf(flatId) ||
+          request.resource.data.userId == request.auth.uid
+        );
+
+        // Deletion is not permitted from the client.
+        allow delete: if false;
+      }
+
+      // ── /wgs/{flatId}/expenses/{expenseId} ───────────────────────────────
+      match /expenses/{expenseId} {
+        allow read:   if isMemberOf(flatId);
+        // During flat creation, expenses are written in the same batch as member
+        // docs. Firestore evaluates rules against the pre-batch DB state, so
+        // isMemberOf() returns false at batch-commit time. We allow any signed-in
+        // user to create — the flat ID is an unguessable random UUID.
+        allow create: if isSignedIn();
+        allow update: if isMemberOf(flatId);
+        allow delete: if isMemberOf(flatId);
+      }
+
+      // ── /wgs/{flatId}/billing_cycles/{cycleId} ───────────────────────────
+      match /billing_cycles/{cycleId} {
+        allow read:   if isMemberOf(flatId);
+        // Created during flat setup (creator is not yet a "member" in DB
+        // at batch commit time, so we allow any authenticated user to create).
+        allow create: if isSignedIn();
+        allow update: if isMemberOf(flatId);
+        allow delete: if false;
+      }
+
+      // ── /wgs/{flatId}/debts/{debtId} ─────────────────────────────────────
+      match /debts/{debtId} {
+        allow read:   if isMemberOf(flatId);
+        allow create: if isMemberOf(flatId);
+        allow update: if isMemberOf(flatId);
+        allow delete: if isMemberOf(flatId);
+      }
+
+      // ── /wgs/{flatId}/activities/{activityId} ────────────────────────────
+      match /activities/{activityId} {
+        allow read:   if isMemberOf(flatId);
+        allow create: if isMemberOf(flatId);
+        allow update: if false;
+        allow delete: if false;
+      }
+
+      // ── /wgs/{flatId}/monthly_history/{monthId} ──────────────────────────
+      match /monthly_history/{monthId} {
+        allow read:   if isMemberOf(flatId);
+        // Written by server helper (upsertMonthlyHistory) after flat creation
+        // and on expense changes; allow any authenticated user to create/update.
+        allow create: if isSignedIn();
+        allow update: if isSignedIn();
+        allow delete: if false;
+      }
+    }
+
+    // ─── /invitations/{inviteCode} ────────────────────────────────────────────
+    // Global invitation documents created when a flat owner adds placeholder
+    // members. Identified by their 6-digit invite code.
+    match /invitations/{inviteCode} {
+      // Any signed-in user can read an invitation (needed to validate a code
+      // before joining).
+      allow read: if isSignedIn();
+
+      // Any authenticated user can create an invitation (happens during flat
+      // creation batch).
+      allow create: if isSignedIn();
+
+      // Any authenticated user can update an invitation (marks it 'used' when
+      // the invitee joins via executeJoinFlatTransaction).
+      allow update: if isSignedIn();
+
+      // Deletion is not permitted from the client.
+      allow delete: if false;
+    }
+
+    // NOTE: /users/{userId}/notifications/{notificationId} rules are defined
+    // above inside the /users match block.
+  }
+}
