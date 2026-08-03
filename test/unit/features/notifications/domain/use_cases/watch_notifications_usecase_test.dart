@@ -1,6 +1,7 @@
 import 'package:fair_share/features/notifications/domain/entities/notifications_entity.dart';
 import 'package:fair_share/features/notifications/domain/repositories/notifications_repository.dart';
 import 'package:fair_share/features/notifications/domain/usecases/watch_notifications_usecase.dart';
+import 'package:fair_share/features/notifications/domain/entities/notification_type.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -18,12 +19,12 @@ void main() {
 
   group('WatchNotificationsUseCase', () {
     const tUserId = 'user_123';
-    const tNotifications = [
+    final tNotifications = [
       NotificationsEntity(
         id: 'notif_1',
         title: 'New expense',
         body: 'Mahmoud added a new expense',
-        type: 'expense',
+        type: NotificationType.expenseAdded,
         isRead: false,
       ),
     ];

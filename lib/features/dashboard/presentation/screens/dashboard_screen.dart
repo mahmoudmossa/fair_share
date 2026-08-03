@@ -20,6 +20,9 @@ import 'package:fair_share/features/history/presentation/screens/history_screen.
 import 'package:fair_share/features/profile/presentation/screens/profile_screen.dart';
 import 'package:fair_share/features/occupants/domain/entities/occupant.dart';
 import 'package:fair_share/features/occupants/presentation/widget/occupants_widget.dart';
+import 'package:fair_share/features/notifications/presentation/widgets/notification_icon_widget.dart';
+import 'package:fair_share/features/notifications/presentation/providers/fcm_token_notifier.dart';
+import 'package:fair_share/features/notifications/presentation/widgets/notifications_side_sheet.dart';
 
 @RoutePage()
 class DashboardScreen extends HookConsumerWidget {
@@ -66,6 +69,13 @@ class DashboardScreen extends HookConsumerWidget {
           );
         }
 
+        useEffect(() {
+          Future.microtask(() {
+            ref.read(fcmTokenProvider.notifier).syncFcmToken();
+          });
+          return null;
+        }, const []);
+
         final stateAsync = ref.watch(dashboardStateProvider);
 
         return Scaffold(
@@ -102,13 +112,7 @@ class DashboardScreen extends HookConsumerWidget {
                     ],
                   ),
                   actions: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.notifications_none_outlined,
-                        color: colorScheme.primary,
-                      ),
-                    ),
+                    const NotificationIconWidget(),
                     IconButton(
                       onPressed: () {
                         ref.read(authProvider.notifier).signOut().then((_) {
@@ -135,6 +139,7 @@ class DashboardScreen extends HookConsumerWidget {
               ),
             ),
           ),
+          endDrawer: const NotificationsSideSheet(),
           floatingActionButton: currentTab.value == 0
               ? stateAsync.maybeWhen(
                   data: (state) {

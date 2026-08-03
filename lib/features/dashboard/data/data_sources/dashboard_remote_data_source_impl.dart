@@ -19,6 +19,8 @@ import '../models/activity_model.dart';
 import 'dashboard_remote_data_source.dart';
 
 
+import 'package:fair_share/features/notifications/domain/entities/notification_type.dart';
+
 part 'dashboard_remote_data_source_impl.g.dart';
 
 class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
@@ -292,6 +294,14 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
     // Keep the monthly history summary in sync
     await upsertMonthlyHistory(_firestore, flatId);
+
+    // Send notification
+    await _notifyMembers(
+      flatId: flatId,
+      title: 'dashboard_notification_expense_added_title',
+      body: 'dashboard_notification_expense_added_body|${expense.payerName}|${expense.title}|${expense.amount.toStringAsFixed(2)}',
+      type: NotificationType.expenseAdded,
+    );
   }
 
   /// Private helper to recalculate debts after costs/expenses change,
@@ -415,6 +425,30 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     );
 
     await _recalculateBillingCycleSettlement(flatId);
+
+    // Send notification to the receiver (debt toName/toId)
+    if (userId != debtId) {
+      // Find the debt details first to get the receiver
+      final debtSnap = await debtRef.get();
+      if (debtSnap.exists && debtSnap.data() != null) {
+        final toId = debtSnap.data()!['toId'] as String?;
+        if (toId != null) {
+          final notifRef = _firestore
+              .collection(FirestoreConstants.users)
+              .doc(toId)
+              .collection(FirestoreConstants.notifications)
+              .doc();
+          await notifRef.set({
+            'id': notifRef.id,
+            'title': 'dashboard_notification_settled_title',
+            'body': 'dashboard_notification_settled_body|$userName',
+            'type': NotificationType.settle.name,
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+          });
+        }
+      }
+    }
   }
 
   @override
@@ -473,6 +507,13 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
         .update({FirestoreConstants.billingCalculationDay: day});
+
+    await _notifyMembers(
+      flatId: flatId,
+      title: 'dashboard_notification_billing_day_title',
+      body: 'dashboard_notification_billing_day_body|$day',
+      type: NotificationType.calculationDayChanged,
+    );
   }
 
   @override
@@ -552,16 +593,49 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     }, SetOptions(merge: true));
 
     // 6. Write notification doc for members
-    await _firestore
+    await _notifyMembers(
+      flatId: flatId,
+      title: 'dashboard_notification_costs_calculated_title',
+      body: 'dashboard_notification_costs_calculated_body|${_getMonthNameFormatted(now)}',
+      type: NotificationType.costsCalculated,
+    );
+  }
+
+  Future<void> _notifyMembers({
+    required String flatId,
+    required String title,
+    required String body,
+    required NotificationType type,
+  }) async {
+    final membersSnap = await _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
-        .collection(FirestoreConstants.notifications)
-        .add({
-      'title': 'Monthly Cost Calculated',
-      'body':
-          'Monthly costs for ${_getMonthNameFormatted(now)} have been calculated and processed.',
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+        .collection(FirestoreConstants.members)
+        .get();
+
+    final batch = _firestore.batch();
+
+    for (final doc in membersSnap.docs) {
+      final data = doc.data();
+      final userId = data['userId'] as String?;
+      if (userId != null && userId.isNotEmpty) {
+        final notifRef = _firestore
+            .collection(FirestoreConstants.users)
+            .doc(userId)
+            .collection(FirestoreConstants.notifications)
+            .doc();
+        batch.set(notifRef, {
+          'id': notifRef.id,
+          'title': title,
+          'body': body,
+          'type': type.name,
+          'timestamp': FieldValue.serverTimestamp(),
+          'isRead': false,
+        });
+      }
+    }
+
+    await batch.commit();
   }
 }
 

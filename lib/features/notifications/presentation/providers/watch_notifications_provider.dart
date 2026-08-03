@@ -7,9 +7,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'watch_notifications_provider.g.dart';
 
 @riverpod
-Future<Stream<List<NotificationsEntity>>> build(Ref ref) async {
-  final authState = await ref.watch(authStateProvider.future);
+Stream<List<NotificationsEntity>> watchNotifications(Ref ref) {
+  final authState = ref.watch(authStateProvider).value;
   if (authState == null) return Stream.value([]);
+  
   final repository = ref.watch(notificationsRepositoryProvider);
   final watchNotificationUsecase = WatchNotificationsUseCase(repository);
   return watchNotificationUsecase(authState.id);

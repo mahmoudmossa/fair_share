@@ -160,6 +160,19 @@
     "pick_from_gallery": "Choose from Gallery",
     "take_photo": "Take a Photo",
     "photo_too_large": "Image is too large. Please select a smaller image."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "empty": "No notifications yet",
+    "dashboard_notification_settled_title": "Debt Settled",
+    "dashboard_notification_settled_body": "{} settled a debt with you",
+    "dashboard_notification_expense_added_title": "New Expense Added",
+    "dashboard_notification_expense_added_body": "{} added {} ({}€)",
+    "dashboard_notification_billing_day_title": "Billing Day Changed",
+    "dashboard_notification_billing_day_body": "Billing calculation day changed to Day {}",
+    "dashboard_notification_costs_calculated_title": "Monthly Costs Calculated",
+    "dashboard_notification_costs_calculated_body": "Monthly costs for {} have been calculated."
   }
 }
 

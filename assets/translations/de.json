@@ -158,8 +158,20 @@
     "update_error": "Fehler beim Aktualisieren des Profils: {}",
     "pick_photo_title": "Profilfoto aktualisieren",
     "pick_from_gallery": "Aus Galerie wählen",
-    "take_photo": "Foto aufnehmen",
-    "photo_too_large": "Das Bild ist zu groß. Bitte wähle ein kleineres Bild."
+    "take_photo": "Ein Foto machen",
+    "photo_too_large": "Bild ist zu groß. Bitte wählen Sie ein kleineres Bild."
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "mark_all_read": "Alle als gelesen markieren",
+    "empty": "Noch keine Benachrichtigungen",
+    "dashboard_notification_settled_title": "Schuld beglichen",
+    "dashboard_notification_settled_body": "{} hat eine Schuld mit Ihnen beglichen",
+    "dashboard_notification_expense_added_title": "Neue Ausgabe hinzugefügt",
+    "dashboard_notification_expense_added_body": "{} hat {} hinzugefügt ({}€)",
+    "dashboard_notification_billing_day_title": "Abrechnungstag geändert",
+    "dashboard_notification_billing_day_body": "Abrechnungstag wurde auf Tag {} geändert",
+    "dashboard_notification_costs_calculated_title": "Monatliche Kosten berechnet",
+    "dashboard_notification_costs_calculated_body": "Die monatlichen Kosten für {} wurden berechnet."
   }
 }
-

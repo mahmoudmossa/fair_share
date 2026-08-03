@@ -35,6 +35,16 @@
             ]
         },
         {
+            "name": "fair_share_pro_real_device",
+            "type": "dart",
+            "request": "launch",
+            "deviceId": "R5CW13QMGET",
+            "program": "lib/main.dart",
+            "args": [
+                "--dart-define-from-file=.env.dev",
+            ]
+        },
+        {
             "name": "fair_share_dev_tablet",
             "type": "dart",
             "request": "launch",
