@@ -49,7 +49,7 @@
     "cancel": "Abbrechen",
     "validation_empty_fields": "Bitte füllen Sie alle Felder aus",
     "history_tab": "Verlauf",
-    "admin_tab": "Admin",
+    "admin_tab": "Haushalt",
     "profile_tab": "Profil",
     "history_coming_soon": "Verlauf-Bildschirm kommt bald!",
     "admin_coming_soon": "Admin-Bildschirm kommt bald!",
@@ -123,9 +123,14 @@
     "invalid_invite": "Ungültiger oder abgelaufener Einladungscode"
   },
   "occupants": {
-    "title": "Bewohner-Ansicht",
+    "title": "Haushalt & Mitglieder",
     "subtitle": "Dies ist die Bewohner-Ansicht",
-    "widget": "Bewohner-Widget"
+    "widget": "Bewohner-Widget",
+    "edit_flat_name": "WG-Name bearbeiten",
+    "flat_name_label": "WG-Name",
+    "flat_name_empty_error": "WG-Name darf nicht leer sein",
+    "update_flat_success": "WG-Name erfolgreich aktualisiert!",
+    "update_flat_error": "Fehler beim Aktualisieren des WG-Namens: {}"
   },
   "history": {
     "title": "Ausgabenverlauf",

@@ -1,3 +1,6 @@
+import 'package:shared_ui/shared_ui.dart';
+import 'package:fair_share/features/notifications/presentation/widgets/notification_icon_widget.dart';
+import 'package:fair_share/features/notifications/presentation/widgets/notifications_side_sheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -45,14 +48,14 @@ class JoinFlatScreen extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 0,
+      appBar: AppHeader(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => context.router.maybePop(),
         ),
+        notificationIcon: const NotificationIconWidget(),
       ),
+      endDrawer: const NotificationsSideSheet(),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

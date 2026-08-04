@@ -49,7 +49,7 @@
     "cancel": "Cancel",
     "validation_empty_fields": "Please fill out all fields",
     "history_tab": "History",
-    "admin_tab": "Admin",
+    "admin_tab": "Household",
     "profile_tab": "Profile",
     "history_coming_soon": "History Screen coming soon!",
     "admin_coming_soon": "Admin Screen coming soon!",
@@ -123,9 +123,14 @@
     "invalid_invite": "Invalid or expired invite code"
   },
   "occupants": {
-    "title": "Occupants View",
+    "title": "Household & Members",
     "subtitle": "This is the Occupants view",
-    "widget": "Occupants Widget"
+    "widget": "Occupants Widget",
+    "edit_flat_name": "Edit Flat Name",
+    "flat_name_label": "Flat Name",
+    "flat_name_empty_error": "Flat name cannot be empty",
+    "update_flat_success": "Flat name updated successfully!",
+    "update_flat_error": "Failed to update flat name: {}"
   },
   "history": {
     "title": "Expense History",

@@ -1,3 +1,6 @@
+import 'package:shared_ui/shared_ui.dart';
+import 'package:fair_share/features/notifications/presentation/widgets/notification_icon_widget.dart';
+import 'package:fair_share/features/notifications/presentation/widgets/notifications_side_sheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -36,21 +39,17 @@ class MonthDetailScreen extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: Text(
-          _monthLabel,
-          key: AppKeys.history.monthDetailTitle,
-          style: TextStyle(color: colorScheme.onSurface),
-        ),
+      appBar: AppHeader(
+        title: _monthLabel,
+        titleKey: AppKeys.history.monthDetailTitle,
         leading: IconButton(
           key: AppKeys.history.monthDetailBackButton,
           icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => context.router.maybePop(),
         ),
+        notificationIcon: const NotificationIconWidget(),
       ),
+      endDrawer: const NotificationsSideSheet(),
       body: Column(
         children: [
           MonthDetailHeaderWidget(

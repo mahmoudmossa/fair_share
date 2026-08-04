@@ -1,3 +1,4 @@
+import 'package:shared_ui/shared_ui.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:fair_share/features/dashboard/presentation/widgets/add_expense_dialog.dart';
 import 'package:flutter/material.dart';
@@ -80,39 +81,15 @@ class DashboardScreen extends HookConsumerWidget {
 
         return Scaffold(
           backgroundColor: colorScheme.surface,
-          appBar: currentTab.value == 0
-              ? AppBar(
-                  backgroundColor: colorScheme.surface,
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
-                  title: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: colorScheme.surfaceContainer,
-                          image: const DecorationImage(
-                            image: NetworkImage(
-                              'https://lh3.googleusercontent.com/aida-public/AB6AXuB_ed-ERBLeIla1t0aMV__AlEIejbPsS3SJzc6ti4ajOFy1QZ0wjxo3pLYNCPfYOi-gd6xM5cw98nK3Mwb5EetDGZjUTIl3mtEm7TTN0iP33f3TmsObpm51k5NYcOyoiDXNs1zcpxwhesPZOKC3YuuoLK9nCAMrp-IWsKDMCGlfWchVNeA19S2YwHvvPFgVeehel7LEG6KQiPce4RZRQLI-r7izPjQ9B3TaGiGYkwhimHRq6sdPWV-a8-cj_hJtKagbfFJ3ji6PxDhY',
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        LocaleKeys.dashboard_title.tr(),
-                        style: TextStyle(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  actions: [
-                    const NotificationIconWidget(),
+          appBar: AppHeader(
+            title: _getTitleForTab(currentTab.value),
+            titleKey: currentTab.value == 3 ? AppKeys.profile.profileTitle : null,
+            avatarUrl: currentTab.value == 0
+                ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuB_ed-ERBLeIla1t0aMV__AlEIejbPsS3SJzc6ti4ajOFy1QZ0wjxo3pLYNCPfYOi-gd6xM5cw98nK3Mwb5EetDGZjUTIl3mtEm7TTN0iP33f3TmsObpm51k5NYcOyoiDXNs1zcpxwhesPZOKC3YuuoLK9nCAMrp-IWsKDMCGlfWchVNeA19S2YwHvvPFgVeehel7LEG6KQiPce4RZRQLI-r7izPjQ9B3TaGiGYkwhimHRq6sdPWV-a8-cj_hJtKagbfFJ3ji6PxDhY'
+                : null,
+            notificationIcon: const NotificationIconWidget(),
+            actions: currentTab.value == 0
+                ? [
                     IconButton(
                       onPressed: () {
                         ref.read(authProvider.notifier).signOut().then((_) {
@@ -124,9 +101,9 @@ class DashboardScreen extends HookConsumerWidget {
                       icon: Icon(Icons.logout, color: colorScheme.outline),
                       tooltip: LocaleKeys.flat_setup_logout.tr(),
                     ),
-                  ],
-                )
-              : null,
+                  ]
+                : null,
+          ),
           body: SafeArea(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
@@ -197,6 +174,20 @@ class DashboardScreen extends HookConsumerWidget {
     );
   }
 
+  String _getTitleForTab(int tabIndex) {
+    switch (tabIndex) {
+      case 1:
+        return LocaleKeys.history_title.tr();
+      case 2:
+        return LocaleKeys.dashboard_admin_tab.tr();
+      case 3:
+        return LocaleKeys.dashboard_profile_tab.tr();
+      case 0:
+      default:
+        return LocaleKeys.dashboard_title.tr();
+    }
+  }
+
   Widget _buildBodyForTab(
     BuildContext context,
     int tabIndex,
@@ -238,6 +229,7 @@ class DashboardScreen extends HookConsumerWidget {
             isCurrentAdmin: isCurrentAdmin,
             currentUserId: currentUserId,
             flatId: state.flat.id,
+            flatName: state.flat.name,
             initialBillingDay: state.flat.billingCalculationDay,
           );
         },
