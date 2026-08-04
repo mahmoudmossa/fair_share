@@ -316,8 +316,13 @@ class DashboardScreen extends HookConsumerWidget {
               ref
                   .watch(flatDebtsProvider(state.flat.id))
                   .when(
-                    data: (debts) =>
-                        DebtMatrixWidget(flatId: state.flat.id, debts: debts),
+                    data: (debts) => DebtMatrixWidget(
+                      flatId: state.flat.id,
+                      debts: debts,
+                      currentUserId: currentUserId,
+                      isCurrentAdmin: state.flat.createdBy == currentUserId,
+                      members: state.members,
+                    ),
                     loading: () => const SizedBox.shrink(),
                     error: (err, stack) => Text(err.toString()),
                   ),

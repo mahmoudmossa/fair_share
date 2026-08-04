@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:fair_share/features/history/domain/entities/month_summary_entity.dart';
+import 'package:fair_share/features/dashboard/domain/entities/expense_entity.dart';
 import 'package:fair_share/features/history/domain/repositories/history_repository.dart';
 import 'package:fair_share/features/history/domain/use_cases/watch_monthly_history_use_case.dart';
 
@@ -16,29 +16,31 @@ void main() {
   });
 
   group('WatchMonthlyHistoryUseCase', () {
-    test('delegates to repository.watchMonthlyHistory with correct flatId',
+    test('delegates to repository.watchAllExpenses with correct flatId',
         () async {
       const flatId = 'flat-123';
-      final fakeEntity = MonthSummaryEntity(
-        monthId: '2026-07',
-        monthLabel: 'Jul 2026',
-        total: 1200.0,
-        myShare: 300.0,
-        lockedAt: DateTime(2026, 7, 20),
+      final fakeExpense = ExpenseEntity(
+        id: 'exp-1',
+        title: 'Rent',
+        amount: 1200.0,
+        payerId: 'user-1',
+        payerName: 'John',
+        date: DateTime(2026, 7, 20),
+        isDisputed: false,
       );
 
-      when(() => mockRepo.watchMonthlyHistory(flatId))
-          .thenAnswer((_) => Stream.value([fakeEntity]));
+      when(() => mockRepo.watchAllExpenses(flatId))
+          .thenAnswer((_) => Stream.value([fakeExpense]));
 
       final result = await useCase(flatId).first;
 
-      expect(result, [fakeEntity]);
-      verify(() => mockRepo.watchMonthlyHistory(flatId)).called(1);
+      expect(result, [fakeExpense]);
+      verify(() => mockRepo.watchAllExpenses(flatId)).called(1);
     });
 
     test('propagates errors from the repository stream', () {
       const flatId = 'flat-abc';
-      when(() => mockRepo.watchMonthlyHistory(flatId))
+      when(() => mockRepo.watchAllExpenses(flatId))
           .thenAnswer((_) => Stream.error(Exception('Firestore error')));
 
       expect(useCase(flatId), emitsError(isA<Exception>()));

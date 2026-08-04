@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fair_share/core/config/env_config.dart';
+import 'package:fair_share/features/notifications/data/models/notifications_dto.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'package:fair_share/core/constants/firestore_constants.dart';
-import 'package:fair_share/core/utils/monthly_history_helper.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_member_dto.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_cost.dart';
@@ -17,7 +21,6 @@ import '../models/expense_model.dart';
 import '../models/debt_model.dart';
 import '../models/activity_model.dart';
 import 'dashboard_remote_data_source.dart';
-
 
 import 'package:fair_share/features/notifications/domain/entities/notification_type.dart';
 
@@ -292,8 +295,6 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     // Recalculate billing cycle settled percentage
     await _recalculateBillingCycleSettlement(flatId);
 
-    // Keep the monthly history summary in sync
-    await upsertMonthlyHistory(_firestore, flatId);
 
     // Send notification
     await _notifyMembers(
@@ -577,8 +578,6 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       calculatedDebts,
     );
 
-    // 4. Archive current month to history
-    await upsertMonthlyHistory(_firestore, flatId);
 
     // 5. Create new billing cycle for next month
     await _firestore
@@ -614,11 +613,13 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .get();
 
     final batch = _firestore.batch();
+    final recipientUserIds = <String>[];
 
     for (final doc in membersSnap.docs) {
       final data = doc.data();
       final userId = data['userId'] as String?;
       if (userId != null && userId.isNotEmpty) {
+        recipientUserIds.add(userId);
         final notifRef = _firestore
             .collection(FirestoreConstants.users)
             .doc(userId)
@@ -636,6 +637,73 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     }
 
     await batch.commit();
+
+    // Trigger FCM Push via Vercel for cost notification button
+    if (recipientUserIds.isNotEmpty) {
+      final notificationDto = NotificationsDto(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: title,
+        body: body,
+        timestamp: DateTime.now(),
+        type: type,
+        isRead: false,
+      );
+      unawaited(_sendPushViaVercel(userIds: recipientUserIds, notification: notificationDto));
+    }
+  }
+
+  Future<void> _sendPushViaVercel({
+    required List<String> userIds,
+    required NotificationsDto notification,
+  }) async {
+    final apiUrl = EnvConfig.pushApiUrl;
+    final apiSecret = EnvConfig.pushApiSecret;
+
+    if (apiUrl.isEmpty || apiSecret.isEmpty) {
+      debugPrint('⚠️ Push API not configured — skipping FCM push');
+      return;
+    }
+
+    try {
+      final tokenFutures = userIds.map(
+        (uid) => _firestore.collection(FirestoreConstants.users).doc(uid).get(),
+      );
+      final userDocs = await Future.wait(tokenFutures);
+
+      final allTokens = <String>[];
+      for (final doc in userDocs) {
+        final tokens = List<String>.from(
+          doc.data()?[FirestoreConstants.fcmTokens] ?? [],
+        );
+        allTokens.addAll(tokens);
+      }
+
+      if (allTokens.isEmpty) {
+        debugPrint('ℹ️ No FCM tokens found for recipients');
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('$apiUrl/api/send-notification'),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-fairshare-secret': apiSecret,
+        },
+        body: jsonEncode({
+          'tokens': allTokens,
+          'title': notification.title,
+          'body': notification.body,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        debugPrint('✅ FCM push notification sent successfully via Vercel');
+      } else {
+        debugPrint('❌ Vercel push error ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to dispatch push via Vercel: $e');
+    }
   }
 }
 

@@ -75,11 +75,17 @@ class AddExpenseDialog extends HookConsumerWidget {
           recurrence: recurrence.value,
         );
 
+        final recipientUserIds = members
+            .map((m) => m.userId ?? m.id)
+            .where((uid) => uid.isNotEmpty)
+            .toList();
+
         ref
             .read(dashboardActionsProvider.notifier)
             .addExpense(
               flatId: flatId,
               expense: expense,
+              recipientUserIds: recipientUserIds,
             );
       }
     }

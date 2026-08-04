@@ -27,6 +27,7 @@ dependencies:
   flutter_riverpod: ^3.3.1
   get_it: ^7.7.0
   hooks_riverpod: any
+  http: ^1.2.0
   logger: ^2.7.0
   mason: ^0.1.2
   riverpod_annotation: any

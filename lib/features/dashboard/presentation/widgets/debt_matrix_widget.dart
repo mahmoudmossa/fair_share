@@ -2,17 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
+import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import '../../domain/entities/debt_entity.dart';
 import '../providers/dashboard_actions_provider.dart';
 
 class DebtMatrixWidget extends ConsumerWidget {
   final String flatId;
   final List<DebtEntity> debts;
+  final String currentUserId;
+  final bool isCurrentAdmin;
+  final List<FlatMemberEntity> members;
 
   const DebtMatrixWidget({
     super.key,
     required this.flatId,
     required this.debts,
+    required this.currentUserId,
+    required this.isCurrentAdmin,
+    required this.members,
   });
 
   @override
@@ -73,6 +80,24 @@ class DebtMatrixWidget extends ConsumerWidget {
                   final initial = debt.fromName.isNotEmpty
                       ? debt.fromName[0].toUpperCase()
                       : '';
+
+                  // Find member entities for debtor and creditor
+                  final debtorMember = members.firstWhere(
+                    (m) => m.id == debt.fromId || m.userId == debt.fromId,
+                    orElse: () => FlatMemberEntity(id: debt.fromId, name: debt.fromName),
+                  );
+                  final creditorMember = members.firstWhere(
+                    (m) => m.id == debt.toId || m.userId == debt.toId,
+                    orElse: () => FlatMemberEntity(id: debt.toId, name: debt.toName),
+                  );
+
+                  final debtorUserId = debtorMember.userId ?? debtorMember.id;
+                  final creditorUserId = creditorMember.userId ?? creditorMember.id;
+
+                  // Permission check: Can settle if current user is debtor, creditor, or admin
+                  final canSettle = isCurrentAdmin ||
+                      currentUserId == debtorUserId ||
+                      currentUserId == creditorUserId;
 
                   // Select avatar color based on name to match design
                   Color avatarBg = colorScheme.secondaryContainer;
@@ -168,12 +193,21 @@ class DebtMatrixWidget extends ConsumerWidget {
                                 )
                               : ElevatedButton(
                                   key: Key('settleButton_${debt.id}'),
-                                  onPressed: () {
-                                    notifier.settleDebt(
-                                      flatId: flatId,
-                                      debtId: debt.id,
-                                    );
-                                  },
+                                  onPressed: canSettle
+                                      ? () {
+                                          // Recipient of push notification is the other party (if current user is debtor, notify creditor; if creditor or admin, notify debtor)
+                                          final recipientUserId = currentUserId == debtorUserId
+                                              ? creditorUserId
+                                              : debtorUserId;
+                                          notifier.settleDebt(
+                                            flatId: flatId,
+                                            debtId: debt.id,
+                                            recipientUserId: recipientUserId,
+                                            debtorName: debt.fromName,
+                                            amount: debt.amount,
+                                          );
+                                        }
+                                      : null,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: colorScheme.primary,
                                     foregroundColor: colorScheme.onPrimary,
