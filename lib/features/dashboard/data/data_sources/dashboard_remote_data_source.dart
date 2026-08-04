@@ -8,6 +8,10 @@ abstract class DashboardRemoteDataSource {
     String flatId,
     ExpenseModel expense,
   );
+  Future<void> deleteExpense(
+    String flatId,
+    String expenseId,
+  );
   Future<void> settleDebt(
     String flatId,
     String debtId,

@@ -110,14 +110,12 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
           percentage = 85.0 + (15.0 * (settledCount / totalCount));
         }
 
-        final activeCycle =
-            latestCycle ??
-            BillingCycleModel(
-              id: currentMonthId,
-              monthName: _getMonthNameFormatted(now),
-              totalCosts: totalCosts,
-              settledPercentage: percentage,
-            );
+        final activeCycle = BillingCycleModel(
+          id: latestCycle?.id ?? currentMonthId,
+          monthName: latestCycle?.monthName ?? _getMonthNameFormatted(now),
+          totalCosts: totalCosts,
+          settledPercentage: latestCycle?.settledPercentage ?? percentage,
+        );
 
         controller.add(
           DashboardState(
@@ -233,6 +231,49 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   }
 
   @override
+  Future<void> deleteExpense(String flatId, String expenseId) async {
+    final expRef = _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.expenses)
+        .doc(expenseId);
+
+    final docSnap = await expRef.get();
+    if (!docSnap.exists) return;
+
+    final data = docSnap.data();
+    final amount = (data?['amount'] as num?)?.toDouble() ?? 0.0;
+    final title = data?['title'] as String? ?? 'Expense';
+    final payerId = data?['payerId'] as String? ?? '';
+    final payerName = data?['payerName'] as String? ?? 'Member';
+
+    await expRef.delete();
+
+    // Log Activity
+    final actRef = _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.activities)
+        .doc();
+    await actRef.set(
+      ActivityModel(
+        id: actRef.id,
+        userId: payerId,
+        userName: payerName,
+        action:
+            'deleted expense "$title" of ${amount.toStringAsFixed(2)}€.',
+        timestamp: DateTime.now(),
+      ).toMap(),
+    );
+
+    // Recalculate member debt matrix amounts and reset isSettled to false
+    await _recalculateAndSaveDebts(flatId);
+
+    // Recalculate billing cycle settled percentage & update total costs
+    await _recalculateBillingCycleSettlement(flatId);
+  }
+
+  @override
   Future<void> addExpense(String flatId, ExpenseModel expense) async {
     // Add expense doc
     final expRef = _firestore
@@ -243,6 +284,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     final modelToSave = expense.copyWith(id: expRef.id);
     await expRef.set(modelToSave.toJson());
 
+    final bool isEditMode = expense.id.isNotEmpty;
     // Log Activity
     final actRef = _firestore
         .collection(FirestoreConstants.wgs)
@@ -254,45 +296,17 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         id: actRef.id,
         userId: expense.payerId,
         userName: expense.payerName,
-        action:
-            'added expense "${expense.title}" of ${expense.amount.toStringAsFixed(2)}€.',
+        action: isEditMode
+            ? 'edited expense "${expense.title}" to ${expense.amount.toStringAsFixed(2)}€.'
+            : 'added expense "${expense.title}" of ${expense.amount.toStringAsFixed(2)}€.',
         timestamp: DateTime.now(),
       ).toMap(),
     );
 
-    // Update Billing Cycle Total Cost
-    final now = DateTime.now();
-    final currentMonthId = _getMonthId(now);
-    final cycleRef = _firestore
-        .collection(FirestoreConstants.wgs)
-        .doc(flatId)
-        .collection(FirestoreConstants.billingCycles)
-        .doc(currentMonthId);
-
-    await _firestore.runTransaction((transaction) async {
-      final snapshot = await transaction.get(cycleRef);
-      if (snapshot.exists && snapshot.data() != null) {
-        final currentTotal =
-            (snapshot.data()![FirestoreConstants.totalCosts] as num?)
-                ?.toDouble() ??
-            0.0;
-        transaction.update(cycleRef, {
-          FirestoreConstants.totalCosts: currentTotal + expense.amount,
-        });
-      } else {
-        transaction.set(cycleRef, {
-          'monthName': _getMonthNameFormatted(now),
-          'status': 'draft',
-          'totalCosts': expense.amount,
-          'settledPercentage': 85.0,
-        });
-      }
-    });
-
     // Recalculate member debt matrix amounts and reset isSettled to false
     await _recalculateAndSaveDebts(flatId);
 
-    // Recalculate billing cycle settled percentage
+    // Recalculate billing cycle settled percentage & total costs
     await _recalculateBillingCycleSettlement(flatId);
 
 
@@ -382,6 +396,21 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
     final now = DateTime.now();
     final currentMonthId = _getMonthId(now);
+
+    final expensesSnap = await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.expenses)
+        .get();
+
+    double monthTotalCosts = 0.0;
+    for (final doc in expensesSnap.docs) {
+      final model = ExpenseModel.fromMap(doc.data(), doc.id);
+      if (model.date.year == now.year && model.date.month == now.month) {
+        monthTotalCosts += model.amount;
+      }
+    }
+
     final cycleRef = _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
@@ -389,6 +418,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .doc(currentMonthId);
     await cycleRef.set({
       FirestoreConstants.settledPercentage: percentage,
+      FirestoreConstants.totalCosts: monthTotalCosts,
     }, SetOptions(merge: true));
   }
 

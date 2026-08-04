@@ -4,6 +4,7 @@ import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import '../../domain/entities/expense_entity.dart';
 import 'add_expense_dialog.dart';
+import 'delete_expense_dialog.dart';
 
 class ItemizedExpensesWidget extends StatelessWidget {
   final String flatId;
@@ -109,6 +110,24 @@ class ItemizedExpensesWidget extends StatelessWidget {
                             flatId: flatId,
                             members: members,
                             expenseToEdit: exp,
+                          ),
+                        );
+                      },
+                    ),
+                    // Delete Icon Button
+                    IconButton(
+                      icon: Icon(
+                        Icons.delete_outline,
+                        color: colorScheme.error,
+                        size: 22,
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => DeleteExpenseDialog(
+                            flatId: flatId,
+                            expense: exp,
+                            members: members,
                           ),
                         );
                       },

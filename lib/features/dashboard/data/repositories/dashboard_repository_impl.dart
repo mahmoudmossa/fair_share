@@ -33,6 +33,19 @@ class DashboardRepositoryImpl implements DashboardRepository {
   }
 
   @override
+  Future<Either<Exception, void>> deleteExpense(
+    String flatId,
+    String expenseId,
+  ) async {
+    try {
+      await _remoteDataSource.deleteExpense(flatId, expenseId);
+      return const Right(null);
+    } on Exception catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
   Future<Either<Exception, void>> settleDebt(
     String flatId,
     String debtId,

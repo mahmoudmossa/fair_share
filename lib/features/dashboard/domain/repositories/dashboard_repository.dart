@@ -10,6 +10,10 @@ abstract class DashboardRepository {
     String flatId,
     ExpenseEntity expense,
   );
+  Future<Either<Exception, void>> deleteExpense(
+    String flatId,
+    String expenseId,
+  );
   Future<Either<Exception, void>> settleDebt(
     String flatId,
     String debtId,

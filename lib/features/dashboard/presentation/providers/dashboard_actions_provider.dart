@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_state_provider.dart';
 import '../../domain/entities/expense_entity.dart';
 import 'add_new_expense_use_case_provider.dart';
+import 'dashboard_repository_provider.dart';
 import '../../domain/use_cases/settle_use_case.dart';
 
 part 'dashboard_actions_provider.g.dart';
@@ -42,6 +43,40 @@ class DashboardActions extends _$DashboardActions {
             id: const Uuid().v4(),
             title: 'dashboard_notification_expense_added_title',
             body: 'dashboard_notification_expense_added_body|${expense.payerName}|${expense.title}|${expense.amount.toStringAsFixed(2)}',
+            type: NotificationType.expenseAdded,
+            isRead: false,
+          );
+          ref.read(notifyMembersProvider.notifier).notify(recipientUserIds, notification);
+        }
+        return const ActionSuccess(null);
+      },
+    );
+  }
+
+  Future<void> deleteExpense({
+    required String flatId,
+    required String expenseId,
+    required String expenseTitle,
+    List<String>? recipientUserIds,
+  }) async {
+    state = const ActionLoading();
+    final auth = ref.read(authStateProvider).value;
+    if (auth == null) {
+      state = ActionError(Exception('User not authenticated'));
+      return;
+    }
+
+    final repository = ref.read(dashboardRepositoryProvider);
+    final result = await repository.deleteExpense(flatId, expenseId);
+
+    state = result.fold(
+      (error) => ActionError(error),
+      (_) {
+        if (recipientUserIds != null && recipientUserIds.isNotEmpty) {
+          final notification = NotificationsEntity(
+            id: const Uuid().v4(),
+            title: 'dashboard_notification_expense_added_title',
+            body: 'dashboard_notification_expense_added_body|Deleted|$expenseTitle|0.00',
             type: NotificationType.expenseAdded,
             isRead: false,
           );
