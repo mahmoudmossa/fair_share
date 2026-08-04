@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
+import 'package:shared_ui/shared_ui.dart';
 import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import '../../domain/entities/debt_entity.dart';
 import '../providers/dashboard_actions_provider.dart';
@@ -34,32 +35,12 @@ class DebtMatrixWidget extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                LocaleKeys.dashboard_debt_matrix.tr(),
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              TextButton.icon(
-                onPressed: () {},
-                icon: Text(
-                  LocaleKeys.dashboard_view_details.tr(),
-                  style: TextStyle(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                label: Icon(
-                  Icons.chevron_right,
-                  size: 18,
-                  color: colorScheme.primary,
-                ),
-              ),
-            ],
+          Text(
+            LocaleKeys.dashboard_debt_matrix.tr(),
+            style: textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 12),
           LayoutBuilder(
@@ -77,10 +58,6 @@ class DebtMatrixWidget extends ConsumerWidget {
                 itemCount: debts.length,
                 itemBuilder: (context, index) {
                   final debt = debts[index];
-                  final initial = debt.fromName.isNotEmpty
-                      ? debt.fromName[0].toUpperCase()
-                      : '';
-
                   // Find member entities for debtor and creditor
                   final debtorMember = members.firstWhere(
                     (m) => m.id == debt.fromId || m.userId == debt.fromId,
@@ -99,9 +76,13 @@ class DebtMatrixWidget extends ConsumerWidget {
                       currentUserId == debtorUserId ||
                       currentUserId == creditorUserId;
 
-                  // Select avatar color based on name to match design
-                  Color avatarBg = colorScheme.secondaryContainer;
-                  Color avatarFg = colorScheme.onSecondaryContainer;
+                  final avatarPalette = [
+                    (colorScheme.tertiaryContainer, colorScheme.onTertiaryContainer),
+                    (colorScheme.secondaryContainer, colorScheme.onSecondaryContainer),
+                    (colorScheme.primaryContainer, colorScheme.onPrimaryContainer),
+                    (colorScheme.surfaceContainerHigh, colorScheme.onSurfaceVariant),
+                  ];
+                  final avatarColors = avatarPalette[index % avatarPalette.length];
 
                   return Container(
                     padding: const EdgeInsets.symmetric(
@@ -120,16 +101,12 @@ class DebtMatrixWidget extends ConsumerWidget {
                         Expanded(
                           child: Row(
                             children: [
-                              CircleAvatar(
+                              MemberAvatarWidget(
+                                displayName: debt.fromName,
+                                photoBase64: debtorMember.photoBase64,
                                 radius: 20,
-                                backgroundColor: avatarBg,
-                                child: Text(
-                                  initial,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: avatarFg,
-                                  ),
-                                ),
+                                backgroundColor: avatarColors.$1,
+                                foregroundColor: avatarColors.$2,
                               ),
                               const SizedBox(width: 12),
                               Expanded(

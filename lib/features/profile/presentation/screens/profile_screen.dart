@@ -50,8 +50,8 @@ class ProfileScreen extends HookConsumerWidget {
         final members = dashboardStateAsync.value?.members ?? [];
         final membersCount = members.isNotEmpty ? members.length : 1;
 
-        final currentMember = members.where((m) => m.id == user.id).firstOrNull;
-        final displayName = currentMember?.name ?? user.email.split('@').first;
+        final currentMember = members.where((m) => m.id == user.id || m.userId == user.id).firstOrNull;
+        final displayName = currentMember?.name ?? '';
         final photoBase64 = currentMember?.photoBase64;
 
         return SingleChildScrollView(

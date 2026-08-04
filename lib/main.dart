@@ -11,6 +11,7 @@ import 'package:shared_core/shared_core.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'firebase_options.dart';
 import 'package:fair_share/core/theme/app_theme.dart';
+import 'package:fair_share/core/theme/theme_mode_provider.dart';
 import 'injection_container.dart';
 
 void main() async {
@@ -69,11 +70,12 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appAutoRouter = ref.watch(appRouterProvider);
+    final themeMode = ref.watch(appThemeModeProvider);
     const materialTheme = MaterialTheme(TextTheme());
     return MaterialApp.router(
       theme: materialTheme.light(),
       darkTheme: materialTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: appAutoRouter.config(),
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,

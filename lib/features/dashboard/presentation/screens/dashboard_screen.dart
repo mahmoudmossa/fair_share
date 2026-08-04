@@ -84,8 +84,20 @@ class DashboardScreen extends HookConsumerWidget {
           appBar: AppHeader(
             title: _getTitleForTab(currentTab.value),
             titleKey: currentTab.value == 3 ? AppKeys.profile.profileTitle : null,
-            avatarUrl: currentTab.value == 0
-                ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuB_ed-ERBLeIla1t0aMV__AlEIejbPsS3SJzc6ti4ajOFy1QZ0wjxo3pLYNCPfYOi-gd6xM5cw98nK3Mwb5EetDGZjUTIl3mtEm7TTN0iP33f3TmsObpm51k5NYcOyoiDXNs1zcpxwhesPZOKC3YuuoLK9nCAMrp-IWsKDMCGlfWchVNeA19S2YwHvvPFgVeehel7LEG6KQiPce4RZRQLI-r7izPjQ9B3TaGiGYkwhimHRq6sdPWV-a8-cj_hJtKagbfFJ3ji6PxDhY'
+            avatarWidget: currentTab.value == 0
+                ? Builder(
+                    builder: (context) {
+                      final members = stateAsync.value?.members ?? [];
+                      final currentMember = members.where((m) => m.id == user.id || m.userId == user.id).firstOrNull;
+                      final displayName = currentMember?.name ?? '';
+                      final photoBase64 = currentMember?.photoBase64;
+                      return MemberAvatarWidget(
+                        displayName: displayName,
+                        photoBase64: photoBase64,
+                        radius: 18,
+                      );
+                    },
+                  )
                 : null,
             notificationIcon: const NotificationIconWidget(),
             actions: currentTab.value == 0
