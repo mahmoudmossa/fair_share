@@ -1,0 +1,12 @@
+{
+  "name": "fairshare-push-api",
+  "version": "1.0.0",
+  "description": "Vercel serverless function to send FCM push notifications for FairShare app",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "google-auth-library": "^9.0.0"
+  }
+}
