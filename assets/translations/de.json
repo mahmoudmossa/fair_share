@@ -134,7 +134,9 @@
     "detail_empty": "Keine Ausgaben in diesem Monat erfasst",
     "detail_paid_by": "Bezahlt von {}",
     "loading_error": "Fehler beim Laden des Verlaufs: {}",
-    "detail_loading_error": "Fehler beim Laden der Ausgaben: {}"
+    "detail_loading_error": "Fehler beim Laden der Ausgaben: {}",
+    "yearly_costs_title": "DURCHSCHNITTLICHE JAHRESKOSTEN",
+    "yearly_costs_empty": "Keine Jahreskostendaten verfügbar"
   },
   "profile": {
     "title": "Mein Profil",

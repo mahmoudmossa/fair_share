@@ -134,7 +134,9 @@
     "detail_empty": "No expenses recorded for this month",
     "detail_paid_by": "Paid by {}",
     "loading_error": "Error loading history: {}",
-    "detail_loading_error": "Error loading expenses: {}"
+    "detail_loading_error": "Error loading expenses: {}",
+    "yearly_costs_title": "AVERAGE YEARLY TOTAL",
+    "yearly_costs_empty": "No yearly cost data available"
   },
   "profile": {
     "title": "My Profile",

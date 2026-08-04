@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
+import '../widgets/history/yearly_costs_card_widget.dart';
 import '../widgets/history/history_widget.dart';
 
 @RoutePage()
@@ -27,6 +28,7 @@ class HistoryScreen extends HookConsumerWidget {
             ),
           ),
         ),
+        const YearlyCostsCardWidget(),
         Expanded(
           child: const HistoryWidget(),
         ),
