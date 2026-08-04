@@ -329,8 +329,10 @@ class DashboardScreen extends HookConsumerWidget {
 
               // Itemized Expenses
               ItemizedExpensesWidget(
+                flatId: state.flat.id,
                 expenses: state.expenses,
                 currentUserId: currentUserId,
+                members: state.members,
               ),
 
               // Recent Activity Feed

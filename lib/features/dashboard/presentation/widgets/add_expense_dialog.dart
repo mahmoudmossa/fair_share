@@ -14,11 +14,13 @@ import '../providers/dashboard_provider.dart';
 class AddExpenseDialog extends HookConsumerWidget {
   final String flatId;
   final List<FlatMemberEntity> members;
+  final ExpenseEntity? expenseToEdit;
 
   const AddExpenseDialog({
     super.key,
     required this.flatId,
     required this.members,
+    this.expenseToEdit,
   });
 
   @override
@@ -27,17 +29,31 @@ class AddExpenseDialog extends HookConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
-    final titleController = useTextEditingController();
-    final amountController = useTextEditingController();
+    final titleController = useTextEditingController(
+      text: expenseToEdit?.title ?? '',
+    );
+    final amountController = useTextEditingController(
+      text: expenseToEdit != null ? expenseToEdit!.amount.toStringAsFixed(2) : '',
+    );
     final selectedMember = useState<FlatMemberEntity?>(() {
       if (members.isEmpty) return null;
+      if (expenseToEdit != null) {
+        return members.firstWhere(
+          (m) => m.id == expenseToEdit!.payerId || m.userId == expenseToEdit!.payerId,
+          orElse: () => members.first,
+        );
+      }
       final user = ref.read(firestoreUserProvider).value;
       return members.firstWhere(
         (m) => m.userId == user?.id || m.id == user?.id,
         orElse: () => members.first,
       );
     }());
-    final recurrence = useState<RecurrenceType>(RecurrenceType.oneTime);
+    final recurrence = useState<RecurrenceType>(
+      expenseToEdit?.recurrence ?? RecurrenceType.oneTime,
+    );
+
+    final isConfirmed = useState<bool>(expenseToEdit == null);
 
     final actionState = ref.watch(dashboardActionsProvider);
 
@@ -49,7 +65,7 @@ class AddExpenseDialog extends HookConsumerWidget {
           SnackBar(
             content: Text(
               LocaleKeys.login_auth_success.tr(),
-            ), // Reusing success
+            ),
             backgroundColor: colorScheme.primary,
           ),
         );
@@ -57,7 +73,7 @@ class AddExpenseDialog extends HookConsumerWidget {
     });
 
     void submit() {
-      if (formKey.currentState?.validate() ?? false) {
+      if ((formKey.currentState?.validate() ?? false) && isConfirmed.value) {
         final title = titleController.text.trim();
         final amount = double.tryParse(amountController.text.trim()) ?? 0.0;
         final payer = selectedMember.value;
@@ -65,14 +81,16 @@ class AddExpenseDialog extends HookConsumerWidget {
         if (payer == null) return;
 
         final expense = ExpenseEntity(
-          id: '',
+          id: expenseToEdit?.id ?? '',
           title: title,
           amount: amount,
           payerId: payer.id,
           payerName: payer.name,
           date: DateTime.now(),
-          isDisputed: false,
+          isDisputed: expenseToEdit?.isDisputed ?? false,
+          disputeReason: expenseToEdit?.disputeReason,
           recurrence: recurrence.value,
+          specificMonths: expenseToEdit?.specificMonths,
         );
 
         final recipientUserIds = members
@@ -90,6 +108,8 @@ class AddExpenseDialog extends HookConsumerWidget {
       }
     }
 
+    final bool isEdit = expenseToEdit != null;
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       backgroundColor: colorScheme.surface,
@@ -98,160 +118,185 @@ class AddExpenseDialog extends HookConsumerWidget {
         child: Form(
           key: formKey,
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                LocaleKeys.dashboard_add_expense.tr(),
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ExpenseFormFields(
-                titleController: titleController,
-                amountController: amountController,
-                titleKey: const Key('expenseTitleField'),
-                amountKey: const Key('expenseAmountField'),
-                titleLabel: LocaleKeys.new_flat_setup_cost_title_label.tr(),
-                titleHint: LocaleKeys.new_flat_setup_cost_title_hint.tr(),
-                amountLabel: LocaleKeys.new_flat_setup_amount_label.tr(),
-                amountHint: '0.00',
-                paidByLabel: LocaleKeys.new_flat_setup_paid_by_label.tr(),
-                frequencyLabel: LocaleKeys.new_flat_setup_frequency_label.tr(),
-                titleValidator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return LocaleKeys.dashboard_validation_empty_fields.tr();
-                  }
-                  return null;
-                },
-                amountValidator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return LocaleKeys.dashboard_validation_empty_fields.tr();
-                  }
-                  final parsed = double.tryParse(value.trim());
-                  if (parsed == null || parsed <= 0) {
-                    return LocaleKeys.new_flat_setup_invalid_costs_error.tr();
-                  }
-                  return null;
-                },
-                payerDropdown: DropdownButtonFormField<FlatMemberEntity>(
-                  key: ValueKey(
-                    'expensePayerDropdown_${selectedMember.value?.id}',
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  isEdit
+                      ? LocaleKeys.dashboard_edit_expense.tr()
+                      : LocaleKeys.dashboard_add_expense.tr(),
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
                   ),
-                  initialValue: selectedMember.value,
-                  items: members
-                      .map(
-                        (member) => DropdownMenuItem<FlatMemberEntity>(
-                          value: member,
-                          child: Text(
-                            member.name,
-                            style: textTheme.bodyMedium,
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (member) {
-                    if (member != null) {
-                      selectedMember.value = member;
-                    }
-                  },
-                  validator: (value) {
-                    if (value == null) {
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ExpenseFormFields(
+                  titleController: titleController,
+                  amountController: amountController,
+                  titleKey: const Key('expenseTitleField'),
+                  amountKey: const Key('expenseAmountField'),
+                  titleLabel: LocaleKeys.new_flat_setup_cost_title_label.tr(),
+                  titleHint: LocaleKeys.new_flat_setup_cost_title_hint.tr(),
+                  amountLabel: LocaleKeys.new_flat_setup_amount_label.tr(),
+                  amountHint: '0.00',
+                  paidByLabel: LocaleKeys.new_flat_setup_paid_by_label.tr(),
+                  frequencyLabel: LocaleKeys.new_flat_setup_frequency_label.tr(),
+                  titleValidator: (value) {
+                    if (value == null || value.trim().isEmpty) {
                       return LocaleKeys.dashboard_validation_empty_fields.tr();
                     }
                     return null;
                   },
-                  decoration: InputDecoration(
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-                frequencySegmentedButton: SegmentedButton<bool>(
-                  key: const Key('expenseFrequencySegmentedButton'),
-                  segments: [
-                    ButtonSegment(
-                      value: true,
-                      label: Text(
-                        LocaleKeys.new_flat_setup_recurring_monthly.tr(),
-                        style: const TextStyle(fontSize: 11),
-                      ),
-                    ),
-                    ButtonSegment(
-                      value: false,
-                      label: Text(
-                        LocaleKeys.new_flat_setup_one_time.tr(),
-                        style: const TextStyle(fontSize: 11),
-                      ),
-                    ),
-                  ],
-                  selected: {recurrence.value == RecurrenceType.monthly},
-                  onSelectionChanged: (val) {
-                    recurrence.value = val.first
-                        ? RecurrenceType.monthly
-                        : RecurrenceType.oneTime;
+                  amountValidator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return LocaleKeys.dashboard_validation_empty_fields.tr();
+                    }
+                    final parsed = double.tryParse(value.trim());
+                    if (parsed == null || parsed <= 0) {
+                      return LocaleKeys.new_flat_setup_invalid_costs_error.tr();
+                    }
+                    return null;
                   },
-                  style: SegmentedButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
+                  payerDropdown: DropdownButtonFormField<FlatMemberEntity>(
+                    key: ValueKey(
+                      'expensePayerDropdown_${selectedMember.value?.id}',
+                    ),
+                    initialValue: selectedMember.value,
+                    items: members
+                        .map(
+                          (member) => DropdownMenuItem<FlatMemberEntity>(
+                            value: member,
+                            child: Text(
+                              member.name,
+                              style: textTheme.bodyMedium,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (member) {
+                      if (member != null) {
+                        selectedMember.value = member;
+                      }
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return LocaleKeys.dashboard_validation_empty_fields.tr();
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  frequencySegmentedButton: SegmentedButton<bool>(
+                    key: const Key('expenseFrequencySegmentedButton'),
+                    segments: [
+                      ButtonSegment(
+                        value: true,
+                        label: Text(
+                          LocaleKeys.new_flat_setup_recurring_monthly.tr(),
+                          style: const TextStyle(fontSize: 11),
+                        ),
+                      ),
+                      ButtonSegment(
+                        value: false,
+                        label: Text(
+                          LocaleKeys.new_flat_setup_one_time.tr(),
+                          style: const TextStyle(fontSize: 11),
+                        ),
+                      ),
+                    ],
+                    selected: {recurrence.value == RecurrenceType.monthly},
+                    onSelectionChanged: (val) {
+                      recurrence.value = val.first
+                          ? RecurrenceType.monthly
+                          : RecurrenceType.oneTime;
+                    },
+                    style: SegmentedButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      LocaleKeys.dashboard_cancel.tr(),
-                      style: TextStyle(
-                        color: colorScheme.outline,
-                        fontWeight: FontWeight.bold,
+                if (isEdit) ...[
+                  const SizedBox(height: 16),
+                  CheckboxListTile(
+                    key: const Key('editExpenseConfirmationCheckbox'),
+                    value: isConfirmed.value,
+                    onChanged: (val) {
+                      isConfirmed.value = val ?? false;
+                    },
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(
+                      LocaleKeys.dashboard_edit_expense_confirmation.tr(),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    key: const Key('saveExpenseButton'),
-                    onPressed: actionState is ActionLoading ? null : submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                    ),
-                    child: actionState is ActionLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            LocaleKeys.dashboard_save.tr(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
                   ),
                 ],
-              ),
-            ],
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        LocaleKeys.dashboard_cancel.tr(),
+                        style: TextStyle(
+                          color: colorScheme.outline,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      key: const Key('saveExpenseButton'),
+                      onPressed: actionState is ActionLoading || !isConfirmed.value
+                          ? null
+                          : submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: actionState is ActionLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              LocaleKeys.dashboard_save.tr(),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

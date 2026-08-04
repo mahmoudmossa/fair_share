@@ -37,6 +37,8 @@
     "settle": "Ausgleichen",
     "settled": "Ausgeglichen",
     "add_expense": "Ausgabe hinzufügen",
+    "edit_expense": "Ausgabe bearbeiten",
+    "edit_expense_confirmation": "Ich verstehe, dass das Bearbeiten dieser Ausgabe die Berechnung des aktuellen Monats aktualisiert, ein erneutes Ausgleichen erfordert und Benachrichtigungen an alle Mitbewohner sendet.",
     "expense_title": "Titel der Ausgabe",
     "expense_amount": "Betrag (€)",
     "expense_category": "Kategorie",
