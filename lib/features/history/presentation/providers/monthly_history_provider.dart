@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/features/dashboard/presentation/providers/dashboard_provider.dart';
+import 'package:fair_share/features/dashboard/presentation/providers/flat_members_provider.dart';
 import 'package:fair_share/features/history/domain/entities/month_summary_entity.dart';
 import 'watch_monthly_history_use_case_provider.dart';
 
@@ -15,8 +16,9 @@ Stream<List<MonthSummaryEntity>> monthlyHistory(Ref ref) async* {
     return;
   }
 
-  final dashboardState = ref.watch(dashboardStateProvider).value;
-  final memberCount = dashboardState?.members.length ?? 1;
+  final members = ref.watch(flatMembersProvider).value ?? [];
+  final memberCount = members.isNotEmpty ? members.length : 1;
+
 
   final expensesStream = ref
       .watch(watchMonthlyHistoryUseCaseProvider)

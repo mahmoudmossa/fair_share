@@ -136,11 +136,12 @@ class BentoSummaryWidget extends StatelessWidget {
                         right: 20,
                         top: 20,
                         child: CircularProgressIndicator(
-                          value: cycle.settledPercentage / 100.0,
+                          value: (cycle.settledPercentage ?? 0.0) / 100.0,
                           strokeWidth: 8,
                           backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.1),
                           valueColor: AlwaysStoppedAnimation<Color>(colorScheme.onPrimaryContainer),
                         ),
+
                       ),
                       Padding(
                         padding: const EdgeInsets.all(24.0),
@@ -158,13 +159,14 @@ class BentoSummaryWidget extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               LocaleKeys.dashboard_settled_msg.tr(args: [
-                                cycle.settledPercentage.toStringAsFixed(0),
-                                cycle.monthName,
+                                cycle.settledPercentage?.toStringAsFixed(0) ?? '0',
+                                cycle.monthName ?? '',
                               ]),
                               style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onPrimary.withValues(alpha: 0.85),
                               ),
                             ),
+
 
                           ],
                         ),

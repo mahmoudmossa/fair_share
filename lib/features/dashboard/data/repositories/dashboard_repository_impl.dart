@@ -1,10 +1,14 @@
 import 'package:dartz/dartz.dart';
-import '../../domain/entities/expense_entity.dart';
 import '../models/expense_model.dart';
-import '../../domain/entities/dashboard_state.dart';
+import '../../domain/entities/expense_entity.dart';
+import '../../domain/entities/billing_cycle_entity.dart';
+import '../../domain/entities/activity_entity.dart';
+import '../../domain/entities/flat_entity.dart';
 import '../../domain/entities/debt_entity.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 import '../data_sources/dashboard_remote_data_source.dart';
+import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
+
 
 class DashboardRepositoryImpl implements DashboardRepository {
   final DashboardRemoteDataSource _remoteDataSource;
@@ -12,9 +16,37 @@ class DashboardRepositoryImpl implements DashboardRepository {
   DashboardRepositoryImpl(this._remoteDataSource);
 
   @override
-  Stream<DashboardState?> watchDashboardState(String flatId) {
-    return _remoteDataSource.watchDashboardState(flatId);
+  Stream<FlatEntity?> watchFlat(String flatId) {
+    return _remoteDataSource.watchFlat(flatId).map((m) => m?.toEntity());
   }
+
+  @override
+  Stream<List<FlatMemberEntity>> watchFlatMembers(String flatId) {
+    return _remoteDataSource.watchFlatMembers(flatId);
+  }
+
+
+  @override
+  Stream<BillingCycleEntity?> watchActiveBillingCycle(String flatId) {
+    return _remoteDataSource
+        .watchActiveBillingCycle(flatId)
+        .map((m) => m?.toEntity());
+  }
+
+  @override
+  Stream<List<ExpenseEntity>> watchExpenses(String flatId) {
+    return _remoteDataSource
+        .watchExpenses(flatId)
+        .map((list) => list.map((m) => m.toEntity()).toList());
+  }
+
+  @override
+  Stream<List<ActivityEntity>> watchActivities(String flatId) {
+    return _remoteDataSource
+        .watchActivities(flatId)
+        .map((list) => list.map((m) => m.toEntity()).toList());
+  }
+
 
   @override
   Future<Either<Exception, void>> addExpense(

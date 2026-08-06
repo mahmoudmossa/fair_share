@@ -8,16 +8,17 @@ part 'billing_cycle_model.g.dart';
 @JsonSerializable()
 class BillingCycleModel {
   final String id;
-  final String monthName;
+  final String? monthName;
   final double totalCosts;
-  final double settledPercentage;
+  final double? settledPercentage;
 
   const BillingCycleModel({
     required this.id,
-    required this.monthName,
-    required this.totalCosts,
-    required this.settledPercentage,
+    this.monthName,
+    this.totalCosts = 0.0,
+    this.settledPercentage,
   });
+
 
   factory BillingCycleModel.fromEntity(BillingCycleEntity entity) {
     return BillingCycleModel(

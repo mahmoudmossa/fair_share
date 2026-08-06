@@ -9,8 +9,12 @@ import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'package:fair_share/core/router/app_router.dart';
 import 'package:fair_share/core/router/providers/app_router_provider.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_notifier_provider.dart';
-import 'package:fair_share/features/dashboard/domain/entities/dashboard_state.dart';
 import '../providers/dashboard_provider.dart';
+import '../providers/dashboard_flat_provider.dart';
+import '../providers/flat_members_provider.dart';
+import '../providers/active_billing_cycle_provider.dart';
+import '../providers/dashboard_expenses_provider.dart';
+import '../providers/dashboard_activities_provider.dart';
 import '../providers/flat_debts_provider.dart';
 import '../widgets/bento_summary_widget.dart';
 import '../widgets/debt_matrix_widget.dart';
@@ -46,10 +50,8 @@ class DashboardScreen extends HookConsumerWidget {
           ),
         ),
       ),
-
       data: (user) {
         if (user == null) {
-          // Fallback if auth state is lost
           Future.microtask(
             () => ref.read(appRouterProvider).replace(LoginRoute()),
           );
@@ -59,7 +61,6 @@ class DashboardScreen extends HookConsumerWidget {
         }
 
         if (user.flatId == null || user.flatId!.isEmpty) {
-          // If the user has no flat, redirect to the Setup/Join/Create flow
           Future.microtask(
             () => ref
                 .read(appRouterProvider)
@@ -77,7 +78,8 @@ class DashboardScreen extends HookConsumerWidget {
           return null;
         }, const []);
 
-        final stateAsync = ref.watch(dashboardStateProvider);
+        final flatAsync = ref.watch(dashboardFlatProvider);
+        final membersAsync = ref.watch(flatMembersProvider);
 
         return Scaffold(
           backgroundColor: colorScheme.surface,
@@ -87,7 +89,7 @@ class DashboardScreen extends HookConsumerWidget {
             avatarWidget: currentTab.value == 0
                 ? Builder(
                     builder: (context) {
-                      final members = stateAsync.value?.members ?? [];
+                      final members = membersAsync.value ?? [];
                       final currentMember = members.where((m) => m.id == user.id || m.userId == user.id).firstOrNull;
                       final displayName = currentMember?.name ?? '';
                       final photoBase64 = currentMember?.photoBase64;
@@ -122,17 +124,18 @@ class DashboardScreen extends HookConsumerWidget {
               child: _buildBodyForTab(
                 context,
                 currentTab.value,
-                stateAsync,
                 user.id,
+                user.flatId!,
                 ref,
               ),
             ),
           ),
           endDrawer: const NotificationsSideSheet(),
           floatingActionButton: currentTab.value == 0
-              ? stateAsync.maybeWhen(
-                  data: (state) {
-                    if (state == null) return null;
+              ? flatAsync.maybeWhen(
+                  data: (flat) {
+                    if (flat == null) return null;
+                    final members = membersAsync.value ?? [];
                     return FloatingActionButton(
                       key: const Key('addExpenseFab'),
                       backgroundColor: colorScheme.primary,
@@ -142,8 +145,8 @@ class DashboardScreen extends HookConsumerWidget {
                         showDialog(
                           context: context,
                           builder: (context) => AddExpenseDialog(
-                            flatId: state.flat.id,
-                            members: state.members,
+                            flatId: flat.id,
+                            members: members,
                           ),
                         );
                       },
@@ -203,8 +206,8 @@ class DashboardScreen extends HookConsumerWidget {
   Widget _buildBodyForTab(
     BuildContext context,
     int tabIndex,
-    AsyncValue<DashboardState?> stateAsync,
     String currentUserId,
+    String flatId,
     WidgetRef ref,
   ) {
     if (tabIndex == 1) {
@@ -212,37 +215,40 @@ class DashboardScreen extends HookConsumerWidget {
     }
 
     if (tabIndex == 2) {
-      return stateAsync.when(
+      final flatAsync = ref.watch(dashboardFlatProvider);
+      final membersAsync = ref.watch(flatMembersProvider);
+
+      return flatAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text(err.toString())),
-        data: (state) {
-          if (state == null) {
+        data: (flat) {
+          if (flat == null) {
             return const Center(child: CircularProgressIndicator());
           }
-
-          final occupantsList = state.members
+          final members = membersAsync.value ?? [];
+          final occupantsList = members
               .map(
                 (m) => Occupant(
                   id: m.id,
                   name: m.name,
                   userId: m.userId,
                   invitationCode: m.invitationCode,
-                  flatId: state.flat.id,
+                  flatId: flat.id,
                 ),
               )
               .toList();
 
-          final isCurrentAdmin = state.flat.createdBy == currentUserId;
+          final isCurrentAdmin = flat.createdBy == currentUserId;
 
           return OccupantsWidget(
             key: const ValueKey('tab_2_admin'),
             occupantsList: occupantsList,
-            inviteCode: state.flat.id,
+            inviteCode: flat.id,
             isCurrentAdmin: isCurrentAdmin,
             currentUserId: currentUserId,
-            flatId: state.flat.id,
-            flatName: state.flat.name,
-            initialBillingDay: state.flat.billingCalculationDay,
+            flatId: flat.id,
+            flatName: flat.name,
+            initialBillingDay: flat.billingCalculationDay,
           );
         },
       );
@@ -252,99 +258,100 @@ class DashboardScreen extends HookConsumerWidget {
       return const ProfileScreen(key: ValueKey('tab_3'));
     }
 
-    return stateAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(
-        child: Text(
-          LocaleKeys.dashboard_error_loading_dashboard.tr(
-            args: [err.toString()],
+    final flatAsync = ref.watch(dashboardFlatProvider);
+    final cycleAsync = ref.watch(activeBillingCycleProvider);
+    final expensesAsync = ref.watch(dashboardExpensesProvider);
+    final activitiesAsync = ref.watch(dashboardActivitiesProvider);
+    final members = ref.watch(flatMembersProvider).value ?? [];
+
+    final colorScheme = Theme.of(context);
+    final textTheme = colorScheme.textTheme;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Dashboard Header Section
+          cycleAsync.when(
+            data: (cycle) {
+              if (cycle == null || cycle.monthName == null || cycle.monthName!.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              final flatCreatedByName = flatAsync.value?.createdByName ?? '';
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    cycle.monthName!,
+                    style: textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.colorScheme.surfaceContainerHigh,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          LocaleKeys.dashboard_created_by.tr(
+                            args: [flatCreatedByName],
+                          ),
+                          style: textTheme.labelMedium?.copyWith(
+                            color: colorScheme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  BentoSummaryWidget(
+                    cycle: cycle,
+                    membersCount: members.length,
+                  ),
+                ],
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (err, stack) => const SizedBox.shrink(),
           ),
-        ),
-      ),
 
-      data: (nullableState) {
-        if (nullableState == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final state = nullableState;
-
-        final cycle = state.activeCycle;
-        final colorScheme = Theme.of(context);
-        final textTheme = colorScheme.textTheme;
-
-        return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Dashboard Header Section
-              if (cycle != null) ...[
-                Text(
-                  cycle.monthName,
-                  style: textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.colorScheme.onSurface,
-                  ),
+          // Debt Matrix
+          ref
+              .watch(flatDebtsProvider(flatId))
+              .when(
+                data: (debts) => DebtMatrixWidget(
+                  flatId: flatId,
+                  debts: debts,
+                  currentUserId: currentUserId,
+                  isCurrentAdmin: flatAsync.value?.createdBy == currentUserId,
+                  members: members,
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.colorScheme.surfaceContainerHigh,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        LocaleKeys.dashboard_created_by.tr(
-                          args: [state.flat.createdByName],
-                        ),
-                        style: textTheme.labelMedium?.copyWith(
-                          color: colorScheme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                BentoSummaryWidget(
-                  cycle: cycle,
-                  membersCount: state.members.length,
-                ),
-              ],
-
-              // Debt Matrix
-              ref
-                  .watch(flatDebtsProvider(state.flat.id))
-                  .when(
-                    data: (debts) => DebtMatrixWidget(
-                      flatId: state.flat.id,
-                      debts: debts,
-                      currentUserId: currentUserId,
-                      isCurrentAdmin: state.flat.createdBy == currentUserId,
-                      members: state.members,
-                    ),
-                    loading: () => const SizedBox.shrink(),
-                    error: (err, stack) => Text(err.toString()),
-                  ),
-
-              // Itemized Expenses
-              ItemizedExpensesWidget(
-                flatId: state.flat.id,
-                expenses: state.expenses,
-                currentUserId: currentUserId,
-                members: state.members,
+                loading: () => const SizedBox.shrink(),
+                error: (err, stack) => Text(err.toString()),
               ),
 
-              // Recent Activity Feed
-              ActivityFeedWidget(activities: state.activities),
-            ],
+          // Itemized Expenses
+          ItemizedExpensesWidget(
+            flatId: flatId,
+            expenses: expensesAsync.value ?? [],
+            currentUserId: currentUserId,
+            members: members,
           ),
-        );
-      },
+
+          // Recent Activity Feed
+          ActivityFeedWidget(activities: activitiesAsync.value ?? []),
+        ],
+      ),
     );
   }
 }
+

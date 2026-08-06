@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:fair_share/features/dashboard/presentation/providers/dashboard_provider.dart';
+import 'package:fair_share/features/dashboard/presentation/providers/dashboard_flat_provider.dart';
 import 'package:fair_share/features/dashboard/presentation/providers/dashboard_repository_provider.dart';
 
 part 'billing_scheduler_provider.g.dart';
+
 
 class BillingTimerState {
   final DateTime targetDate;
@@ -43,8 +44,8 @@ class BillingScheduler extends _$BillingScheduler {
       _timer?.cancel();
     });
 
-    final dashboardAsync = ref.watch(dashboardStateProvider);
-    final billingDay = dashboardAsync.value?.flat.billingCalculationDay ?? 1;
+    final flatAsync = ref.watch(dashboardFlatProvider);
+    final billingDay = flatAsync.value?.billingCalculationDay ?? 1;
 
     final target = _calculateNextTargetDate(billingDay);
     final now = DateTime.now();
@@ -87,7 +88,7 @@ class BillingScheduler extends _$BillingScheduler {
   }
 
   Future<void> executeCalculation() async {
-    final flatId = ref.read(dashboardStateProvider).value?.flat.id;
+    final flatId = ref.read(dashboardFlatProvider).value?.id;
     if (flatId == null || flatId.isEmpty) return;
 
     state = state.copyWith(isCalculating: true);
@@ -103,7 +104,7 @@ class BillingScheduler extends _$BillingScheduler {
         lastExecutionStatus: 'Failed: $e',
       );
     } finally {
-      final billingDay = ref.read(dashboardStateProvider).value?.flat.billingCalculationDay ?? 1;
+      final billingDay = ref.read(dashboardFlatProvider).value?.billingCalculationDay ?? 1;
       final newTarget = _calculateNextTargetDate(billingDay);
       final now = DateTime.now();
       state = state.copyWith(
@@ -113,6 +114,7 @@ class BillingScheduler extends _$BillingScheduler {
       _startTimer();
     }
   }
+
 
   void setTestCountdown(Duration duration) {
     _timer?.cancel();

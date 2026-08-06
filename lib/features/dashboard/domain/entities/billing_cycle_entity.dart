@@ -2,15 +2,15 @@ import 'package:equatable/equatable.dart';
 
 class BillingCycleEntity extends Equatable {
   final String id;
-  final String monthName;
+  final String? monthName;
   final double totalCosts;
-  final double settledPercentage;
+  final double? settledPercentage;
 
   const BillingCycleEntity({
     required this.id,
-    required this.monthName,
-    required this.totalCosts,
-    required this.settledPercentage,
+    this.monthName,
+    this.totalCosts = 0.0,
+    this.settledPercentage,
   });
 
   @override
@@ -21,3 +21,4 @@ class BillingCycleEntity extends Equatable {
         settledPercentage,
       ];
 }
+

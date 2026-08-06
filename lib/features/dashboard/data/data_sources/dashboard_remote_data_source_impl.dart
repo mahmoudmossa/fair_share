@@ -13,8 +13,9 @@ import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.
 import 'package:fair_share/features/new_flat/domain/entities/flat_cost.dart';
 import 'package:fair_share/features/new_flat/domain/entities/recurrence_type.dart';
 import 'package:fair_share/features/new_flat/domain/use_cases/calculate_settlements.dart';
-import '../../domain/entities/dashboard_state.dart';
 import '../../domain/entities/debt_entity.dart';
+
+
 import '../models/flat_model.dart';
 import '../models/billing_cycle_model.dart';
 import '../models/expense_model.dart';
@@ -54,181 +55,82 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   }
 
   @override
-  Stream<DashboardState?> watchDashboardState(String flatId) {
-    final controller = StreamController<DashboardState?>();
-
-    FlatModel? latestFlat;
-    BillingCycleModel? latestCycle;
-    List<ExpenseModel> latestExpenses = [];
-    List<DebtModel> latestDebts = [];
-    List<ActivityModel> latestActivities = [];
-    List<FlatMemberEntity> latestMembers = [];
-
-    void emitLatest() {
-      if (latestFlat != null && !controller.isClosed) {
-        // Calculate debts dynamically on the fly
-        final List<FlatCostEntity> flatCosts = latestExpenses
-            .map(
-              (e) => FlatCostEntity(
-                title: e.title,
-                amount: e.amount,
-                recurrenceType: e.recurrence,
-                payerId: e.payerId,
-                payerName: e.payerName,
-              ),
-            )
-            .toList();
-
-        final calculatedDebts = SettlementCalculator.calculateDebts(
-          members: latestMembers,
-          costs: flatCosts,
-        );
-
-        // Match settled status of each pair (fromId_toId) with stored debts in Firestore
-        final Map<String, bool> settledMap = {
-          for (final d in latestDebts) '${d.fromId}_${d.toId}': d.isSettled,
-        };
-
-        final List<DebtModel> displayDebts = calculatedDebts.map((d) {
-          final pairKey = '${d.fromId}_${d.toId}';
-          final isSettled = settledMap[pairKey] ?? false;
-          return DebtModel.fromEntity(d).copyWith(isSettled: isSettled);
-        }).toList();
-
-        // Resolve active billing cycle dynamically if it's missing or out of sync
-        final now = DateTime.now();
-        final currentMonthId = _getMonthId(now);
-
-        final totalCosts = latestExpenses.fold(
-          0.0,
-          (total, exp) => total + exp.amount,
-        );
-        final settledCount = displayDebts.where((d) => d.isSettled).length;
-        final totalCount = displayDebts.length;
-        double percentage = 85.0;
-        if (totalCount > 0) {
-          percentage = 85.0 + (15.0 * (settledCount / totalCount));
-        }
-
-        final activeCycle = BillingCycleModel(
-          id: latestCycle?.id ?? currentMonthId,
-          monthName: latestCycle?.monthName ?? _getMonthNameFormatted(now),
-          totalCosts: totalCosts,
-          settledPercentage: latestCycle?.settledPercentage ?? percentage,
-        );
-
-        controller.add(
-          DashboardState(
-            flat: latestFlat!.toEntity(),
-            activeCycle: activeCycle.toEntity(),
-            expenses: latestExpenses.map((e) => e.toEntity()).toList(),
-            debts: displayDebts.map((d) => d.toEntity()).toList(),
-            activities: latestActivities.map((a) => a.toEntity()).toList(),
-            members: latestMembers,
-          ),
-        );
-      }
-    }
-
-    final flatSub = _firestore
+  Stream<FlatModel?> watchFlat(String flatId) {
+    return _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
         .snapshots()
-        .listen(
-          (snap) {
-            if (snap.exists && snap.data() != null) {
-              latestFlat = FlatModel.fromMap(snap.data()!, snap.id);
-              emitLatest();
-            } else {
-              latestFlat = null;
-              if (!controller.isClosed) controller.add(null);
-            }
-          },
-          onError: (err) {
-            if (!controller.isClosed) controller.addError(err);
-          },
-        );
+        .map((snap) {
+      if (snap.exists && snap.data() != null) {
+        return FlatModel.fromMap(snap.data()!, snap.id);
+      }
+      return null;
+    });
+  }
 
-    final now = DateTime.now();
-    final currentMonthId = _getMonthId(now);
+  @override
+  Stream<List<FlatMemberEntity>> watchFlatMembers(String flatId) {
+    return _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.members)
+        .snapshots()
+        .map((snap) {
+      return snap.docs
+          .map((d) => FlatMemberDto.fromJson(d.data()).toEntity())
+          .toList();
+    });
+  }
 
-    final cycleSub = _firestore
+
+  @override
+  Stream<BillingCycleModel?> watchActiveBillingCycle(String flatId) {
+    final currentMonthId = _getMonthId(DateTime.now());
+    return _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
         .collection(FirestoreConstants.billingCycles)
         .doc(currentMonthId)
         .snapshots()
-        .listen((snap) {
-          if (snap.exists && snap.data() != null) {
-            latestCycle = BillingCycleModel.fromMap(snap.data()!, snap.id);
-          } else {
-            latestCycle = null;
-          }
-          emitLatest();
-        }, onError: (err) {});
+        .map((snap) {
+      if (snap.exists && snap.data() != null) {
+        return BillingCycleModel.fromMap(snap.data()!, snap.id);
+      }
+      return null;
+    });
+  }
 
-    final expensesSub = _firestore
+  @override
+  Stream<List<ExpenseModel>> watchExpenses(String flatId) {
+    return _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
         .collection(FirestoreConstants.expenses)
         .snapshots()
-        .listen((snap) {
-          latestExpenses = snap.docs
-              .map((d) => ExpenseModel.fromMap(d.data(), d.id))
-              .toList();
-          // Sort expenses by date descending
-          latestExpenses.sort((a, b) => b.date.compareTo(a.date));
-          emitLatest();
-        }, onError: (err) {});
+        .map((snap) {
+      final expenses = snap.docs
+          .map((d) => ExpenseModel.fromMap(d.data(), d.id))
+          .toList();
+      expenses.sort((a, b) => b.date.compareTo(a.date));
+      return expenses;
+    });
+  }
 
-    final debtsSub = _firestore
-        .collection(FirestoreConstants.wgs)
-        .doc(flatId)
-        .collection(FirestoreConstants.debts)
-        .snapshots()
-        .listen((snap) {
-          latestDebts = snap.docs
-              .map((d) => DebtModel.fromMap(d.data(), d.id))
-              .toList();
-          emitLatest();
-        }, onError: (err) {});
-
-    final activitiesSub = _firestore
+  @override
+  Stream<List<ActivityModel>> watchActivities(String flatId) {
+    return _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
         .collection(FirestoreConstants.activities)
         .orderBy(FirestoreConstants.timestamp, descending: true)
         .snapshots()
-        .listen((snap) {
-          latestActivities = snap.docs
-              .map((d) => ActivityModel.fromMap(d.data(), d.id))
-              .toList();
-          emitLatest();
-        }, onError: (err) {});
-
-    final membersSub = _firestore
-        .collection(FirestoreConstants.wgs)
-        .doc(flatId)
-        .collection(FirestoreConstants.members)
-        .snapshots()
-        .listen((snap) {
-          latestMembers = snap.docs
-              .map((d) => FlatMemberDto.fromJson(d.data()).toEntity())
-              .toList();
-          emitLatest();
-        }, onError: (err) {});
-
-    controller.onCancel = () {
-      flatSub.cancel();
-      cycleSub.cancel();
-      expensesSub.cancel();
-      debtsSub.cancel();
-      activitiesSub.cancel();
-      membersSub.cancel();
-    };
-
-    return controller.stream;
+        .map((snap) {
+      return snap.docs
+          .map((d) => ActivityModel.fromMap(d.data(), d.id))
+          .toList();
+    });
   }
+
 
   @override
   Future<void> deleteExpense(String flatId, String expenseId) async {
@@ -260,8 +162,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         id: actRef.id,
         userId: payerId,
         userName: payerName,
-        action:
-            'deleted expense "$title" of ${amount.toStringAsFixed(2)}€.',
+        action: 'deleted expense "$title" of ${amount.toStringAsFixed(2)}€.',
         timestamp: DateTime.now(),
       ).toMap(),
     );
@@ -309,12 +210,12 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     // Recalculate billing cycle settled percentage & total costs
     await _recalculateBillingCycleSettlement(flatId);
 
-
     // Send notification
     await _notifyMembers(
       flatId: flatId,
       title: 'dashboard_notification_expense_added_title',
-      body: 'dashboard_notification_expense_added_body|${expense.payerName}|${expense.title}|${expense.amount.toStringAsFixed(2)}',
+      body:
+          'dashboard_notification_expense_added_body|${expense.payerName}|${expense.title}|${expense.amount.toStringAsFixed(2)}',
       type: NotificationType.expenseAdded,
     );
   }
@@ -534,10 +435,9 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
   @override
   Future<void> updateBillingCalculationDay(String flatId, int day) async {
-    await _firestore
-        .collection(FirestoreConstants.wgs)
-        .doc(flatId)
-        .update({FirestoreConstants.billingCalculationDay: day});
+    await _firestore.collection(FirestoreConstants.wgs).doc(flatId).update({
+      FirestoreConstants.billingCalculationDay: day,
+    });
 
     await _notifyMembers(
       flatId: flatId,
@@ -598,16 +498,10 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       costs: flatCosts,
     );
 
-    final totalCosts = monthlyExpenses.fold(
-      0.0,
-      (acc, e) => acc + e.amount,
-    );
+    final totalCosts = monthlyExpenses.fold(0.0, (acc, e) => acc + e.amount);
 
     // Save calculated debts into debts collection
-    await setFlatDebts(
-      flatId,
-      calculatedDebts,
-    );
+    await setFlatDebts(flatId, calculatedDebts);
 
     // 4. Archive current month cycle summary into Firestore
     final currentTotal = allExpenses
@@ -620,13 +514,15 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .collection(FirestoreConstants.billingCycles)
         .doc(currentMonthId)
         .set({
-      'monthName': _getMonthNameFormatted(now),
-      'totalCosts': currentTotal > 0 ? currentTotal : totalCosts,
-      'settledPercentage': 100.0,
-    }, SetOptions(merge: true));
+          'monthName': _getMonthNameFormatted(now),
+          'totalCosts': currentTotal > 0 ? currentTotal : totalCosts,
+          'settledPercentage': 100.0,
+        }, SetOptions(merge: true));
 
     // 5. Add new month instances for recurring catalog expenses starting on nextMonthDate at 00:01
-    final newMonthTimestamp = Timestamp.fromDate(DateTime(nextMonthDate.year, nextMonthDate.month, 1, 0, 1));
+    final newMonthTimestamp = Timestamp.fromDate(
+      DateTime(nextMonthDate.year, nextMonthDate.month, 1, 0, 1),
+    );
     for (final exp in monthlyExpenses) {
       final existsInNextMonth = allExpenses.any(
         (e) => e.title == exp.title && _getMonthId(e.date) == nextMonthId,
@@ -637,14 +533,14 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
             .doc(flatId)
             .collection(FirestoreConstants.expenses)
             .add({
-          'title': exp.title,
-          'amount': exp.amount,
-          'payerId': exp.payerId,
-          'payerName': exp.payerName,
-          'recurrence': exp.recurrence.name,
-          'isDisputed': false,
-          FirestoreConstants.timestamp: newMonthTimestamp,
-        });
+              'title': exp.title,
+              'amount': exp.amount,
+              'payerId': exp.payerId,
+              'payerName': exp.payerName,
+              'recurrence': exp.recurrence.name,
+              'isDisputed': false,
+              FirestoreConstants.timestamp: newMonthTimestamp,
+            });
       }
     }
 
@@ -655,16 +551,17 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .collection(FirestoreConstants.billingCycles)
         .doc(nextMonthId)
         .set({
-      'monthName': _getMonthNameFormatted(nextMonthDate),
-      'totalCosts': totalCosts,
-      'settledPercentage': 0.0,
-    }, SetOptions(merge: true));
+          'monthName': _getMonthNameFormatted(nextMonthDate),
+          'totalCosts': totalCosts,
+          'settledPercentage': 0.0,
+        }, SetOptions(merge: true));
 
     // 7. Write notification doc for members
     await _notifyMembers(
       flatId: flatId,
       title: 'dashboard_notification_costs_calculated_title',
-      body: 'dashboard_notification_costs_calculated_body|${_getMonthNameFormatted(nextMonthDate)}',
+      body:
+          'dashboard_notification_costs_calculated_body|${_getMonthNameFormatted(nextMonthDate)}',
       type: NotificationType.costsCalculated,
     );
   }
@@ -717,7 +614,12 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         type: type,
         isRead: false,
       );
-      unawaited(_sendPushViaVercel(userIds: recipientUserIds, notification: notificationDto));
+      unawaited(
+        _sendPushViaVercel(
+          userIds: recipientUserIds,
+          notification: notificationDto,
+        ),
+      );
     }
   }
 
@@ -768,7 +670,9 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       if (response.statusCode == 200) {
         debugPrint('✅ FCM push notification sent successfully via Vercel');
       } else {
-        debugPrint('❌ Vercel push error ${response.statusCode}: ${response.body}');
+        debugPrint(
+          '❌ Vercel push error ${response.statusCode}: ${response.body}',
+        );
       }
     } catch (e) {
       debugPrint('❌ Failed to dispatch push via Vercel: $e');
@@ -780,4 +684,3 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 DashboardRemoteDataSource dashboardRemoteDataSource(Ref ref) {
   return DashboardRemoteDataSourceImpl(ref.watch(firebaseFirestoreProvider));
 }
-

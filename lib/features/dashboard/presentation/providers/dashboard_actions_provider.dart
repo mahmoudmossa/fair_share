@@ -10,7 +10,8 @@ import 'add_new_expense_use_case_provider.dart';
 import 'dashboard_repository_provider.dart';
 import '../../domain/use_cases/settle_use_case.dart';
 
-import '../providers/dashboard_provider.dart';
+import 'flat_members_provider.dart';
+
 
 part 'dashboard_actions_provider.g.dart';
 
@@ -103,9 +104,10 @@ class DashboardActions extends _$DashboardActions {
       return;
     }
 
-    final dashboardState = ref.read(dashboardStateProvider).value;
-    final currentMember = dashboardState?.members.where((m) => m.id == auth.id || m.userId == auth.id).firstOrNull;
+    final members = ref.read(flatMembersProvider).value ?? [];
+    final currentMember = members.where((m) => m.id == auth.id || m.userId == auth.id).firstOrNull;
     final userName = currentMember?.name ?? '';
+
 
     final useCase = ref.read(settleUseCaseProvider);
     final result = await useCase(
