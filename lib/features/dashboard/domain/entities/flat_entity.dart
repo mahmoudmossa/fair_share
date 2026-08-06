@@ -1,4 +1,6 @@
-class FlatEntity {
+import 'package:equatable/equatable.dart';
+
+class FlatEntity extends Equatable {
   final String id;
   final String name;
   final String invitationCode;
@@ -16,24 +18,13 @@ class FlatEntity {
   });
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is FlatEntity &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name &&
-          invitationCode == other.invitationCode &&
-          createdBy == other.createdBy &&
-          createdByName == other.createdByName &&
-          billingCalculationDay == other.billingCalculationDay;
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      name.hashCode ^
-      invitationCode.hashCode ^
-      createdBy.hashCode ^
-      createdByName.hashCode ^
-      billingCalculationDay.hashCode;
+  List<Object?> get props => [
+        id,
+        name,
+        invitationCode,
+        createdBy,
+        createdByName,
+        billingCalculationDay,
+      ];
 }
 

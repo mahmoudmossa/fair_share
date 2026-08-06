@@ -119,11 +119,11 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
         controller.add(
           DashboardState(
-            flat: latestFlat!,
-            activeCycle: activeCycle,
+            flat: latestFlat!.toEntity(),
+            activeCycle: activeCycle.toEntity(),
             expenses: latestExpenses.map((e) => e.toEntity()).toList(),
             debts: displayDebts.map((d) => d.toEntity()).toList(),
-            activities: latestActivities,
+            activities: latestActivities.map((a) => a.toEntity()).toList(),
             members: latestMembers,
           ),
         );
@@ -163,11 +163,6 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
             latestCycle = BillingCycleModel.fromMap(snap.data()!, snap.id);
           } else {
             latestCycle = null;
-            // Catch-up check: If app opened past billing day and current month cycle hasn't been initialized
-            final billingDay = latestFlat?.billingCalculationDay ?? 1;
-            if (now.day >= billingDay) {
-              calculateMonthlyExpensesAndNotify(flatId);
-            }
           }
           emitLatest();
         }, onError: (err) {});
