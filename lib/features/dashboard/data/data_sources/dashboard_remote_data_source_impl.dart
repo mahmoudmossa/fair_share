@@ -163,6 +163,11 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
             latestCycle = BillingCycleModel.fromMap(snap.data()!, snap.id);
           } else {
             latestCycle = null;
+            // Catch-up check: If app opened past billing day and current month cycle hasn't been initialized
+            final billingDay = latestFlat?.billingCalculationDay ?? 1;
+            if (now.day >= billingDay) {
+              calculateMonthlyExpensesAndNotify(flatId);
+            }
           }
           emitLatest();
         }, onError: (err) {});
@@ -550,6 +555,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   @override
   Future<void> calculateMonthlyExpensesAndNotify(String flatId) async {
     final now = DateTime.now();
+    final currentMonthId = _getMonthId(now);
     final nextMonthDate = DateTime(now.year, now.month + 1, 1);
     final nextMonthId = _getMonthId(nextMonthDate);
 
@@ -575,7 +581,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
         .map((d) => FlatMemberDto.fromJson(d.data()).toEntity())
         .toList();
 
-    // 3. Filter monthly recurring expenses
+    // 3. Filter monthly recurring expenses (catalog templates)
     final monthlyExpenses = allExpenses
         .where((e) => e.recurrence == RecurrenceType.monthly)
         .toList();
@@ -608,8 +614,46 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       calculatedDebts,
     );
 
+    // 4. Archive current month cycle summary into Firestore
+    final currentTotal = allExpenses
+        .where((e) => _getMonthId(e.date) == currentMonthId)
+        .fold(0.0, (acc, e) => acc + e.amount);
 
-    // 5. Create new billing cycle for next month
+    await _firestore
+        .collection(FirestoreConstants.wgs)
+        .doc(flatId)
+        .collection(FirestoreConstants.billingCycles)
+        .doc(currentMonthId)
+        .set({
+      'monthName': _getMonthNameFormatted(now),
+      'totalCosts': currentTotal > 0 ? currentTotal : totalCosts,
+      'settledPercentage': 100.0,
+    }, SetOptions(merge: true));
+
+    // 5. Add new month instances for recurring catalog expenses starting on nextMonthDate at 00:01
+    final newMonthTimestamp = Timestamp.fromDate(DateTime(nextMonthDate.year, nextMonthDate.month, 1, 0, 1));
+    for (final exp in monthlyExpenses) {
+      final existsInNextMonth = allExpenses.any(
+        (e) => e.title == exp.title && _getMonthId(e.date) == nextMonthId,
+      );
+      if (!existsInNextMonth) {
+        await _firestore
+            .collection(FirestoreConstants.wgs)
+            .doc(flatId)
+            .collection(FirestoreConstants.expenses)
+            .add({
+          'title': exp.title,
+          'amount': exp.amount,
+          'payerId': exp.payerId,
+          'payerName': exp.payerName,
+          'recurrence': exp.recurrence.name,
+          'isDisputed': false,
+          FirestoreConstants.timestamp: newMonthTimestamp,
+        });
+      }
+    }
+
+    // 6. Create new billing cycle for next month
     await _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
@@ -621,11 +665,11 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       'settledPercentage': 0.0,
     }, SetOptions(merge: true));
 
-    // 6. Write notification doc for members
+    // 7. Write notification doc for members
     await _notifyMembers(
       flatId: flatId,
       title: 'dashboard_notification_costs_calculated_title',
-      body: 'dashboard_notification_costs_calculated_body|${_getMonthNameFormatted(now)}',
+      body: 'dashboard_notification_costs_calculated_body|${_getMonthNameFormatted(nextMonthDate)}',
       type: NotificationType.costsCalculated,
     );
   }

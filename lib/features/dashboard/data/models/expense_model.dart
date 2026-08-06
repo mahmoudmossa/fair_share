@@ -21,6 +21,7 @@ class ExpenseModel {
   )
   final DateTime date;
 
+  @JsonKey(defaultValue: false)
   final bool isDisputed;
   final String? disputeReason;
 
@@ -36,7 +37,7 @@ class ExpenseModel {
     required this.payerId,
     required this.payerName,
     required this.date,
-    required this.isDisputed,
+    this.isDisputed = false,
     this.disputeReason,
     this.recurrence = RecurrenceType.monthly,
     this.specificMonths,
