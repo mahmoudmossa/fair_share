@@ -85,20 +85,22 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
   @override
   Stream<BillingCycleModel?> watchActiveBillingCycle(String flatId) {
-    final currentMonthId = _getMonthId(DateTime.now());
     return _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
         .collection(FirestoreConstants.billingCycles)
-        .doc(currentMonthId)
+        .orderBy(FieldPath.documentId, descending: true)
+        .limit(1)
         .snapshots()
         .map((snap) {
-      if (snap.exists && snap.data() != null) {
-        return BillingCycleModel.fromMap(snap.data()!, snap.id);
+      if (snap.docs.isNotEmpty) {
+        final doc = snap.docs.first;
+        return BillingCycleModel.fromMap(doc.data(), doc.id);
       }
       return null;
     });
   }
+
 
   @override
   Stream<List<ExpenseModel>> watchExpenses(String flatId) {
