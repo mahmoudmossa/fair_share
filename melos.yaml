@@ -64,6 +64,13 @@ scripts:
       dirExists: "test/widget"
     description: Update golden baseline screenshots
 
+  # Patrol E2E integration tests
+  test:patrol:
+    run: patrol test -d chrome --target integration_test/app_flow_test.dart
+    packageFilters:
+      dirExists: "integration_test"
+    description: Run Patrol E2E integration tests
+
   # Clean build artifacts across all packages
   clean:
     run: flutter clean

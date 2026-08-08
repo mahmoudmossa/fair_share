@@ -108,9 +108,9 @@ patrol_tests:
     - .standard_rules
   stage: test
   script:
-    - dart pub global activate patrol_cli
+    - dart pub global activate patrol_cli 4.4.0
     - export PATH="$PATH:$HOME/.pub-cache/bin"
-    - patrol test -d chrome --target integration_test/app_flow_test.dart
+    - melos run test:patrol
   allow_failure: true
 
 # ==========================================
