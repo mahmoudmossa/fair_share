@@ -45,10 +45,7 @@ variables:
 .flutter_docker_generate_template:
   extends: .flutter_docker_template
   before_script:
-    - export PATH="$PATH:$HOME/.pub-cache/bin"
-    - export PATH="$PATH:$PUB_CACHE/bin"
-    - dart pub global activate melos
-    - melos bootstrap
+    - !reference [.flutter_docker_template, before_script]
     - melos run generate
 
 # ==========================================
