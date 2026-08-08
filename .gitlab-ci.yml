@@ -110,7 +110,6 @@ patrol_tests:
   script:
     - dart pub global activate patrol_cli
     - export PATH="$PATH:$HOME/.pub-cache/bin"
-    - cd apps/app
     - patrol test --target integration_test/app_flow_test.dart
 
 # ==========================================
@@ -369,11 +368,10 @@ build_android_dev:
   extends: .flutter_docker_generate_template
   stage: build
   script:
-    - cd apps/app
     - flutter build apk --flavor development --target lib/main.dart --release --dart-define-from-file=$DEV_CONFIG
   artifacts:
     paths:
-      - apps/app/build/app/outputs/flutter-apk/app-development-release.apk
+      - build/app/outputs/flutter-apk/app-development-release.apk
     expire_in: 1 week
   rules:
     - if: $CI_COMMIT_MESSAGE =~ /^chore\(release\)/ && $CI_COMMIT_BRANCH == "main"
@@ -391,7 +389,7 @@ firebase_distribution_android_dev:
   dependencies:
     - build_android_dev
   script:
-    - cd apps/app/android
+    - cd android
     - gem install fastlane --no-document
     - cp $FASTLANE_ENV_DEV ./fastlane/.env
     - bundle exec fastlane distribute_to_firebase
