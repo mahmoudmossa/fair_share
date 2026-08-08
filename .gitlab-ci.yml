@@ -21,7 +21,7 @@ cache:
 # Global environment variables
 variables:
   PUB_CACHE: "$CI_PROJECT_DIR/.pub-cache"
-  FLUTTER_VERSION: "stable"
+  FLUTTER_VERSION: "3.44.2"
 
 # Hidden base job defining standard pipeline rules
 .standard_rules:
