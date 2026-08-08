@@ -37,6 +37,11 @@
     "settle": "Settle",
     "settled": "Settled",
     "add_expense": "Add Expense",
+    "edit_expense": "Edit Expense",
+    "delete_expense": "Delete Expense",
+    "delete_expense_confirmation": "I understand that deleting this expense updates current month calculations, requires re-settling, and will send push notifications to all housemates.",
+    "delete_expense_btn": "Delete Expense",
+    "edit_expense_confirmation": "I understand that editing this expense updates current month calculations, requires re-settling, and will send push notifications to all housemates.",
     "expense_title": "Expense Title",
     "expense_amount": "Amount (€)",
     "expense_category": "Category",
@@ -44,7 +49,7 @@
     "cancel": "Cancel",
     "validation_empty_fields": "Please fill out all fields",
     "history_tab": "History",
-    "admin_tab": "Admin",
+    "admin_tab": "Household",
     "profile_tab": "Profile",
     "history_coming_soon": "History Screen coming soon!",
     "admin_coming_soon": "Admin Screen coming soon!",
@@ -118,9 +123,14 @@
     "invalid_invite": "Invalid or expired invite code"
   },
   "occupants": {
-    "title": "Occupants View",
+    "title": "Household & Members",
     "subtitle": "This is the Occupants view",
-    "widget": "Occupants Widget"
+    "widget": "Occupants Widget",
+    "edit_flat_name": "Edit Flat Name",
+    "flat_name_label": "Flat Name",
+    "flat_name_empty_error": "Flat name cannot be empty",
+    "update_flat_success": "Flat name updated successfully!",
+    "update_flat_error": "Failed to update flat name: {}"
   },
   "history": {
     "title": "Expense History",
@@ -134,7 +144,9 @@
     "detail_empty": "No expenses recorded for this month",
     "detail_paid_by": "Paid by {}",
     "loading_error": "Error loading history: {}",
-    "detail_loading_error": "Error loading expenses: {}"
+    "detail_loading_error": "Error loading expenses: {}",
+    "yearly_costs_title": "AVERAGE YEARLY TOTAL",
+    "yearly_costs_empty": "No yearly cost data available"
   },
   "profile": {
     "title": "My Profile",
@@ -146,6 +158,12 @@
     "flat_details": "Flat Details",
     "security_privacy": "Security & Privacy",
     "biometrics_data_splitting": "Biometrics and Data splitting",
+    "language": "Language",
+    "english": "English",
+    "german": "Deutsch",
+    "theme_mode": "App Theme",
+    "theme_light": "Light Mode",
+    "theme_dark": "Dark Mode",
     "app_tagline": "FairShare for iOS & Android",
     "app_version": "Version {}",
     "edit_name_title": "Edit Display Name",
@@ -160,6 +178,19 @@
     "pick_from_gallery": "Choose from Gallery",
     "take_photo": "Take a Photo",
     "photo_too_large": "Image is too large. Please select a smaller image."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "empty": "No notifications yet",
+    "dashboard_notification_settled_title": "Debt Settled",
+    "dashboard_notification_settled_body": "{} settled a debt with you",
+    "dashboard_notification_expense_added_title": "New Expense Added",
+    "dashboard_notification_expense_added_body": "{} added {} ({}€)",
+    "dashboard_notification_billing_day_title": "Billing Day Changed",
+    "dashboard_notification_billing_day_body": "Billing calculation day changed to Day {}",
+    "dashboard_notification_costs_calculated_title": "Monthly Costs Calculated",
+    "dashboard_notification_costs_calculated_body": "Monthly costs for {} have been calculated."
   }
 }
 

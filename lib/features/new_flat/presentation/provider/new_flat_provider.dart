@@ -21,10 +21,16 @@ class NewFlat extends _$NewFlat {
     state = const ActionState.loading();
 
     final useCase = ref.read(createFlatUseCaseProvider);
+    final setDebtsUseCase = ref.read(setFlatDebtsUseCaseProvider);
+
     final result = await useCase(flat);
 
     await result.fold(
-      (failure) async => state = ActionState.failure(failure),
+      (failure) async {
+        if (ref.mounted) {
+          state = ActionState.failure(failure);
+        }
+      },
       (_) async {
         try {
           final allMembers = [
@@ -35,11 +41,16 @@ class NewFlat extends _$NewFlat {
             members: allMembers,
             costs: flat.costs,
           );
-          final setDebtsUseCase = ref.read(setFlatDebtsUseCaseProvider);
           await setDebtsUseCase(flatId: flat.id, debts: calculatedDebts);
-          state = const ActionState.success();
+          if (ref.mounted) {
+            state = const ActionState.success();
+          }
         } catch (e) {
-          state = ActionState.failure(ServerFailure(ServerFailureType.unknown));
+          if (ref.mounted) {
+            state = ActionState.failure(
+              ServerFailure(ServerFailureType.unknown),
+            );
+          }
         }
       },
     );

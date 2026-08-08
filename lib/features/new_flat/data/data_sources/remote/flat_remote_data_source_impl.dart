@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'package:fair_share/core/constants/firestore_constants.dart';
-import 'package:fair_share/core/utils/monthly_history_helper.dart';
 import 'package:fair_share/features/new_flat/data/data_sources/remote/flat_remote_data_source.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_dto.dart';
 import 'package:fair_share/features/new_flat/data/models/flat_member_dto.dart';
@@ -107,13 +106,10 @@ class FlatRemoteDataSourceImpl implements FlatRemoteDataSource {
     final userRef = _firestore
         .collection(FirestoreConstants.users)
         .doc(flat.createdBy);
-    batch.update(userRef, {FirestoreConstants.flatId: flat.id});
+    batch.set(userRef, {FirestoreConstants.flatId: flat.id}, SetOptions(merge: true));
 
     // Commit batch transaction
     await batch.commit();
-
-    // Seed the monthly history summary now that expenses + members are stored
-    await upsertMonthlyHistory(_firestore, flat.id);
   }
 
   @override

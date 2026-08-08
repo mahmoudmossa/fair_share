@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'notification_type.dart';
 
 class NotificationsEntity extends Equatable {
   const NotificationsEntity({
@@ -11,7 +12,7 @@ class NotificationsEntity extends Equatable {
   final String id;
   final String title;
   final String body;
-  final String type;
+  final NotificationType type;
   final bool isRead;
   @override
   List<Object?> get props => [id, title, body, type, isRead];

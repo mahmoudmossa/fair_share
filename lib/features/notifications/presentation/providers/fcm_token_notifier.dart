@@ -9,7 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fcm_token_notifier.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class FcmTokenNotifier extends _$FcmTokenNotifier {
   StreamSubscription<String>? _tokenSubscription;
 

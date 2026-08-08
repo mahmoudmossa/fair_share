@@ -1,3 +1,6 @@
+import 'package:shared_ui/shared_ui.dart';
+import 'package:fair_share/features/notifications/presentation/widgets/notification_icon_widget.dart';
+import 'package:fair_share/features/notifications/presentation/widgets/notifications_side_sheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,16 +31,9 @@ class JoinOrCreateFlatScreen extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 0,
-        title: Text(
-          LocaleKeys.dashboard_title.tr(),
-          style: TextStyle(
-            color: colorScheme.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: AppHeader(
+        title: LocaleKeys.dashboard_title.tr(),
+        notificationIcon: const NotificationIconWidget(),
         actions: [
           IconButton(
             onPressed: () {
@@ -52,6 +48,7 @@ class JoinOrCreateFlatScreen extends HookConsumerWidget {
           ),
         ],
       ),
+      endDrawer: const NotificationsSideSheet(),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

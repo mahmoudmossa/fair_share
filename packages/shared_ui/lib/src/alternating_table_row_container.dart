@@ -41,11 +41,7 @@ class AlternatingTableRowContainer extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return InkWell(
-        key: keyName,
-        onTap: onTap,
-        child: containerWidget,
-      );
+      return InkWell(key: keyName, onTap: onTap, child: containerWidget);
     }
 
     return containerWidget;

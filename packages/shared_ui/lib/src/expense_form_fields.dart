@@ -144,10 +144,7 @@ class ExpenseFormFields extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            SizedBox(
-              width: double.infinity,
-              child: frequencySegmentedButton,
-            ),
+            SizedBox(width: double.infinity, child: frequencySegmentedButton),
           ],
         ),
       ],

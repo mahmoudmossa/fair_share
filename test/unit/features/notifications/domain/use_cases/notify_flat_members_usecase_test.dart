@@ -1,6 +1,7 @@
 import 'package:fair_share/features/notifications/domain/entities/notifications_entity.dart';
 import 'package:fair_share/features/notifications/domain/repositories/notifications_repository.dart';
 import 'package:fair_share/features/notifications/domain/usecases/notify_flat_members.dart';
+import 'package:fair_share/features/notifications/domain/entities/notification_type.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -19,10 +20,10 @@ void main() {
   group('NotifyFlatMembersUseCase', () {
     const tUserIds = ['user_1', 'user_2'];
     const tNotification = NotificationsEntity(
-      id: 'notif_1',
-      title: 'New expense',
-      body: 'Mahmoud added a new expense',
-      type: 'expense',
+      id: '1',
+      title: 'Title',
+      body: 'Body',
+      type: NotificationType.settle,
       isRead: false,
     );
 

@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/notifications_entity.dart';
+import '../../domain/entities/notification_type.dart';
+import 'package:fair_share/core/utils/date_utils_converter.dart';
 part 'notifications_dto.g.dart';
 
 @JsonSerializable()
@@ -8,8 +10,10 @@ class NotificationsDto extends Equatable {
   final String id;
   final String title;
   final String body;
+  @JsonKey(fromJson: DateUtilsConverter.dateFromJson, toJson: DateUtilsConverter.dateToJson)
   final DateTime timestamp;
-  final String type;
+  @JsonKey(unknownEnumValue: NotificationType.unknown)
+  final NotificationType type;
   final bool isRead;
 
   const NotificationsDto({

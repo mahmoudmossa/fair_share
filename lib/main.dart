@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:fair_share/core/providers/firebase_providers.dart';
 import 'package:fair_share/core/router/providers/app_router_provider.dart';
+import 'package:fair_share/features/notifications/data/services/push_notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +11,7 @@ import 'package:shared_core/shared_core.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'firebase_options.dart';
 import 'package:fair_share/core/theme/app_theme.dart';
+import 'package:fair_share/core/theme/theme_mode_provider.dart';
 import 'injection_container.dart';
 
 void main() async {
@@ -16,6 +19,11 @@ void main() async {
 
   // Initialize easy_localization
   await EasyLocalization.ensureInitialized();
+
+  // ⚠️ MUST be registered before runApp() and before any async gap.
+  // FCM background handler runs in a separate Dart isolate and requires
+  // the registration to happen at the top level of main().
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   // Initialize Firebase options
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -62,11 +70,12 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appAutoRouter = ref.watch(appRouterProvider);
+    final themeMode = ref.watch(appThemeModeProvider);
     const materialTheme = MaterialTheme(TextTheme());
     return MaterialApp.router(
       theme: materialTheme.light(),
       darkTheme: materialTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: appAutoRouter.config(),
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
