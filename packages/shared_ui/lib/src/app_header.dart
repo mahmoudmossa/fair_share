@@ -45,10 +45,12 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
     }
 
     Widget? leadingOrAvatar = leading;
-    if (leadingOrAvatar == null && (avatarWidget != null || avatarUrl != null)) {
+    if (leadingOrAvatar == null &&
+        (avatarWidget != null || avatarUrl != null)) {
       leadingOrAvatar = Padding(
         padding: const EdgeInsets.all(8.0),
-        child: avatarWidget ??
+        child:
+            avatarWidget ??
             Container(
               width: 40,
               height: 40,
