@@ -33,7 +33,6 @@
             {
                 "assets": [
                     "pubspec.yaml",
-                    "apps/app/pubspec.yaml",
                     "CHANGELOG.md"
                 ],
                 "message": "chore(release): ${nextRelease.version} \n\n${nextRelease.notes}"
