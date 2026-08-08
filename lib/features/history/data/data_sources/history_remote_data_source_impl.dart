@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fair_share/core/constants/firestore_constants.dart';
 import 'package:fair_share/features/dashboard/domain/entities/expense_entity.dart';
 import 'package:fair_share/features/dashboard/data/models/expense_model.dart';
-import 'package:fair_share/features/history/domain/entities/month_summary_entity.dart';
-import '../dtos/month_summary_dto.dart';
 import 'history_remote_data_source.dart';
 
 class HistoryRemoteDataSourceImpl implements HistoryRemoteDataSource {
@@ -12,16 +10,22 @@ class HistoryRemoteDataSourceImpl implements HistoryRemoteDataSource {
   final FirebaseFirestore _firestore;
 
   @override
-  Stream<List<MonthSummaryEntity>> watchMonthlyHistory(String flatId) {
+  Stream<List<ExpenseEntity>> watchAllExpenses(String flatId) {
     return _firestore
         .collection(FirestoreConstants.wgs)
         .doc(flatId)
-        .collection(FirestoreConstants.monthlyHistory)
+        .collection(FirestoreConstants.expenses)
         .snapshots()
         .map(
-          (snap) => snap.docs
-              .map((d) => MonthSummaryDto.fromMap(d.data(), d.id).toEntity())
-              .toList(),
+          (snap) {
+            final list = snap.docs
+                .map(
+                  (d) => ExpenseModel.fromMap(d.data(), d.id).toEntity(),
+                )
+                .toList();
+            list.sort((a, b) => b.date.compareTo(a.date));
+            return list;
+          },
         );
   }
 

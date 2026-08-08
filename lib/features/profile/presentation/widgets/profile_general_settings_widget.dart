@@ -5,6 +5,7 @@ import 'package:fair_share/core/constants/app_keys.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
 import 'package:fair_share/core/router/app_router.dart';
 import 'package:fair_share/core/router/providers/app_router_provider.dart';
+import 'package:fair_share/core/theme/theme_mode_provider.dart';
 import 'package:fair_share/features/auth/presentation/provider/auth_notifier_provider.dart';
 
 class ProfileGeneralSettingsWidget extends HookConsumerWidget {
@@ -37,6 +38,7 @@ class ProfileGeneralSettingsWidget extends HookConsumerWidget {
           ),
           child: Column(
             children: [
+              /*
               ListTile(
                 key: AppKeys.profile.flatDetailsTile,
                 leading: Container(
@@ -104,6 +106,123 @@ class ProfileGeneralSettingsWidget extends HookConsumerWidget {
                   color: colorScheme.onSurfaceVariant,
                 ),
                 onTap: () {},
+              ),
+              Divider(
+                height: 1,
+                indent: 16,
+                endIndent: 16,
+                color: colorScheme.outlineVariant.withAlpha(50),
+              ),
+              */
+              // Language Selection Section
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.language_outlined,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                LocaleKeys.profile_language.tr(),
+                                style: textTheme.bodyLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                context.locale.languageCode == 'de'
+                                    ? LocaleKeys.profile_german.tr()
+                                    : LocaleKeys.profile_english.tr(),
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: SegmentedButton<String>(
+                        segments: [
+                          ButtonSegment<String>(
+                            value: 'en',
+                            label: Text(LocaleKeys.profile_english.tr()),
+                          ),
+                          ButtonSegment<String>(
+                            value: 'de',
+                            label: Text(LocaleKeys.profile_german.tr()),
+                          ),
+                        ],
+                        selected: {context.locale.languageCode},
+                        onSelectionChanged: (newSelection) {
+                          final selectedLang = newSelection.first;
+                          context.setLocale(Locale(selectedLang));
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(
+                height: 1,
+                indent: 16,
+                endIndent: 16,
+                color: colorScheme.outlineVariant.withAlpha(50),
+              ),
+              // App Theme Mode Toggle Section
+              ListTile(
+                key: const Key('profileThemeTile'),
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: colorScheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Icons.dark_mode_outlined
+                        : Icons.light_mode_outlined,
+                    color: colorScheme.onSecondaryContainer,
+                  ),
+                ),
+                title: Text(
+                  LocaleKeys.profile_theme_mode.tr(),
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Text(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? LocaleKeys.profile_theme_dark.tr()
+                      : LocaleKeys.profile_theme_light.tr(),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                trailing: Switch(
+                  value: Theme.of(context).brightness == Brightness.dark,
+                  onChanged: (_) {
+                    ref.read(appThemeModeProvider.notifier).toggleTheme();
+                  },
+                ),
               ),
               Divider(
                 height: 1,

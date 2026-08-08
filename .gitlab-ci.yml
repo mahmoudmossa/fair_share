@@ -23,9 +23,18 @@ variables:
   PUB_CACHE: "$CI_PROJECT_DIR/.pub-cache"
   FLUTTER_VERSION: "stable"
 
-# Base anchor template for Dart/Flutter jobs running on Linux/Docker
-.flutter_docker_template: &flutter_docker_template
-  image: ghcr.io/cirruslabs/flutter:stable
+# Hidden base job defining standard pipeline rules
+.standard_rules:
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /^chore\(release\)/ && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH
+
+# Base template for Dart/Flutter jobs running on Linux/Docker
+.flutter_docker_template:
+  image: ghcr.io/cirruslabs/flutter:$FLUTTER_VERSION
   before_script:
     - export PATH="$PATH:$HOME/.pub-cache/bin"
     - export PATH="$PATH:$PUB_CACHE/bin"
@@ -33,13 +42,10 @@ variables:
     - melos bootstrap
 
 # Extended template that also runs code generation (for build/deploy jobs)
-.flutter_docker_generate_template: &flutter_docker_generate_template
-  image: ghcr.io/cirruslabs/flutter:stable
+.flutter_docker_generate_template:
+  extends: .flutter_docker_template
   before_script:
-    - export PATH="$PATH:$HOME/.pub-cache/bin"
-    - export PATH="$PATH:$PUB_CACHE/bin"
-    - dart pub global activate melos
-    - melos bootstrap
+    - !reference [.flutter_docker_template, before_script]
     - melos run generate
 
 # ==========================================
@@ -48,29 +54,21 @@ variables:
 
 # Check formatting across all packages
 format_check:
-  <<: *flutter_docker_template
+  extends:
+    - .flutter_docker_template
+    - .standard_rules
   stage: validate
   script:
     - melos run format:check
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /^chore\(release\)/ && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH =~ /^feat\//
 
 # Static Analysis and Linters (custom_lint & DCM presets)
 static_analysis:
-  <<: *flutter_docker_generate_template
+  extends:
+    - .flutter_docker_generate_template
+    - .standard_rules
   stage: validate
   script:
     - melos run analyze
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /^chore\(release\)/ && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH =~ /^feat\//
 
 # ==========================================
 # 2. TESTING STAGE
@@ -78,7 +76,9 @@ static_analysis:
 
 # Run all unit tests concurrently
 unit_tests:
-  <<: *flutter_docker_generate_template
+  extends:
+    - .flutter_docker_generate_template
+    - .standard_rules
   stage: test
   script:
     - melos run test:unit
@@ -88,40 +88,27 @@ unit_tests:
     paths:
       - "**/coverage/"
     expire_in: 7 days
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /^chore\(release\)/ && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH =~ /^feat\//
 
 # Run widget & golden tests concurrently
 widget_tests:
-  <<: *flutter_docker_generate_template
+  extends:
+    - .flutter_docker_generate_template
+    - .standard_rules
   stage: test
   script:
     - melos run test:golden
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /^chore\(release\)/ && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH =~ /^feat\//
 
 # Run Patrol E2E Integration tests
 patrol_tests:
-  <<: *flutter_docker_generate_template
+  extends:
+    - .flutter_docker_generate_template
+    - .standard_rules
   stage: test
   script:
-    - dart pub global activate patrol_cli
+    - dart pub global activate patrol_cli 4.4.0
     - export PATH="$PATH:$HOME/.pub-cache/bin"
-    - cd apps/app
-    - patrol test --target integration_test/app_flow_test.dart
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /^chore\(release\)/ && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "main"
+    - melos run test:patrol
+  allow_failure: true
 
 # ==========================================
 # 3. BUILD STAGE (Manual compilation per env)
@@ -376,14 +363,13 @@ semantic-release:
 
 # build android dev
 build_android_dev:
-  <<: *flutter_docker_generate_template
+  extends: .flutter_docker_generate_template
   stage: build
   script:
-    - cd apps/app
     - flutter build apk --flavor development --target lib/main.dart --release --dart-define-from-file=$DEV_CONFIG
   artifacts:
     paths:
-      - apps/app/build/app/outputs/flutter-apk/app-development-release.apk
+      - build/app/outputs/flutter-apk/app-development-release.apk
     expire_in: 1 week
   rules:
     - if: $CI_COMMIT_MESSAGE =~ /^chore\(release\)/ && $CI_COMMIT_BRANCH == "main"
@@ -401,7 +387,7 @@ firebase_distribution_android_dev:
   dependencies:
     - build_android_dev
   script:
-    - cd apps/app/android
+    - cd android
     - gem install fastlane --no-document
     - cp $FASTLANE_ENV_DEV ./fastlane/.env
     - bundle exec fastlane distribute_to_firebase

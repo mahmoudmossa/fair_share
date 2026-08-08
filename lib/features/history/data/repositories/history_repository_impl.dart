@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fair_share/core/errors/failures.dart';
 import 'package:fair_share/features/dashboard/domain/entities/expense_entity.dart';
-import 'package:fair_share/features/history/domain/entities/month_summary_entity.dart';
 import 'package:fair_share/features/history/domain/repositories/history_repository.dart';
 import '../data_sources/history_remote_data_source.dart';
 
@@ -11,8 +10,8 @@ class HistoryRepositoryImpl implements HistoryRepository {
   final HistoryRemoteDataSource _remoteDataSource;
 
   @override
-  Stream<List<MonthSummaryEntity>> watchMonthlyHistory(String flatId) {
-    return _remoteDataSource.watchMonthlyHistory(flatId).handleError((error) {
+  Stream<List<ExpenseEntity>> watchAllExpenses(String flatId) {
+    return _remoteDataSource.watchAllExpenses(flatId).handleError((error) {
       if (error is FirebaseException) {
         throw FirebaseErrorMapper().mapException(error);
       }

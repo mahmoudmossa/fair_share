@@ -1,30 +1,51 @@
+import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:json_annotation/json_annotation.dart';
 import '../../domain/entities/billing_cycle_entity.dart';
 
-class BillingCycleModel extends BillingCycleEntity {
+part 'billing_cycle_model.g.dart';
+
+@CopyWith()
+@JsonSerializable()
+class BillingCycleModel {
+  final String id;
+  final String? monthName;
+  final double totalCosts;
+  final double? settledPercentage;
+
   const BillingCycleModel({
-    required super.id,
-    required super.monthName,
-    required super.status,
-    required super.totalCosts,
-    required super.settledPercentage,
+    required this.id,
+    this.monthName,
+    this.totalCosts = 0.0,
+    this.settledPercentage,
   });
 
-  factory BillingCycleModel.fromMap(Map<String, dynamic> map, String id) {
+
+  factory BillingCycleModel.fromEntity(BillingCycleEntity entity) {
     return BillingCycleModel(
-      id: id,
-      monthName: map['monthName'] as String? ?? '',
-      status: map['status'] as String? ?? 'draft',
-      totalCosts: (map['totalCosts'] as num?)?.toDouble() ?? 0.0,
-      settledPercentage: (map['settledPercentage'] as num?)?.toDouble() ?? 0.0,
+      id: entity.id,
+      monthName: entity.monthName,
+      totalCosts: entity.totalCosts,
+      settledPercentage: entity.settledPercentage,
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'monthName': monthName,
-      'status': status,
-      'totalCosts': totalCosts,
-      'settledPercentage': settledPercentage,
-    };
+  BillingCycleEntity toEntity() {
+    return BillingCycleEntity(
+      id: id,
+      monthName: monthName,
+      totalCosts: totalCosts,
+      settledPercentage: settledPercentage,
+    );
   }
+
+  factory BillingCycleModel.fromJson(Map<String, dynamic> json) =>
+      _$BillingCycleModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BillingCycleModelToJson(this);
+
+  factory BillingCycleModel.fromMap(Map<String, dynamic> map, String id) {
+    return BillingCycleModel.fromJson({'id': id, ...map});
+  }
+
+  Map<String, dynamic> toMap() => toJson();
 }

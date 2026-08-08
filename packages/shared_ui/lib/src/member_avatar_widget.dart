@@ -10,12 +10,16 @@ class MemberAvatarWidget extends StatelessWidget {
   final String? photoBase64;
   final String displayName;
   final double radius;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   const MemberAvatarWidget({
     super.key,
     required this.displayName,
     this.photoBase64,
     this.radius = 28,
+    this.backgroundColor,
+    this.foregroundColor,
   });
 
   @override
@@ -36,21 +40,24 @@ class MemberAvatarWidget extends StatelessWidget {
       }
     }
 
+    final effectiveBgColor = backgroundColor ?? colorScheme.primaryContainer;
+    final effectiveFgColor = foregroundColor ?? colorScheme.onPrimaryContainer;
+
     if (imageBytes != null) {
       return CircleAvatar(
         radius: radius,
         backgroundImage: MemoryImage(imageBytes),
-        backgroundColor: colorScheme.primaryContainer,
+        backgroundColor: effectiveBgColor,
       );
     }
 
     return CircleAvatar(
       radius: radius,
-      backgroundColor: colorScheme.primaryContainer,
+      backgroundColor: effectiveBgColor,
       child: Text(
         initial,
         style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onPrimaryContainer,
+          color: effectiveFgColor,
           fontWeight: FontWeight.bold,
           fontSize: radius * 0.75,
         ),

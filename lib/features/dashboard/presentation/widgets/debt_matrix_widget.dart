@@ -2,17 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fair_share/core/localization/locale_keys.g.dart';
+import 'package:shared_ui/shared_ui.dart';
+import 'package:fair_share/features/new_flat/domain/entities/flat_member_entity.dart';
 import '../../domain/entities/debt_entity.dart';
 import '../providers/dashboard_actions_provider.dart';
 
 class DebtMatrixWidget extends ConsumerWidget {
   final String flatId;
   final List<DebtEntity> debts;
+  final String currentUserId;
+  final bool isCurrentAdmin;
+  final List<FlatMemberEntity> members;
 
   const DebtMatrixWidget({
     super.key,
     required this.flatId,
     required this.debts,
+    required this.currentUserId,
+    required this.isCurrentAdmin,
+    required this.members,
   });
 
   @override
@@ -27,32 +35,12 @@ class DebtMatrixWidget extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                LocaleKeys.dashboard_debt_matrix.tr(),
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              TextButton.icon(
-                onPressed: () {},
-                icon: Text(
-                  LocaleKeys.dashboard_view_details.tr(),
-                  style: TextStyle(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                label: Icon(
-                  Icons.chevron_right,
-                  size: 18,
-                  color: colorScheme.primary,
-                ),
-              ),
-            ],
+          Text(
+            LocaleKeys.dashboard_debt_matrix.tr(),
+            style: textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 12),
           LayoutBuilder(
@@ -70,13 +58,31 @@ class DebtMatrixWidget extends ConsumerWidget {
                 itemCount: debts.length,
                 itemBuilder: (context, index) {
                   final debt = debts[index];
-                  final initial = debt.fromName.isNotEmpty
-                      ? debt.fromName[0].toUpperCase()
-                      : '';
+                  // Find member entities for debtor and creditor
+                  final debtorMember = members.firstWhere(
+                    (m) => m.id == debt.fromId || m.userId == debt.fromId,
+                    orElse: () => FlatMemberEntity(id: debt.fromId, name: debt.fromName),
+                  );
+                  final creditorMember = members.firstWhere(
+                    (m) => m.id == debt.toId || m.userId == debt.toId,
+                    orElse: () => FlatMemberEntity(id: debt.toId, name: debt.toName),
+                  );
 
-                  // Select avatar color based on name to match design
-                  Color avatarBg = colorScheme.secondaryContainer;
-                  Color avatarFg = colorScheme.onSecondaryContainer;
+                  final debtorUserId = debtorMember.userId ?? debtorMember.id;
+                  final creditorUserId = creditorMember.userId ?? creditorMember.id;
+
+                  // Permission check: Can settle if current user is debtor, creditor, or admin
+                  final canSettle = isCurrentAdmin ||
+                      currentUserId == debtorUserId ||
+                      currentUserId == creditorUserId;
+
+                  final avatarPalette = [
+                    (colorScheme.tertiaryContainer, colorScheme.onTertiaryContainer),
+                    (colorScheme.secondaryContainer, colorScheme.onSecondaryContainer),
+                    (colorScheme.primaryContainer, colorScheme.onPrimaryContainer),
+                    (colorScheme.surfaceContainerHigh, colorScheme.onSurfaceVariant),
+                  ];
+                  final avatarColors = avatarPalette[index % avatarPalette.length];
 
                   return Container(
                     padding: const EdgeInsets.symmetric(
@@ -95,16 +101,12 @@ class DebtMatrixWidget extends ConsumerWidget {
                         Expanded(
                           child: Row(
                             children: [
-                              CircleAvatar(
+                              MemberAvatarWidget(
+                                displayName: debt.fromName,
+                                photoBase64: debtorMember.photoBase64,
                                 radius: 20,
-                                backgroundColor: avatarBg,
-                                child: Text(
-                                  initial,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: avatarFg,
-                                  ),
-                                ),
+                                backgroundColor: avatarColors.$1,
+                                foregroundColor: avatarColors.$2,
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -168,12 +170,21 @@ class DebtMatrixWidget extends ConsumerWidget {
                                 )
                               : ElevatedButton(
                                   key: Key('settleButton_${debt.id}'),
-                                  onPressed: () {
-                                    notifier.settleDebt(
-                                      flatId: flatId,
-                                      debtId: debt.id,
-                                    );
-                                  },
+                                  onPressed: canSettle
+                                      ? () {
+                                          // Recipient of push notification is the other party (if current user is debtor, notify creditor; if creditor or admin, notify debtor)
+                                          final recipientUserId = currentUserId == debtorUserId
+                                              ? creditorUserId
+                                              : debtorUserId;
+                                          notifier.settleDebt(
+                                            flatId: flatId,
+                                            debtId: debt.id,
+                                            recipientUserId: recipientUserId,
+                                            debtorName: debt.fromName,
+                                            amount: debt.amount,
+                                          );
+                                        }
+                                      : null,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: colorScheme.primary,
                                     foregroundColor: colorScheme.onPrimary,

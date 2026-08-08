@@ -16,8 +16,10 @@ class MarkAllNotificationsAsRead extends _$MarkAllNotificationsAsRead {
       final repository = ref.read(notificationsRepositoryProvider);
       final useCase = MarkAllNotificationAsReadUseCase(repository);
       await useCase(userId);
+      if (!ref.mounted) return;
       state = const ActionSuccess(null);
     } catch (e) {
+      if (!ref.mounted) return;
       state = ActionError(e);
     }
   }

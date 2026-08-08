@@ -18,15 +18,12 @@ class EmptyValueDashWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final defaultStyle = style ??
+    final defaultStyle =
+        style ??
         textTheme.bodyLarge?.copyWith(
           color: color ?? colorScheme.onSurfaceVariant,
         );
 
-    return Text(
-      '—',
-      textAlign: textAlign,
-      style: defaultStyle,
-    );
+    return Text('—', textAlign: textAlign, style: defaultStyle);
   }
 }

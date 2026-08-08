@@ -1,4 +1,6 @@
-class Occupant {
+import 'package:equatable/equatable.dart';
+
+class Occupant extends Equatable {
   final String id;
   final String name;
   final String? avatarUrl;
@@ -6,7 +8,7 @@ class Occupant {
   final String? invitationCode;
   final String? flatId;
 
-  Occupant({
+  const Occupant({
     required this.id,
     required this.name,
     this.avatarUrl,
@@ -32,5 +34,15 @@ class Occupant {
       flatId: flatId ?? this.flatId,
     );
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        avatarUrl,
+        userId,
+        invitationCode,
+        flatId,
+      ];
 }
 

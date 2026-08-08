@@ -42,12 +42,7 @@ class FirebaseCrashReporter implements CrashReporter {
     String? reason,
   }) async {
     try {
-      await crashlytics.recordError(
-        error,
-        stack,
-        fatal: fatal,
-        reason: reason,
-      );
+      await crashlytics.recordError(error, stack, fatal: fatal, reason: reason);
     } catch (e, s) {
       fallbackLogger.error('Failed to record crash reporter error', e, s);
     }

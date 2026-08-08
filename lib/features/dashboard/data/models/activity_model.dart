@@ -1,41 +1,60 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:fair_share/core/utils/date_utils_converter.dart';
 import '../../domain/entities/activity_entity.dart';
 
-class ActivityModel extends ActivityEntity {
+part 'activity_model.g.dart';
+
+@CopyWith()
+@JsonSerializable()
+class ActivityModel {
+  final String id;
+  final String userId;
+  final String userName;
+  final String action;
+
+  @JsonKey(
+    fromJson: DateUtilsConverter.dateFromJson,
+    toJson: DateUtilsConverter.dateToJson,
+  )
+  final DateTime timestamp;
+
   const ActivityModel({
-    required super.id,
-    required super.userId,
-    required super.userName,
-    required super.action,
-    required super.timestamp,
+    required this.id,
+    required this.userId,
+    required this.userName,
+    required this.action,
+    required this.timestamp,
   });
 
-  factory ActivityModel.fromMap(Map<String, dynamic> map, String id) {
-    DateTime parsedTimestamp;
-    final dynamic rawTimestamp = map['timestamp'];
-    if (rawTimestamp is Timestamp) {
-      parsedTimestamp = rawTimestamp.toDate();
-    } else if (rawTimestamp is String) {
-      parsedTimestamp = DateTime.tryParse(rawTimestamp) ?? DateTime.now();
-    } else {
-      parsedTimestamp = DateTime.now();
-    }
-
+  factory ActivityModel.fromEntity(ActivityEntity entity) {
     return ActivityModel(
-      id: id,
-      userId: map['userId'] as String? ?? '',
-      userName: map['userName'] as String? ?? '',
-      action: map['action'] as String? ?? '',
-      timestamp: parsedTimestamp,
+      id: entity.id,
+      userId: entity.userId,
+      userName: entity.userName,
+      action: entity.action,
+      timestamp: entity.timestamp,
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'userId': userId,
-      'userName': userName,
-      'action': action,
-      'timestamp': Timestamp.fromDate(timestamp),
-    };
+  ActivityEntity toEntity() {
+    return ActivityEntity(
+      id: id,
+      userId: userId,
+      userName: userName,
+      action: action,
+      timestamp: timestamp,
+    );
   }
+
+  factory ActivityModel.fromJson(Map<String, dynamic> json) =>
+      _$ActivityModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ActivityModelToJson(this);
+
+  factory ActivityModel.fromMap(Map<String, dynamic> map, String id) {
+    return ActivityModel.fromJson({'id': id, ...map});
+  }
+
+  Map<String, dynamic> toMap() => toJson();
 }

@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 0.1.0+1
 
 environment:
-  sdk: ^3.12.2
+  sdk: ^3.12.0
 
 workspace:
   - packages/shared_ui
@@ -27,6 +27,7 @@ dependencies:
   flutter_riverpod: ^3.3.1
   get_it: ^7.7.0
   hooks_riverpod: any
+  http: ^1.2.0
   logger: ^2.7.0
   mason: ^0.1.2
   riverpod_annotation: any
@@ -105,7 +106,7 @@ melos:
       exec:
         concurrency: 1
       packageFilters:
-        scope: "features"
+        dirExists: "test/widget"
       description: Run golden and widget tests in all feature packages
 
     # Update golden baseline images
@@ -114,12 +115,19 @@ melos:
       exec:
         concurrency: 1
       packageFilters:
-        scope: "features"
+        dirExists: "test/widget"
       description: Update golden baseline screenshots
+
+    # Patrol E2E integration tests
+    test:patrol:
+      run: patrol test -d chrome --target integration_test/app_flow_test.dart
+      packageFilters:
+        dirExists: "integration_test"
+      description: Run Patrol E2E integration tests
 
     # Lint and analyze all packages
     analyze:
-      run: dart analyze --fatal-infos
+      run: flutter analyze .
       exec:
         concurrency: 4
       description: Analyze all packages for errors and warnings
@@ -149,19 +157,27 @@ melos:
     run:dev:
       run: flutter run --flavor development --target lib/main.dart
       packageFilters:
-        scope: "app"
+        isApp: true
       description: Run the app in development mode
 
     # Build release APK for Android
     build:android:
       run: flutter build apk --flavor production --target lib/main.dart --release
       packageFilters:
-        scope: "app"
+        isApp: true
       description: Build production APK
+
+    # Build development release APK for Android
+    build:android:dev:
+      run: flutter build apk --flavor development --target lib/main.dart --release
+      packageFilters:
+        isApp: true
+      description: Build development release APK
 
     # Build release IPA for iOS
     build:ios:
       run: flutter build ipa --flavor production --target lib/main.dart
       packageFilters:
-        scope: "app"
+        isApp: true
       description: Build production IPA
+

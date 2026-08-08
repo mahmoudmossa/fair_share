@@ -1,34 +1,24 @@
-class BillingCycleEntity {
+import 'package:equatable/equatable.dart';
+
+class BillingCycleEntity extends Equatable {
   final String id;
-  final String monthName;
-  final String status; // 'draft' | 'published'
+  final String? monthName;
   final double totalCosts;
-  final double settledPercentage;
+  final double? settledPercentage;
 
   const BillingCycleEntity({
     required this.id,
-    required this.monthName,
-    required this.status,
-    required this.totalCosts,
-    required this.settledPercentage,
+    this.monthName,
+    this.totalCosts = 0.0,
+    this.settledPercentage,
   });
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BillingCycleEntity &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          monthName == other.monthName &&
-          status == other.status &&
-          totalCosts == other.totalCosts &&
-          settledPercentage == other.settledPercentage;
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      monthName.hashCode ^
-      status.hashCode ^
-      totalCosts.hashCode ^
-      settledPercentage.hashCode;
+  List<Object?> get props => [
+        id,
+        monthName,
+        totalCosts,
+        settledPercentage,
+      ];
 }
+
