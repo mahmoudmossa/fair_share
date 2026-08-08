@@ -34,7 +34,7 @@ variables:
 
 # Base template for Dart/Flutter jobs running on Linux/Docker
 .flutter_docker_template:
-  image: ghcr.io/cirruslabs/flutter:FLUTTER_VERSION
+  image: ghcr.io/cirruslabs/flutter:$FLUTTER_VERSION
   before_script:
     - export PATH="$PATH:$HOME/.pub-cache/bin"
     - export PATH="$PATH:$PUB_CACHE/bin"
