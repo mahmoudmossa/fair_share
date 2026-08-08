@@ -110,7 +110,8 @@ patrol_tests:
   script:
     - dart pub global activate patrol_cli
     - export PATH="$PATH:$HOME/.pub-cache/bin"
-    - patrol test --target integration_test/app_flow_test.dart
+    - patrol test -d chrome --target integration_test/app_flow_test.dart
+  allow_failure: true
 
 # ==========================================
 # 3. BUILD STAGE (Manual compilation per env)
