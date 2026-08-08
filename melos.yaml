@@ -1,0 +1,100 @@
+name: fair_share
+repository: https://gitlab.com/fair_share/fair_share
+
+packages:
+  - .
+  - packages/*
+
+scripts:
+  # Code generation across all packages containing build_runner
+  generate:
+    run: dart run build_runner build --delete-conflicting-outputs
+    exec:
+      concurrency: 1
+    packageFilters:
+      dependsOn: build_runner
+    description: Run build_runner code generation in packages that depend on build_runner
+
+  # Check formatting without modifying code
+  format:check:
+    run: dart format . --line-length 80 --set-exit-if-changed
+    exec:
+      concurrency: 4
+    description: Verify formatting without applying changes across all packages
+
+  # Format all Dart files across the workspace
+  format:
+    run: dart format . --line-length 80
+    exec:
+      concurrency: 4
+    description: Format all Dart code across all packages
+
+  # Static analysis and linting
+  analyze:
+    run: flutter analyze .
+    exec:
+      concurrency: 4
+    description: Analyze all packages for lint errors and warnings
+
+  # Unit tests across all packages with a test folder
+  test:unit:
+    run: flutter test --coverage
+    exec:
+      concurrency: 4
+      failFast: true
+    packageFilters:
+      dirExists: "test"
+    description: Run all unit tests across all packages
+
+  # Widget and Golden tests
+  test:golden:
+    run: flutter test test/widget
+    exec:
+      concurrency: 1
+    packageFilters:
+      dirExists: "test/widget"
+    description: Run golden and widget tests in packages with widget tests
+
+  # Update golden baseline images
+  test:golden:update:
+    run: flutter test test/widget --update-goldens
+    exec:
+      concurrency: 1
+    packageFilters:
+      dirExists: "test/widget"
+    description: Update golden baseline screenshots
+
+  # Clean build artifacts across all packages
+  clean:
+    run: flutter clean
+    exec:
+      concurrency: 4
+    description: Clean all packages in the workspace
+
+  # Run app in development flavor
+  run:dev:
+    run: flutter run --flavor development --target lib/main.dart
+    packageFilters:
+      isApp: true
+    description: Run the application in development mode
+
+  # Build release APK for Android (Production)
+  build:android:
+    run: flutter build apk --flavor production --target lib/main.dart --release
+    packageFilters:
+      isApp: true
+    description: Build production release APK
+
+  # Build development release APK for Android
+  build:android:dev:
+    run: flutter build apk --flavor development --target lib/main.dart --release
+    packageFilters:
+      isApp: true
+    description: Build development release APK
+
+  # Build release IPA for iOS (Production)
+  build:ios:
+    run: flutter build ipa --flavor production --target lib/main.dart
+    packageFilters:
+      isApp: true
+    description: Build production release IPA
